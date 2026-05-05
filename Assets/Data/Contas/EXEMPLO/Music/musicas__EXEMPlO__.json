@@ -1,0 +1,43 @@
+{
+    "hash do arquivo da música diretamente": {
+        "id_playlist": "pl_012",
+        "caminho": "teste3",
+        "arquivo_original": "musica arquivo nativo",
+        "titulo_ID3_original": "titulo original (metadado ID3, caso exista)",
+        "artista_final": "Artista final definido pelo algoritmo",
+        "nome_musica_filtrado": {
+            "arquivo_mp3_filtrado": "arquivo original filtrado",
+            "titulo_ID3_filtrado": "titulo original filtrado"
+        },
+        "artista_filtrado": {
+            "artista_arquivo_mp3": "artista arquivo filtrado",
+            "artista_titulo_ID3": "artista do titulo (ID3) filtrado",
+            "artista_ID3_nativo": "artista nativamente imposto no arquivo"
+        },
+        "artista": {
+            "id_artista_deezer": "id retornado pela API da Deezer",
+            "img_medium": "caminho salvo em Imagens/Artistas/img.jpg",
+            "img_big": {
+                "link": "link",
+                "caminho": "caminho integral do arquivo, para ler como metadado e carregada em base64"
+            }
+        },
+        "album": {
+            "nome_album": "Nome do álbum retornado pela Deezer",
+            "id_album_deezer": "id retornado pela API da Deezer",
+            "img_medium": "caminho salvo em Imagens/Albuns/img.jpg",
+            "img_big": {
+                "link": "link",
+                "caminho": "caminho integral do arquivo, para ler como metadado e carregada em base64"
+            }
+        },
+        "metricas": {
+            "score": 0,
+            "status": "baixa / media / alta",
+            "gap": 0,
+            "consenso": 0,
+            "sim_1": 0,
+            "sim_2": 0
+        }
+    }
+}

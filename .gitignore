@@ -1,5 +1,6 @@
 .env
 client_secret_google.json
+contas.json
 __pycache__/
 *.pyc
 .vscode/

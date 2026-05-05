@@ -1,0 +1,8 @@
+.env
+client_secret_google.json
+__pycache__/
+*.pyc
+.vscode/
+Assets/Data/Contas/*
+!Assets/Data/Contas/EXEMPLO/
+!Assets/Data/Contas/EXEMPLO/**

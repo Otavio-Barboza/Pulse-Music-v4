@@ -1,5 +1,0 @@
-.env
-client_secret_google.json
-__pycache__/
-*.pyc
-.vscode/

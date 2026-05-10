@@ -49,6 +49,8 @@ class PipelineFase2:
     
     @classmethod
     async def ajustar_ambos(cls, lista_ambos : list[MusicaMetadados], caminho : str):
+        from .pipeline import Pipeline
+
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
@@ -61,7 +63,7 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
+                    ) if musica.artista_final is not None else None
                 )
                 musica.set_possiveis_artistas([musica.artista_meta_nativo])
                 musica.set_status(Status.ALTA)
@@ -132,6 +134,11 @@ class PipelineFase2:
                     id_art = musica.img_album.get('id')
                 )
 
+        await Pipeline.salvar_dados(
+            {Status.AMBOS : lista_ambos}
+        )
+        Pipeline.executar_callbacks(caminho)
+    
     @classmethod
     async def _resolver_musica(cls, fontes : GerenciadorFontes, musica : MusicaMetadados, estrategia : dict):
         artista_para_busca = estrategia['artista_para_busca'](musica)
@@ -188,6 +195,8 @@ class PipelineFase2:
     
     @classmethod
     async def resolver_medios_e_inconsistentes(cls, lista_medios : list[MusicaMetadados], lista_inconsistentes : list[MusicaMetadados], caminho : str):
+        from .pipeline import Pipeline
+
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
@@ -212,7 +221,7 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
+                    ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
@@ -308,7 +317,7 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
+                    ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
@@ -385,7 +394,15 @@ class PipelineFase2:
                         id_alb = musica.img_artista.get('id'),
                         id_art = musica.img_album.get('id')
                     )
-                    
+        
+        await Pipeline.salvar_dados(
+            {
+                Status.MEDIO : lista_medios,
+                Status.INCONSISTENTE : lista_inconsistentes
+            }
+        )
+        Pipeline.executar_callbacks(caminho)
+
     @classmethod
     def _estrategia_artista_filtrado(cls):
         return {
@@ -418,6 +435,7 @@ class PipelineFase2:
     
     @classmethod
     async def resolver_sem_artista_filtrado_ou_nativo(cls, lista_so_nativos : list[MusicaMetadados], lista_so_filtrados : list[MusicaMetadados], caminho : str):
+        from .pipeline import Pipeline
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
@@ -443,7 +461,7 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
+                    ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
@@ -539,7 +557,7 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
+                    ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
@@ -617,6 +635,14 @@ class PipelineFase2:
                         id_art = musica.img_album.get('id')
                     )
 
+        await Pipeline.salvar_dados(
+            {
+                Status.SEM_ART_FILTRADO : lista_so_nativos,
+                Status.SEM_ART_NATIVO : lista_so_filtrados
+            }
+        )
+        Pipeline.executar_callbacks(caminho)
+
     @classmethod
     def _calcular_score_apenas_titulo(cls, musica : MusicaMetadados, item : dict):
         similaridade_titulo = Validacao.similaridade(
@@ -656,6 +682,8 @@ class PipelineFase2:
         
     @classmethod
     async def resolver_apenas_titulos(cls,  lista_apenas_titulo : list[MusicaMetadados], caminho : str):
+        from .pipeline import Pipeline
+
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
@@ -672,7 +700,7 @@ class PipelineFase2:
                 if not resultado or not resultado.get('track'):
                     musica.set_status(Status.BAIXA)
                     musica.set_artista_final(None)
-                    musica.set_artista_id('')
+                    musica.set_artista_id(None)
                     musica.set_score(0)
                     continue
 
@@ -715,8 +743,9 @@ class PipelineFase2:
                 musica.set_artista_id(
                     MemoriaArtistas.resolver_id(
                         musica.artista_final
-                    )
-                )
+                    ) if musica.artista_final is not None else None
+                ) 
+
                 musica.set_consenso(consenso)
                 musica.set_gap(gap)
                 musica.set_sim_1(sim_1)
@@ -786,3 +815,8 @@ class PipelineFase2:
                         id_alb = musica.img_artista.get('id'),
                         id_art = musica.img_album.get('id')
                     )
+                
+        await Pipeline.salvar_dados(
+            {Status.APENAS_TITULO : lista_apenas_titulo}
+        )
+        Pipeline.executar_callbacks(caminho)

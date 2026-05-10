@@ -317,3 +317,24 @@ class PlaylistRepositorio:
                 pastas_existentes.append(caminho_pasta)
 
         return pastas_existentes
+    
+    @classmethod
+    def identificar_artista_da_musica(cls, id_musica : str) -> str:
+        json_musicas = cls.ler_json(
+            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json'
+        )
+
+        for chave, conteudo in json_musicas.items():
+            if chave == id_musica:
+                return conteudo.get('artista_final', 'Artista Desconhecido')
+            
+    @classmethod
+    def retornar_capa_musica(cls, nome_musica : str) -> str:
+        lista_capas = os.listdir(
+            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Capa Musica'
+        )
+
+        for capa in lista_capas:
+            if capa == nome_musica + '.jpg':
+                return f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Capa Musica/{capa}'
+        return r'Assets\Global\Images\Padrao\capa_musicas_desconhecidas.png'

@@ -43,6 +43,10 @@ class Persistencia:
         dados_finais = {}
         
         for musica in lista_objetos:
+            print()
+            print(musica.caminho, musica.arquivo_mp3_original)
+            print()
+            
             caminho_completo = os.path.normpath(
                 os.path.join(
                     musica.caminho, 

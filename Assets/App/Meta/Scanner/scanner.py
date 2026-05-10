@@ -11,6 +11,7 @@ class Scanner:
     @classmethod
     async def validar_dados_json(cls, dados : dict):
         from ..Models.scanner_model import ScannerModel
+        from ...Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
 
         pasta = dados.get('musicas').get('pasta')
         len_pasta = len(
@@ -27,6 +28,15 @@ class Scanner:
         )
        
         if musicas_removidas is not None:
+            if (
+                isinstance(EstadoPlay._playlist_aberta, dict) and
+                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+            ):
+                EstadoPlay.notificar(
+                    evento = 'att_musicas_exibidas',
+                    dados = None
+                )
+
             chaves = await cls.obter_chaves_por_caminho(musicas_removidas)
             
             if ScannerModel.esta_ocupado():
@@ -41,6 +51,15 @@ class Scanner:
             await asyncio.sleep(1)
 
         if musicas_novas is not None:   
+            if (
+                isinstance(EstadoPlay._playlist_aberta, dict) and
+                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+            ):
+                EstadoPlay.notificar(
+                    evento = 'att_musicas_exibidas',
+                    dados = None
+                )
+
             if ScannerModel.esta_ocupado():
                 return
             

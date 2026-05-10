@@ -14,6 +14,10 @@ class ModoPlaylist(Enum):
     GRID = "grid"
     LISTA = "lista"
 
+class PlaylistCarregada(Enum):
+    ABERTA = 'aberta'
+    FECHADA = 'fechada'
+
 class EstadoPlaylist:
     def __init__(self, grid):
         self.grid = grid
@@ -146,7 +150,7 @@ class EstadoPlaylist:
         return PlaylistRepositorio.verificar_pastas_existentes()
 
 class EstadoPlay:
-    _playlist_aberta = None
+    _playlist_aberta = PlaylistCarregada.FECHADA
     _callbacks = {}
 
     @classmethod
@@ -174,7 +178,7 @@ class EstadoPlay:
                 traceback.print_exc()
 
     @classmethod
-    def abrir_playlist(cls, id_playlist : str, status : bool):
+    def abrir_playlist(cls, id_playlist : str, status : PlaylistCarregada):
         cls._playlist_aberta = {
             'id' : id_playlist,
             'aberta' : status
@@ -182,4 +186,12 @@ class EstadoPlay:
 
     @classmethod
     def fechar_playlist(cls):
-        cls._playlist_aberta = None
+        cls._playlist_aberta = PlaylistCarregada.FECHADA
+
+    @classmethod
+    def retornar_artista_musica(cls, id_musica : str) -> str:
+        return PlaylistRepositorio.identificar_artista_da_musica(id_musica)
+    
+    @classmethod
+    def retornar_capa_musica(cls, nome_musica : str) -> str:
+        return PlaylistRepositorio.retornar_capa_musica(nome_musica)

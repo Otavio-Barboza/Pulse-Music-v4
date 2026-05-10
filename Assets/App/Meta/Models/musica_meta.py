@@ -5,7 +5,7 @@ class MusicaMetadados:
         self,
         # IDs a serem salvos
         id_playlist : str,
-        artista_id : str,
+        artista_id : str | None,
         
         # Elementos originais do arquivo (título e artista)
         arquivo_mp3_original : str,
@@ -152,5 +152,5 @@ class MusicaMetadados:
     def set_caminho(self, caminho : str):
         self.caminho = caminho
 
-    def set_artista_id(self, id : str):
+    def set_artista_id(self, id : str | None):
         self.id_artista = id

@@ -100,6 +100,7 @@ class PipelineFase3:
     @classmethod
     async def _async_fase_3(cls, lista_incompletas: list[MusicaMetadados], caminho : str):
         from ..Repository.extrai_metadados import ExtracaoMetadados
+        from .pipeline import Pipeline
 
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
@@ -130,7 +131,7 @@ class PipelineFase3:
                     musica.set_artista_id(
                         MemoriaArtistas.resolver_id(
                             musica.artista_final
-                        )
+                        ) if musica.artista_final is not None else None
                     )
                     continue
 
@@ -149,7 +150,7 @@ class PipelineFase3:
                     musica.set_artista_id(
                         MemoriaArtistas.resolver_id(
                             musica.artista_final
-                        )
+                        ) if musica.artista_final is not None else None
                     )
                     continue
 
@@ -165,7 +166,7 @@ class PipelineFase3:
                     musica.set_artista_id(
                         MemoriaArtistas.resolver_id(
                             musica.artista_final
-                        )
+                        ) if musica.artista_final is not None else None
                     )
                     musica.set_status(dados_apenas_titulo["status"])
                     musica.set_score(dados_apenas_titulo["sim_1"])
@@ -256,7 +257,7 @@ class PipelineFase3:
                     musica.set_artista_id(
                         MemoriaArtistas.resolver_id(
                             musica.artista_final
-                        )
+                        ) if musica.artista_final is not None else None
                     )
 
                     musica.set_score(melhor_score)
@@ -330,3 +331,8 @@ class PipelineFase3:
                         id_alb = musica.img_artista.get('id'),
                         id_art = musica.img_album.get('id')
                     )
+
+        await Pipeline.salvar_dados(
+            {Status.INCOMPLETO : lista_incompletas}
+        )
+        Pipeline.executar_callbacks(caminho)

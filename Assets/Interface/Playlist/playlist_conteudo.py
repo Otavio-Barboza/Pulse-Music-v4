@@ -1,6 +1,7 @@
 from ...App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist
 from ...App.Audio.Controller.estado_musica import EstadoMusica
 from ...App.Music.Fontes.fonte_playlist import FontePlaylist
+from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
 from .Base.grid_playlists import GridPlaylists
 from .Base.list_musicas import ListViewMusicas
 from .overlay import ContainerOverlay
@@ -81,7 +82,7 @@ class PlaylistConteudo(ft.Container):
         list_view = ListViewMusicas(
             page = self.page,
             musicas = EstadoMusica.fila_ativa,
-            tipagem = 'play' # para as favoritas é FAV
+            pasta_musicas = card.pasta
         )
         
         self.content = list_view
@@ -89,7 +90,7 @@ class PlaylistConteudo(ft.Container):
 
         EstadoPlay.abrir_playlist(
             id_playlist = card.data['id'],
-            status = True
+            status = PlaylistCarregada.ABERTA
         )
         
     def fechar_playlist(self):

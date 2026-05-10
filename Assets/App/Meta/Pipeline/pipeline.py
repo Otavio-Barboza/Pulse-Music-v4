@@ -34,6 +34,51 @@ class Pipeline:
         return musica
     
     @classmethod
+    async def salvar_dados(cls, grupos : dict):
+        from ..Memoria.memoria_artistas import MemoriaArtistas
+
+        await Persistencia.gerenciar_dados_json_musicas(grupos = grupos)
+        await MemoriaArtistas.salvar()
+        await Persistencia.atribuir_memoria()
+    
+    @classmethod
+    def executar_callbacks(cls, caminho : str):
+        from ...Services.Controllers.estado_grid import EstadoGrid, GridMode
+        from ...Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
+
+        EstadoGrid._notificar(
+            evento = 'att_grid', 
+            dados = GridMode.ARTISTA
+        )
+        EstadoGrid._notificar(
+            evento = 'att_grid',
+            dados = GridMode.ALBUM
+        )
+        
+        EstadoPlay.notificar(
+            evento = 'att_qtde_play',
+            dados = {
+                'id' : id,
+                'qtde' : len(
+                    os.listdir(caminho)
+                )
+            }
+        )
+
+        if (
+            isinstance(EstadoPlay._playlist_aberta, dict) and 
+            EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+        ):
+            EstadoPlay.notificar(
+                evento = 'att_artista',
+                dados = None
+            )
+            EstadoPlay.notificar(
+                evento = 'att_capa',
+                dados = None
+            )
+
+    @classmethod
     def _processar_wrapper_sync(cls, caminho : str, lista_objetos : list = [], id_playlist : str | None = None) -> list[MusicaMetadados]:
         from ..Models.scanner_model import ScannerModel
         from ..Controller.scanner_controller import ScannerController
@@ -63,8 +108,6 @@ class Pipeline:
 
             print(f"[PIPELINE ERROR]: {e}")
             traceback.print_exc()
-    
-            # notificação de erro
         finally:
             ScannerModel.finalizar_tarefa()
             
@@ -178,36 +221,19 @@ class Pipeline:
                             ),
                             id_playlist = id
                         ))
+        
+        grupo_fase_0 = {Status.METADADOS_FASE_0 : lista_já_processadas}
+        await cls.salvar_dados(grupos = grupo_fase_0)
+        cls.executar_callbacks(caminho)
 
         grupos = await PipelineFase2._async_fase_2(
             lista = lista, 
             caminho = caminho
         )
+        
         await PipelineFase3._async_fase_3(
             lista_incompletas = grupos[Status.INCOMPLETO], 
             caminho = caminho
         )
-        
-        grupos[Status.METADADOS_FASE_0] = lista_já_processadas
-        await Persistencia.gerenciar_dados_json_musicas(grupos = grupos)
-        await Persistencia.atribuir_memoria()
-        await MemoriaArtistas.salvar()
 
-        EstadoGrid._notificar(
-            evento = 'att_grid', 
-            dados = GridMode.ARTISTA
-        )
-        EstadoGrid._notificar(
-            evento = 'att_grid',
-            dados = GridMode.ALBUM
-        )
-        
-        EstadoPlay.notificar(
-            evento = 'att_qtde_play',
-            dados = {
-                'id' : id,
-                'qtde' : len(
-                    os.listdir(caminho)
-                )
-            }
-        )
+        cls.executar_callbacks(caminho)

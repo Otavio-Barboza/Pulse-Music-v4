@@ -28,7 +28,10 @@ class MemoriaArtistas:
         await Persistencia.salvar_artistas(cls.cache_id)
 
     @classmethod
-    def resolver_id(cls, nome_org : str) -> str:
+    def resolver_id(cls, nome_org : str | None) -> str:
+        if nome_org is None:
+            return None
+        
         nome = cls._normalizar(nome_org)
 
         if nome in cls.index_nome:
@@ -69,7 +72,6 @@ class MemoriaArtistas:
         artista_id : str,
         nome : str
     ):
-        
         aliases = cls.cache_id[artista_id]['aliases']
 
         if nome not in aliases:

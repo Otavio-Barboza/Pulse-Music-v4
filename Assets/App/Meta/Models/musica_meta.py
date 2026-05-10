@@ -3,31 +3,45 @@ from Assets.App.Meta.Controller.status import Status
 class MusicaMetadados:
     def __init__(
         self,
+        # IDs a serem salvos
         id_playlist : str,
+        artista_id : str,
+        
+        # Elementos originais do arquivo (título e artista)
         arquivo_mp3_original : str,
-        arquivo_mp3_filtrado : str | None,
         titulo_musica_original : str | None,
-        titulo_musica_filtrado : str | None,
-        artista_arquivo_filtrado : str | None,
-        artista_titulo_filtrado : str | None,
         artista_meta_nativo : str | None,
+
+        # Elementos filtrados ou captados
+        titulo_musica_filtrado : str | None,
+        artista_titulo_filtrado : str | None,
+        arquivo_mp3_filtrado : str | None,
+        artista_arquivo_filtrado : str | None,
+
         artista_final : str | None,
+        
+        # Classificações do processo (sobretudo em casos que contém apenas o título, sem nenhuma referência de artista)
         score : float | int,
         status : Status,
-        caminho_musica : str | None = None,
         sim_1 : None | float = None,
         sim_2 : None | float = None,
         gap : None | float = None,
         consenso : None | float = None,
+
+        caminho_musica : str | None = None,
         lista_artistas_possiveis : list[dict] | None = None,
+
+        # Dados artista
         img_artista : dict = {
-            'id' : None, # str do ID 
+            'id_deezer' : None,
             'medium' : None, # str do caminho da img medium salva
             'big' : {
                 'link' : None,
                 'caminho' : None # str da musica sendo salva.
             } 
         },
+
+        # Dados álbum
         img_album : dict = {
             'id' : None, 
             'nome' : None, 
@@ -40,7 +54,8 @@ class MusicaMetadados:
     ):
         self.caminho = caminho_musica
         self.id_playlist = id_playlist
-        
+        self.id_artista = artista_id
+
         # nome do .mp3
         self.arquivo_mp3_original = arquivo_mp3_original
         self.arquivo_mp3_filtrado = arquivo_mp3_filtrado
@@ -136,3 +151,6 @@ class MusicaMetadados:
         
     def set_caminho(self, caminho : str):
         self.caminho = caminho
+
+    def set_artista_id(self, id : str):
+        self.id_artista = id

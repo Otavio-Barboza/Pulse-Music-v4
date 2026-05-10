@@ -5,6 +5,7 @@ from Assets.App.Meta.Providers.deezer import GerenciadorFontes
 from ..Models.musica_meta import MusicaMetadados
 from ..Repository.persistencia import Persistencia
 from ...Services.gerenciador_contas import GerenciadorContas
+from ..Memoria.memoria_artistas import MemoriaArtistas
 import aiohttp, os
 
 class PipelineFase3:
@@ -105,8 +106,6 @@ class PipelineFase3:
         
         async with aiohttp.ClientSession() as session:
             fontes = GerenciadorFontes(session)
-            cont_apenas_titulo = 0
-            cont_com_artista = 0
 
             for musica in lista_incompletas:
 
@@ -128,6 +127,11 @@ class PipelineFase3:
                             filtro['artista']
                         ) or None
                     )  
+                    musica.set_artista_id(
+                        MemoriaArtistas.resolver_id(
+                            musica.artista_final
+                        )
+                    )
                     continue
 
                 melhor_item, melhor_score, dados_apenas_titulo = await cls._resolver_musica_fase_3(fontes, filtro)
@@ -142,6 +146,11 @@ class PipelineFase3:
                             filtro['artista']
                         ) or None
                     )  
+                    musica.set_artista_id(
+                        MemoriaArtistas.resolver_id(
+                            musica.artista_final
+                        )
+                    )
                     continue
 
                 # 🔹 CASO APENAS TÍTULO
@@ -153,6 +162,11 @@ class PipelineFase3:
                             filtro['artista']
                         ) or None
                     )  
+                    musica.set_artista_id(
+                        MemoriaArtistas.resolver_id(
+                            musica.artista_final
+                        )
+                    )
                     musica.set_status(dados_apenas_titulo["status"])
                     musica.set_score(dados_apenas_titulo["sim_1"])
                     musica.set_gap(dados_apenas_titulo["gap"])
@@ -239,6 +253,12 @@ class PipelineFase3:
                             filtro['artista']
                         ) or None
                     )  
+                    musica.set_artista_id(
+                        MemoriaArtistas.resolver_id(
+                            musica.artista_final
+                        )
+                    )
+
                     musica.set_score(melhor_score)
 
                     if melhor_score >= 0.85:

@@ -63,10 +63,13 @@ class Persistencia:
     
     @classmethod
     async def atribuir_memoria(cls):
-        from ..Models.memoria_global import memoria
+        from ..Memoria.memoria_global import memoria
+        from ..Memoria.memoria_artistas import MemoriaArtistas
 
         dados = await cls.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
         memoria.carregar(dados)
+
+        await MemoriaArtistas.carregar()
 
     @classmethod
     async def scanear_dados(cls):
@@ -118,3 +121,18 @@ class Persistencia:
                 print(f'Imagem não encontrada: {caminho_img}')
         except Exception as erro:
             print(f'Erro ao remover a imagem: {erro}')
+
+    
+    # artistas
+    @classmethod
+    async def ler_artistas(cls) -> dict:
+        return await cls.ler_json(
+            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/artistas.json'
+        )
+    
+    @classmethod
+    async def salvar_artistas(cls, data : dict):
+        await cls.salvar_json(
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/artistas.json',
+            dados = data
+        )

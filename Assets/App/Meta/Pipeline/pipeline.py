@@ -81,6 +81,7 @@ class Pipeline:
     @classmethod
     async def _async_processar_musica(cls, caminho : str, lista_objetos : list = [], id : str | None = None) -> list[MusicaMetadados]:
         from ...Services.Controllers.estado_grid import GridMode, EstadoGrid
+        from ..Memoria.memoria_artistas import MemoriaArtistas
 
         lista_já_processadas = []
         lista = []
@@ -110,6 +111,9 @@ class Pipeline:
                 lista_já_processadas.append(
                     MusicaMetadados(
                         id_playlist = id,
+                        artista_id = MemoriaArtistas.resolver_id(
+                            mus.get('artista')
+                        ),
                         titulo_musica_filtrado = mus.get('titulo'),
                         artista_final = mus.get('artista'),
                         arquivo_mp3_original = musica,
@@ -167,6 +171,7 @@ class Pipeline:
                             nome_arquivo_original = musica,
                             titulo_filtrado = titulo_filtrado,
                             artista_meta_nativo = artista_filtrado,
+                            id_artista = '',
                             status = await cls._async_classificar_presenca(
                                 titulo_filtrado = titulo_filtrado, 
                                 artista_filtrado = artista_filtrado    
@@ -186,6 +191,7 @@ class Pipeline:
         grupos[Status.METADADOS_FASE_0] = lista_já_processadas
         await Persistencia.gerenciar_dados_json_musicas(grupos = grupos)
         await Persistencia.atribuir_memoria()
+        await MemoriaArtistas.salvar()
 
         EstadoGrid._notificar(
             evento = 'att_grid', 

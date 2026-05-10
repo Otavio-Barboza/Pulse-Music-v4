@@ -10,6 +10,7 @@ class GerenciaMetadados:
             'arquivo_original' : musica.arquivo_mp3_original,
             'titulo_ID3_original' : musica.titulo_musica_original,
             'artista_final' : musica.artista_final,
+            'artista_id' : musica.id_artista,
 
             'nome_musica_filtrado' : {
                 'arquivo_mp3_filtrado' : musica.arquivo_mp3_filtrado,
@@ -23,7 +24,7 @@ class GerenciaMetadados:
             },
 
             'artista' : {
-                'id_artista_deezer' : musica.img_artista['id'],
+                'id_artista_deezer' : musica.img_artista.get('id', None),
                 'img_medium' : musica.img_artista['medium'],
                 'img_big' : musica.img_artista['big']
             },

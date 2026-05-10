@@ -1,6 +1,6 @@
 from ...App.Services.Controllers.estado_grid import GridMode, EstadoGrid
 from ..Others.overlay_imagens import OverlayImagens
-from ...App.Meta.Models.memoria_global import memoria
+from ...App.Meta.Memoria.memoria_global import memoria
 from ...App.Meta.Repository.extrai_metadados import ExtracaoMetadados
 import flet as ft
 import os

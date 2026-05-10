@@ -26,7 +26,7 @@ def abrir_perfil(id_atual):
     with open(f"Assets/Data/Contas/{id_atual}/perfil.json") as js:
         dados_perfil = json.load(js)
         return dados_perfil
-    
+   
 async def main(page : ft.Page):
     page.title = 'Pulse Music'
     page.padding = 0
@@ -83,10 +83,13 @@ async def main(page : ft.Page):
             EstadoApp.notificar('sem_conta')
 
     async def carregar_memoria():
-        from Assets.App.Meta.Models.memoria_global import memoria
-    
+        from Assets.App.Meta.Memoria.memoria_global import memoria
+        from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
+        
         dados = await Persistencia.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
         memoria.carregar(dados)
+
+        await MemoriaArtistas.carregar()
 
     await validar_login()
 

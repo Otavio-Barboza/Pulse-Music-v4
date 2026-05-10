@@ -1,5 +1,5 @@
-from .artista_meta import MusicasArtistas
-from .albuns_meta import MusicasAlbuns
+from ..Models.artista_meta import MusicasArtistas
+from ..Models.albuns_meta import MusicasAlbuns
 
 class MemoriaMetadados:
     def __init__(self):

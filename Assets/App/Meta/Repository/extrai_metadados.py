@@ -54,7 +54,7 @@ class ExtracaoMetadados:
         }
 
     @classmethod
-    async def _async_organiza_dados(cls, nome_arquivo_original : str, titulo_filtrado : dict | None, artista_meta_nativo : str | None, status : str, id_playlist : str | None = None) -> MusicaMetadados:
+    async def _async_organiza_dados(cls, nome_arquivo_original : str, titulo_filtrado : dict | None, artista_meta_nativo : str | None, status : str, id_playlist : str | None = None, id_artista : str = '') -> MusicaMetadados:
         """
             Organiza os dados retornados das filtragens e extrações de metadados
         Args:
@@ -68,6 +68,7 @@ class ExtracaoMetadados:
         """
         return MusicaMetadados(
             id_playlist = id_playlist,
+            artista_id = id_artista,
             arquivo_mp3_original = nome_arquivo_original,
             titulo_musica_original = titulo_filtrado['titulo_original'] if titulo_filtrado is not None else None,
             titulo_musica_filtrado = titulo_filtrado['titulo_filtrado'] if titulo_filtrado is not None else None,

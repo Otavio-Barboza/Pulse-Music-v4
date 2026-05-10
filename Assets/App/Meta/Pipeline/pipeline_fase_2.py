@@ -4,8 +4,9 @@ from Assets.App.Meta.Controller.status import Status
 from Assets.App.Meta.Providers.deezer import GerenciadorFontes
 from ..Models.musica_meta import MusicaMetadados
 from ..Repository.persistencia import Persistencia
-from ....App.Services.gerenciador_contas import GerenciadorContas
+from ....App.Services.gerenciador_contas import GerenciadorContas       
 from ..Repository.extrai_metadados import ExtracaoMetadados
+from ..Memoria.memoria_artistas import MemoriaArtistas
 import aiohttp, os
 
 class PipelineFase2:
@@ -56,6 +57,11 @@ class PipelineFase2:
             for musica in lista_ambos:
                 musica.set_artista_final(
                     Filtragem._limpar_feat(musica.artista_titulo_filtrado)
+                )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
                 )
                 musica.set_possiveis_artistas([musica.artista_meta_nativo])
                 musica.set_status(Status.ALTA)
@@ -203,6 +209,12 @@ class PipelineFase2:
                 musica.set_artista_final(
                     Filtragem._limpar_feat(artista_final)
                 )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
+                )
+
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado, musica.artista_meta_nativo])  
                 musica.set_caminho(caminho)
@@ -293,6 +305,12 @@ class PipelineFase2:
                 musica.set_artista_final(
                     Filtragem._limpar_feat(artista_final)
                 )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
+                )
+
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado, musica.artista_meta_nativo])
                 musica.set_caminho(caminho)
@@ -422,6 +440,12 @@ class PipelineFase2:
                 musica.set_artista_final(
                     Filtragem._limpar_feat(artista_final)
                 )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
+                )
+
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_meta_nativo])  
                 musica.set_caminho(caminho)
@@ -512,6 +536,12 @@ class PipelineFase2:
                 musica.set_artista_final(
                     Filtragem._limpar_feat(artista_final)
                 )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
+                )
+
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado])  
                 musica.set_caminho(caminho)
@@ -642,6 +672,7 @@ class PipelineFase2:
                 if not resultado or not resultado.get('track'):
                     musica.set_status(Status.BAIXA)
                     musica.set_artista_final(None)
+                    musica.set_artista_id('')
                     musica.set_score(0)
                     continue
 
@@ -680,6 +711,11 @@ class PipelineFase2:
 
                 musica.set_artista_final(
                     Filtragem._limpar_feat(artista_final)
+                )
+                musica.set_artista_id(
+                    MemoriaArtistas.resolver_id(
+                        musica.artista_final
+                    )
                 )
                 musica.set_consenso(consenso)
                 musica.set_gap(gap)

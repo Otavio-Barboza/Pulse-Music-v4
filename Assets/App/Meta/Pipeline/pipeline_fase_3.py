@@ -175,14 +175,12 @@ class PipelineFase3:
                     musica.set_sim_2(dados_apenas_titulo["sim_2"])
                     musica.set_consenso(dados_apenas_titulo["consenso"])
                     
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
-
                     caminho_img_medium_art = Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )
                     )
@@ -269,14 +267,12 @@ class PipelineFase3:
                     else:
                         musica.set_status(Status.BAIXA)       
 
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
-
                     caminho_img_medium_art = Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )
                     )

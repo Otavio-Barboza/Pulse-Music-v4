@@ -48,11 +48,13 @@ class Abas(ft.Tabs):
         self.pesquisa_musica = PesquisaMusica(page = self.page)
         self.artistas = GridImagens(
             modo = GridMode.ARTISTA,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas',
+            page = self.page
         )
         self.albuns = GridImagens(
             modo = GridMode.ALBUM,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
+            page = self.page
         )
         
         self._criar_tabs()

@@ -17,15 +17,23 @@ class MemoriaMetadados:
         self.artistas = MusicasArtistas()
         self.albuns = MusicasAlbuns()
 
-        for track_id, dados in self.tracks.items():
-            from pathlib import Path
+        for chave, dados in self.tracks.items():
 
-            caminho_art = os.path.join(dados.get('caminho', ''), dados.get("arquivo_original", ""))
             self.artistas.adicionar_musica(
-                nome = dados.get('artista_final'),
-                caminho_completo = dados.get('artista', '').get('img_big', '').get('caminho', '') or caminho_art
+                # Elementos da música
+                chave_musica = chave,
+                caminho_chave_musica = os.path.normpath(
+                    os.path.join(
+                        dados.get('caminho'), dados.get('arquivo_original')
+                    )
+                ),
+                
+                # Elementos do artista
+                artista_id = dados.get('artista_id'),
+                nome_artista_final = dados.get('artista_final')
             )
-
+            
+            # álbuns mantido nessa base ainda de operação
             caminho_alb = os.path.join(dados.get('caminho', ''), dados.get('arquivo_original', ''))
             self.albuns.adicionar_album(
                 nome = dados.get('album').get('nome_album'),

@@ -92,6 +92,7 @@ async def main(page : ft.Page):
         await MemoriaArtistas.carregar()
 
     await validar_login()
+    await carregar_memoria()
 
     config_painel = None
     tabs = Abas(page = page)
@@ -136,7 +137,6 @@ async def main(page : ft.Page):
     page.on_resized = ResizeManager.executar
     AudioLoop.iniciar()
     
-    await carregar_memoria()
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )

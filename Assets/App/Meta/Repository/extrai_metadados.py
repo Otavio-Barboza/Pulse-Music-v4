@@ -357,7 +357,7 @@ class ExtracaoMetadados:
         return resultado
     
     @classmethod
-    def extrair_imagens_mp3(cls, caminho_arquivo: str, nome : dict, nome_capa : str):
+    def extrair_imagens_mp3(cls, caminho_arquivo: str, nome : dict, nome_capa : str, artista_id : str | None = None):
         from ...Services.gerenciador_contas import GerenciadorContas
         from ..Repository.normalizacao import Filtragem
 
@@ -388,8 +388,7 @@ class ExtracaoMetadados:
                     pasta_destino = f'Assets/Data/Contas/{conta}/Imagens/Capa Musica/{nome_capa}.jpg'
                     dic["capa"] = pasta_destino
                 elif tag.desc == 'PLAYER_ARTIST_MEDIUM':
-                    nome_norm = Filtragem.artista_base(nome.get("artista"))
-                    pasta_destino = f'Assets/Data/Contas/{conta}/Imagens/Artistas/{nome_norm}.jpg'
+                    pasta_destino = f'Assets/Data/Contas/{conta}/Imagens/Artistas/{artista_id}.jpg'
                     dic["art"] = pasta_destino
                 elif tag.desc == 'PLAYER_ALBUM_MEDIUM':
                     pasta_destino = f'Assets/Data/Contas/{conta}/Imagens/Albuns/{nome.get("album")}.jpg'

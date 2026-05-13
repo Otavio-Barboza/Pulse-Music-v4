@@ -76,11 +76,6 @@ class Persistencia:
         await MemoriaArtistas.carregar()
 
     @classmethod
-    async def scanear_dados(cls):
-        dados = cls.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/playlists.json')
-        print(dados)
-
-    @classmethod
     def baixar_imagem(cls, url: str, caminho_destino: str) -> str | None:
         """
         Baixa uma imagem via URL e salva no caminho especificado.

@@ -143,20 +143,23 @@ class Pipeline:
             # FASE 0 - verificação da existencia de dados já alterados pelo próprio player, assim carregamento dos dados já imbutidos.
             if ExtracaoMetadados.musica_ja_processada(caminho_arquivo):
                 mus = ExtracaoMetadados.extrair_metadados_player(caminho_arquivo)
-
+                
+                artista_id = MemoriaArtistas.resolver_id(
+                    mus.get('artista')
+                )
+                
                 dic = await asyncio.to_thread(
                     ExtracaoMetadados.extrair_imagens_mp3,
                     caminho_arquivo, 
                     mus, 
-                    musica.replace('.mp3', '')
+                    musica.replace('.mp3', ''),
+                    artista_id
                 )
-
+                
                 lista_já_processadas.append(
                     MusicaMetadados(
                         id_playlist = id,
-                        artista_id = MemoriaArtistas.resolver_id(
-                            mus.get('artista')
-                        ),
+                        artista_id = artista_id,
                         titulo_musica_filtrado = mus.get('titulo'),
                         artista_final = mus.get('artista'),
                         arquivo_mp3_original = musica,

@@ -72,13 +72,12 @@ class PipelineFase2:
                 
                 dados_deezer = await fontes.deezer.buscar_musica(titulo = musica.titulo_musica_filtrado, artista = musica.artista_final)
                 
-                nome_art_norm = Filtragem.artista_base(musica.artista_final)
                 caminho_img_medium_art = Persistencia.baixar_imagem(
                     url = dados_deezer['track'][0]['artist']['picture_medium'],
                     caminho_destino = os.path.normpath(
                         os.path.join(
                             CAMINHO_ARTISTAS, 
-                            nome_art_norm + '.jpg'
+                            musica.id_artista + '.jpg'
                         )
                     )
                 )
@@ -236,14 +235,13 @@ class PipelineFase2:
                     musica.set_status(Status.BAIXA)
 
                 if melhor_item is not None:
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
 
                     caminho_img_medium_art = Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )
                     )
@@ -332,14 +330,13 @@ class PipelineFase2:
                     musica.set_status(Status.BAIXA)
 
                 if melhor_item is not None:
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
 
                     caminho_img_medium_art =  Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )   
                     )
@@ -476,14 +473,13 @@ class PipelineFase2:
                     musica.set_status(Status.BAIXA)
 
                 if melhor_item is not None:
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
 
                     caminho_img_medium_art = Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )
                     )
@@ -572,14 +568,13 @@ class PipelineFase2:
                     musica.set_status(Status.BAIXA)
 
                 if melhor_item is not None:
-                    nome_art_norm = Filtragem.artista_base(musica.artista_final)
 
                     caminho_img_medium_art = Persistencia.baixar_imagem(
                         url = melhor_item['artist']['picture_medium'],
                         caminho_destino = os.path.normpath(
                             os.path.join(
                                 CAMINHO_ARTISTAS, 
-                                nome_art_norm + '.jpg'
+                                musica.id_artista + '.jpg'
                             )
                         )
                     )
@@ -753,14 +748,12 @@ class PipelineFase2:
                 musica.set_status(status_artista_final)
                 musica.set_caminho(caminho)
 
-                nome_art_norm = Filtragem.artista_base(musica.artista_final)
-
                 caminho_img_medium_art = Persistencia.baixar_imagem(
                     url = top5[0]['artist']['picture_medium'],
                     caminho_destino = os.path.normpath(
                         os.path.join(
                             CAMINHO_ARTISTAS, 
-                            nome_art_norm + '.jpg'
+                            musica.id_artista + '.jpg'
                         )
                     )
                 )

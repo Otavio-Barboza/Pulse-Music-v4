@@ -17,39 +17,31 @@ class GridImagens(ft.GridView):
         self.page = page
         self.modo = modo
 
-        for img in os.listdir(caminho):
-            if self.modo == GridMode.ARTISTA:
-                nome = memoria.artistas.to_dict().get(
-                    img.removesuffix('.jpg')
-                ).get('nome_artistas')
-            else:
-                nome = img.removesuffix('.jpg')
-                
-            self.controls.extend([
-                ft.Container(
-                    data = img.removesuffix('.jpg'),
-                    on_click = self.click,
+        self.controls = [
+            ft.Container(
+                data = img.removesuffix('.jpg'),
+                on_click = self.click,
 
-                    content = ft.Column(
-                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                        alignment = ft.MainAxisAlignment.START,
+                content = ft.Column(
+                    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                    alignment = ft.MainAxisAlignment.START,
 
-                        controls = [
-                            Imagem(
-                                src = f'{caminho}/{img}', 
-                                modo = self.modo
-                            ),
-                            ft.Text(
-                                value = nome,
-                                text_align = ft.TextAlign.CENTER,
-                                size = 16,
-                                weight = ft.FontWeight.W_300
-                            )
-                        ]
-                    )
+                    controls = [
+                        Imagem(
+                            src = f'{caminho}/{img}', 
+                            modo = modo
+                        ),
+                        ft.Text(
+                            value = img.removesuffix('.jpg'),
+                            text_align = ft.TextAlign.CENTER,
+                            size = 16,
+                            weight = ft.FontWeight.W_300
+                        )
+                    ]
                 )
-            ])
-               
+            ) for img in os.listdir(caminho)
+        ]
+        
         EstadoGrid.registrar_callback(
             evento = 'att_grid',
             func = self.reconstruir_imagens
@@ -89,7 +81,7 @@ class GridImagens(ft.GridView):
             return
         
         caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/{"Artistas" if modo == GridMode.ARTISTA else "Albuns"}'
-      
+        
         self.controls.clear()
         
         for img in os.listdir(caminho):
@@ -125,8 +117,7 @@ class GridImagens(ft.GridView):
                 )
             ])
         
-        if self.page:
-            self.update()
+        self.update()
         
 class Imagem(ft.Image):
     def __init__(self, src : str, modo : GridMode):

@@ -10,6 +10,7 @@ from Assets.App.Services.Auth.google_login_auth import login_google
 from Assets.App.Services.gerenciador_contas import GerenciadorContas
 from Assets.App.Meta.Repository.persistencia import Persistencia
 from Assets.App.Meta.Models.scanner_model import ScannerModel
+from Assets.Interface.Grids.grid import GridMode
 import asyncio, json
 import flet as ft
 
@@ -88,11 +89,10 @@ async def main(page : ft.Page):
         
         dados = await Persistencia.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
         memoria.carregar(dados)
-
+        print(memoria.artistas.to_dict())        
         await MemoriaArtistas.carregar()
 
     await validar_login()
-    await carregar_memoria()
 
     config_painel = None
     tabs = Abas(page = page)
@@ -137,9 +137,13 @@ async def main(page : ft.Page):
     page.on_resized = ResizeManager.executar
     AudioLoop.iniciar()
     
+    await carregar_memoria()
+    
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )
+    
+    tabs.atualizar_grids()
     
 if __name__ == '__main__':
     asyncio.run(

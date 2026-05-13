@@ -124,3 +124,9 @@ class Abas(ft.Tabs):
             icone.visible = not compacto
 
         self.update()
+        
+    def atualizar_grids(self):
+        self.tabs[1].content.reconstruir_imagens(
+            modo = GridMode.ARTISTA
+        )
+        self.tabs[1].update()

@@ -11,6 +11,7 @@ from Assets.App.Services.gerenciador_contas import GerenciadorContas
 from Assets.App.Meta.Repository.persistencia import Persistencia
 from Assets.App.Meta.Models.scanner_model import ScannerModel
 from Assets.Interface.Grids.grid import GridMode
+from Assets.App.Meta.Memoria.memoria_global import memoria
 import asyncio, json
 import flet as ft
 
@@ -79,6 +80,7 @@ async def main(page : ft.Page):
                 dados = perfil
             )
 
+            await carregar_memoria()
             EstadoApp.notificar('conta_atual', GerenciadorContas.usuario()) 
         else:
             EstadoApp.notificar('sem_conta')
@@ -89,9 +91,9 @@ async def main(page : ft.Page):
         
         dados = await Persistencia.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
         memoria.carregar(dados)
-        print(memoria.artistas.to_dict())        
         await MemoriaArtistas.carregar()
 
+    # await carregar_memoria()
     await validar_login()
 
     config_painel = None
@@ -137,13 +139,27 @@ async def main(page : ft.Page):
     page.on_resized = ResizeManager.executar
     AudioLoop.iniciar()
     
-    await carregar_memoria()
     
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )
     
-    tabs.atualizar_grids()
+    # tabs.atualizar_grids()
+    
+    # def teste():
+    #     import os
+    #     imgs = dict()
+        
+    #     for img in os.listdir(r'Assets\Data\Contas\115700472009531668447\Imagens\Artistas'):
+    #         chave = img.removesuffix('.jpg')
+    #         dados = memoria.artistas.to_dict()
+    #         artista = dados.get(chave).get('nome_artistas')
+            
+    #         print(artista)
+                
+    #     # print(imgs)
+            
+    # teste()
     
 if __name__ == '__main__':
     asyncio.run(

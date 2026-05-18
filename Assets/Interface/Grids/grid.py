@@ -17,30 +17,8 @@ class GridImagens(ft.GridView):
         self.page = page
         self.modo = modo
 
-        self.controls = [
-            ft.Container(
-                data = img.removesuffix('.jpg'),
-                on_click = self.click,
-
-                content = ft.Column(
-                    horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                    alignment = ft.MainAxisAlignment.START,
-
-                    controls = [
-                        Imagem(
-                            src = f'{caminho}/{img}', 
-                            modo = modo
-                        ),
-                        ft.Text(
-                            value = img.removesuffix('.jpg'),
-                            text_align = ft.TextAlign.CENTER,
-                            size = 16,
-                            weight = ft.FontWeight.W_300
-                        )
-                    ]
-                )
-            ) for img in os.listdir(caminho)
-        ]
+        self.controls = []
+        self.reconstruir_imagens(self.modo)
         
         EstadoGrid.registrar_callback(
             evento = 'att_grid',
@@ -50,7 +28,7 @@ class GridImagens(ft.GridView):
     def click(self, e):        
         if self.modo == GridMode.ARTISTA:
             dados = memoria.artistas.to_dict()
-            caminho = dados.get()
+            caminho = dados.get('caminho_chave_musica')
             img = ExtracaoMetadados.carregar_imagem_big_base64(
                 caminho_arquivo = lista_mus[-1], 
                 tipo = 'artist'
@@ -85,16 +63,16 @@ class GridImagens(ft.GridView):
         self.controls.clear()
         
         for img in os.listdir(caminho):
+            chave_img = img.removesuffix('.jpg')
+            
             if self.modo == GridMode.ARTISTA:
-                nome = memoria.artistas.to_dict().get(
-                    img.removesuffix('.jpg')
-                ).get('nome_artistas')
+                nome = memoria.artistas.to_dict().get(chave_img).get('nome_artistas')
             else:
-                nome = img.removesuffix('.jpg')
+                nome = chave_img
                 
             self.controls.extend([
                 ft.Container(
-                    data = img.removesuffix('.jpg'),
+                    data = chave_img,
                     on_click = self.click,
 
                     content = ft.Column(
@@ -117,7 +95,8 @@ class GridImagens(ft.GridView):
                 )
             ])
         
-        self.update()
+        if self.page is not None:
+            self.update()
         
 class Imagem(ft.Image):
     def __init__(self, src : str, modo : GridMode):

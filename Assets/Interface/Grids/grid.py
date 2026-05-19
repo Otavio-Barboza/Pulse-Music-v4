@@ -10,8 +10,8 @@ class GridImagens(ft.GridView):
         super().__init__(
             max_extent = 200 if modo == GridMode.ARTISTA else 250,
             expand = True,
-            spacing = 45,
-            run_spacing = 20 if modo == GridMode.ARTISTA else 10,
+            spacing = 65,
+            run_spacing = 15,
             padding = ft.padding.all(15)
         )
         self.page = page
@@ -28,17 +28,22 @@ class GridImagens(ft.GridView):
     def click(self, e):        
         if self.modo == GridMode.ARTISTA:
             dados = memoria.artistas.to_dict()
-            caminho = dados.get('caminho_chave_musica')
+            lista_mus = [
+                os.path.basename(musica.get('caminho_completo')) for musica in dados.get(e.control.data).get('musicas')
+            ]
+            caminho = dados.get(e.control.data).get('musicas')[0].get('caminho_completo')
             img = ExtracaoMetadados.carregar_imagem_big_base64(
-                caminho_arquivo = lista_mus[-1], 
+                caminho_arquivo = caminho, 
                 tipo = 'artist'
             )
+            nome = dados.get(e.control.data).get('nome_artistas')
         else:
             lista_mus = memoria.albuns.albuns.get(e.control.data).get('musicas')
             img = ExtracaoMetadados.carregar_imagem_big_base64(
                 caminho_arquivo = lista_mus[-1], 
                 tipo = 'album'
             )
+            nome = e.control.data
 
         self.page.overlay.clear()
         self.page.overlay.append(
@@ -46,7 +51,7 @@ class GridImagens(ft.GridView):
                 img_big = img,
                 nomes = lista_mus,
                 modo = self.modo,
-                nome = e.control.data
+                nome = nome
             )
         )
         self.page.update()
@@ -88,16 +93,15 @@ class GridImagens(ft.GridView):
                                 value = nome,
                                 text_align = ft.TextAlign.CENTER,
                                 size = 16,
-                                weight = ft.FontWeight.W_300
+                                weight = ft.FontWeight.W_300,
+                                max_lines = 2,
+                                overflow = ft.TextOverflow.FADE
                             )
                         ]
                     )
                 )
             ])
-        
-        if self.page is not None:
-            self.update()
-        
+
 class Imagem(ft.Image):
     def __init__(self, src : str, modo : GridMode):
         super().__init__(

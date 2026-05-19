@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.estado_musica import EstadoMusica
+from ....App.Audio.Controller.sessao import EstadoMusica
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay
 from ...Others.cores import cor
 import flet as ft
@@ -108,7 +108,8 @@ class RowContainer(ft.Container):
         )
     
     def tocar_ou_pausar(self, e):
-        EstadoMusica.definir_musica_atual(e.control.data)
+        # EstadoMusica.definir_musica_atual(e.control.data)
+        ...
 
     def encontrar_artista(self) -> str:
         from ....App.Playlists.Controller.estado_playlist import EstadoPlay

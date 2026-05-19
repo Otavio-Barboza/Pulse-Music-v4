@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.estado_musica import EstadoMusica
+from ....App.Audio.Controller.sessao import EstadoMusica
 from Assets.Interface.Others.cores import cor
 import flet as ft
 

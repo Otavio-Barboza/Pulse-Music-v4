@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.estado_musica import EstadoMusica
+from ....App.Audio.Controller.sessao import EstadoMusica
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
 from ..Containers.container_musica import RowContainer
 from ...Others.cores import cor

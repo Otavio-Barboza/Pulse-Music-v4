@@ -1,6 +1,6 @@
 from ...App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist
-from ...App.Audio.Controller.estado_musica import EstadoMusica
-from ...App.Music.Fontes.fonte_playlist import FontePlaylist
+from ...App.Audio.Controller.sessao import EstadoMusica
+from ...App.Audio.Fontes.fonte_playlist import FontePlaylist
 from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
 from .Base.grid_playlists import GridPlaylists
 from .Base.list_musicas import ListViewMusicas

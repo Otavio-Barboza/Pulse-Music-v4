@@ -1,7 +1,7 @@
-from .fonte_musica import FonteMusica
-from ...Music.Repository.musica_repositorio import RepositorioMusica
+from .fonte_reproducao import FonteReproducao
+from ..Repository.musica_repositorio import RepositorioMusica
 
-class FontePlaylist(FonteMusica):
+class FontePlaylist(FonteReproducao):
     def __init__(self, pasta : str):
         self.pasta = pasta
     

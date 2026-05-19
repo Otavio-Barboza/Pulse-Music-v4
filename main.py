@@ -42,14 +42,8 @@ async def main(page : ft.Page):
         font_family = 'inter'
     )
     
-    async def on_conta_atual(usuario):
-        """
-            Função para carregar o conteúdo principal do app quando uma conta estiver logada.
+    config_painel = None
 
-        Args:
-            usuario (class Usuario) : O usuário atual é repassado a função tornando mainupulável diretamente ao conteúdo do main.
-        """
-        tabs.playlist.carregar()
 
     async def on_sem_conta(_ = None):
         """
@@ -59,7 +53,6 @@ async def main(page : ft.Page):
         page.update()
         await login_google()
     
-    EstadoApp.registrar_ouvinte('conta_atual', on_conta_atual)
     EstadoApp.registrar_ouvinte('sem_conta', on_sem_conta)
     
     async def validar_login():
@@ -79,9 +72,6 @@ async def main(page : ft.Page):
                 pasta_base = dados["pasta_base"],   
                 dados = perfil
             )
-
-            await carregar_memoria()
-            EstadoApp.notificar('conta_atual', GerenciadorContas.usuario()) 
         else:
             EstadoApp.notificar('sem_conta')
 
@@ -93,13 +83,6 @@ async def main(page : ft.Page):
         memoria.carregar(dados)
         await MemoriaArtistas.carregar()
 
-    # await carregar_memoria()
-    await validar_login()
-
-    config_painel = None
-    tabs = Abas(page = page)
-    player = PlayerSection(page = page)
-    
     def abrir_config():
         """
             Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em 'abrir_config').
@@ -113,17 +96,32 @@ async def main(page : ft.Page):
             if config_painel not in page.overlay:
                 page.overlay.append(config_painel)
         page.update()
-            
+
+    await validar_login()
+    await carregar_memoria()
+
+    tabs = Abas(page = page)
+
+    async def on_conta_atual(usuario):
+        """
+            Função para carregar o conteúdo principal do app quando uma conta estiver logada.
+
+        Args:
+            usuario (class Usuario) : O usuário atual é repassado a função tornando mainupulável diretamente ao conteúdo do main.
+        """
+        tabs.playlist.carregar()
+    
+    EstadoApp.registrar_ouvinte('conta_atual', on_conta_atual)
+    
+    player = PlayerSection(page = page)
     page.appbar = AppBar(page = page, abrir_config = abrir_config)
-        
+                
     layout = ft.Stack(
         expand = True,
-
         controls = [
             ft.Column(
                 expand = True,
                 spacing = 0,
-                
                 controls = [
                     tabs,
                     player.compacto
@@ -135,31 +133,19 @@ async def main(page : ft.Page):
     
     page.add(layout)
     
+    EstadoApp.notificar(
+        'conta_atual',
+        GerenciadorContas.usuario()
+    )
+
     tabs.pesquisa_musica.iniciar_animacao()
+    
     page.on_resized = ResizeManager.executar
     AudioLoop.iniciar()
-    
     
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )
-    
-    # tabs.atualizar_grids()
-    
-    # def teste():
-    #     import os
-    #     imgs = dict()
-        
-    #     for img in os.listdir(r'Assets\Data\Contas\115700472009531668447\Imagens\Artistas'):
-    #         chave = img.removesuffix('.jpg')
-    #         dados = memoria.artistas.to_dict()
-    #         artista = dados.get(chave).get('nome_artistas')
-            
-    #         print(artista)
-                
-    #     # print(imgs)
-            
-    # teste()
     
 if __name__ == '__main__':
     asyncio.run(

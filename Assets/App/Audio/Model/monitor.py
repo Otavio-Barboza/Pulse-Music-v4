@@ -1,7 +1,7 @@
 class Monitor:
     @classmethod
     def notificar_fim(cls):
-        from ..Controller.estado_musica import EstadoMusica
+        from ..Controller.sessao import EstadoMusica
         EstadoMusica.tratar_fim_musica()
 
 import threading

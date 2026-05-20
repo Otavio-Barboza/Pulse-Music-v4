@@ -16,7 +16,6 @@ class InfosExpandida(ft.Container):
             padding = ft.padding.all(10),
             content = self._adicionar_img()
         )
-        self.texto = self._criar_textos('Ano da Música')
 
         self.content = ft.Column(
             alignment = ft.MainAxisAlignment.CENTER,
@@ -26,12 +25,11 @@ class InfosExpandida(ft.Container):
                     controls = [
                         self.imagem
                     ]
-                ),
-                self.texto
+                )
             ]
         )
 
-        # EstadoMusica.registrar_callback('musica_atual', self.att_infos_expandido)
+        SessaoReproducao.registrar_callback('musica_atual', self.att_infos_expandido)
     
     def _criar_textos(self, valor : str = '') -> ft.Text:
         return ft.Text(
@@ -48,6 +46,6 @@ class InfosExpandida(ft.Container):
             width = 600
         )
     
-    def att_infos_expandido(self, estado : SessaoReproducao):
-        # self.imagem.content.src = estado.musica_atual.capa
+    def att_infos_expandido(self, dados = None):
+        self.imagem.content.src = SessaoReproducao.buscar_capa()
         self.update()

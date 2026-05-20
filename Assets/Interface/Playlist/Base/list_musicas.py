@@ -7,14 +7,13 @@ from ....App.Audio.Model.musica import Musica
 import flet as ft
 
 class ListViewMusicas(ft.ListView):
-    def __init__(self, page, musicas : list[Musica], pasta_musicas : str):
+    def __init__(self, page, musicas : list[Musica], pasta_musicas : str | None = None):
         super().__init__(
             spacing = 10,
             expand = True
         )  
         self.page = page
         self.musicas = musicas
-        self.pasta_das_musicas = pasta_musicas
 
         self.controls = []
         
@@ -38,8 +37,8 @@ class ListViewMusicas(ft.ListView):
     def _carregar(self):
         if self.musicas is None:
             return
+        
         for musica in self.musicas:
-
             container = RowContainer(
                 page = self.page,
                 musica = musica

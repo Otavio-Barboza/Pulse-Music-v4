@@ -18,8 +18,8 @@ class InfoPlayer(ft.Container):
             visible = True,
             content = self._criar_img()
         )
-        self.nome_musica = self._nomes(nome = 'Música não selecionada')
-        self.nome_artista = self._nomes(nome = 'Música não selecionada')
+        self.nome_musica = self._nomes(nome = '')
+        self.nome_artista = self._nomes(nome = '')
 
         self.content = ft.ResponsiveRow( 
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
@@ -59,8 +59,8 @@ class InfoPlayer(ft.Container):
             color = cor.branco_puro
         )
     
-    def att_infos(self, estado : SessaoReproducao):
-        self.nome_artista.value = f'Artista: {estado.musica_atual.artista}'
-        self.nome_musica.value = estado.musica_atual.nome
-        # self.imagem.content.src = estado.musica_atual.capa
+    def att_infos(self, dados = None):
+        self.nome_artista.value = SessaoReproducao.buscar_artista()
+        self.nome_musica.value = SessaoReproducao.estado.musica_atual.nome
+        self.imagem.content.src = SessaoReproducao.buscar_capa()
         self.update()

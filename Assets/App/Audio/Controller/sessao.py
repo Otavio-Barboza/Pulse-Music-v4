@@ -13,11 +13,10 @@ class SessaoReproducao:
     indice_atual : int = 0
 
     _monitor_iniciado = False
+    _slider_arrastando = False
 
     _callbacks = {
-        'nome_musica' : [], # callback para att o player inferior com o nome.
-        'nome_artista' : [], # callback para att o player inferior com o artista.
-        
+        'volume' : [],
         'tempo_total' : [],
         'posicao_slider' : [],
         'musica_atual' : [], # callback para marcar musica que estiver tocando no momento.
@@ -82,10 +81,12 @@ class SessaoReproducao:
 
         cls._notificar('att_container')
         cls._notificar('play/pause')
+        cls._notificar('musica_atual')
 
     @classmethod
     def definir_status_tocando(cls, valor : bool):
         cls.estado.tocando = valor
+
 
     # CONTROLES
     @classmethod
@@ -110,7 +111,6 @@ class SessaoReproducao:
             cls.indice_atual = 0
 
         cls.tocar_indice()
-        print(cls.indice_atual)
 
     @classmethod
     def anterior(cls):
@@ -139,6 +139,10 @@ class SessaoReproducao:
     
     # MONITOR
     @classmethod
+    def definir_arrasto_slider(cls, valor : bool):
+        cls._slider_arrastando = valor
+        
+    @classmethod
     def inicar(cls):
         if cls._monitor_iniciado:
             return
@@ -154,7 +158,11 @@ class SessaoReproducao:
             import time
 
             while True:
-                if cls.estado.tocando:
+                if (
+                    cls.estado.tocando 
+                     and 
+                    not cls._slider_arrastando
+                ):
                     duracao_pura = Reprodutor.duracao_pura()
 
                     if (
@@ -201,17 +209,33 @@ class SessaoReproducao:
 
     @classmethod
     def ir_para(cls, valor : float):
-        ...
+        Reprodutor.ir_para(valor)
+        cls._notificar('posicao_slider')
 
     # VOLUME
     @classmethod
     def definir_volume(cls, volume : float):
         cls.estado.volume = volume
-        cls._notificar('')
+        Reprodutor.set_volume(cls.estado.volume)
+        cls._notificar('volume')
 
     
     # TRATAMENTO AUTOMÁTICO DA MÚSICA
     @classmethod
     def tratar_fim_da_musica(cls):
-        cls.proxima()
-        cls._notificar('')
+        if cls.config.repetir:
+            cls.tocar_indice()
+        else:
+            cls.proxima()
+            
+    
+    # OUTROS
+    @classmethod
+    def buscar_artista(cls) -> str:
+        from ..Repository.musica_repositorio import RepositorioMusica
+        return RepositorioMusica.buscar_artista(cls.estado.musica_atual.chave)
+    
+    @classmethod
+    def buscar_capa(cls) -> str:
+        from ..Repository.musica_repositorio import RepositorioMusica
+        return RepositorioMusica.buscar_capa(cls.estado.musica_atual.nome)

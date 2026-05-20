@@ -108,8 +108,9 @@ class RowContainer(ft.Container):
         from ....App.Audio.Controller.sessao import SessaoReproducao
         from ....App.Audio.Model.modo_reproducao import ModoReprodução
         
-        Reprodução.definir_modo(e.control.data.modo)
-
+        if Reprodução._reproducao_atual != e.control.data.modo:
+            Reprodução.definir_modo(e.control.data.modo)
+        
         if SessaoReproducao.fonte_atual != e.control.data.modo:
             SessaoReproducao.definir_fonte()
 

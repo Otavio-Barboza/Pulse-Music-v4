@@ -102,7 +102,7 @@ class ComandosPlayer(ft.Container):
             ]
         )
 
-        # SessaoReproducao.registrar_callback('volume', self.att_volume)
+        SessaoReproducao.registrar_callback('volume', self.att_volume)
 
     def _abrir_volume(self, e):
         if not self.player.expandido.visible:
@@ -135,8 +135,8 @@ class ComandosPlayer(ft.Container):
         elif volume == 0.0:
             return ft.Icons.VOLUME_OFF_ROUNDED
     
-    def att_volume(self, estado):
-        self.slider_volume.value  = estado.volume * 100
-        self.slider_volume_overlay.value  = estado.volume * 100
-        self.icon_volume.icon = self.definir_volume(estado.volume)
+    def att_volume(self, dados = None):
+        self.slider_volume.value  = SessaoReproducao.estado.volume * 100
+        self.slider_volume_overlay.value  = SessaoReproducao.estado.volume * 100
+        self.icon_volume.icon = self.definir_volume(SessaoReproducao.estado.volume)
         self.update()

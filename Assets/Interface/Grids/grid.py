@@ -2,6 +2,7 @@ from ...App.Services.Controllers.estado_grid import GridMode, EstadoGrid
 from ..Others.overlay_imagens import OverlayImagens
 from ...App.Meta.Memoria.memoria_global import memoria
 from ...App.Meta.Repository.extrai_metadados import ExtracaoMetadados
+from ...App.Audio.Model.modo_reproducao import ModoReprodução
 import flet as ft
 import os
 
@@ -25,12 +26,32 @@ class GridImagens(ft.GridView):
             func = self.reconstruir_imagens
         )
     
-    def click(self, e):        
+    def click(self, e):
+        from ...App.Audio.Model.musica import Musica
+        from ...App.Audio.Model.modo_reproducao import Reprodução
+        
+        lista_mus = []
+        
         if self.modo == GridMode.ARTISTA:
+            modo_playlist = ModoReprodução.ARTISTA
             dados = memoria.artistas.to_dict()
-            lista_mus = [
-                os.path.basename(musica.get('caminho_completo')) for musica in dados.get(e.control.data).get('musicas')
-            ]
+            
+            for chave, musica in dados.get(e.control.data).items():
+                if chave == 'musicas':
+                    for mus in musica:
+                        lista_mus.append(
+                            Musica(
+                                modo = modo_playlist,
+                                nome = os.path.basename(
+                                    mus.get('caminho_completo')
+                                ).replace(
+                                    '.mp3', ''
+                                ),
+                                caminho = mus.get('caminho_completo'),
+                                chave = mus.get('chave')
+                            )
+                        )
+                
             caminho = dados.get(e.control.data).get('musicas')[0].get('caminho_completo')
             img = ExtracaoMetadados.carregar_imagem_big_base64(
                 caminho_arquivo = caminho, 
@@ -38,23 +59,34 @@ class GridImagens(ft.GridView):
             )
             nome = dados.get(e.control.data).get('nome_artistas')
         else:
-            lista_mus = memoria.albuns.albuns.get(e.control.data).get('musicas')
+            modo_playlist = ModoReprodução.ALBUM
+            dados = memoria.albuns.to_dict()
+            print(dados)
+            # lista_mus = memoria.albuns.albuns.get(e.control.data).get('musicas')
             img = ExtracaoMetadados.carregar_imagem_big_base64(
                 caminho_arquivo = lista_mus[-1], 
                 tipo = 'album'
             )
             nome = e.control.data
 
+        # print(memoria.artistas.to_dict())
         self.page.overlay.clear()
         self.page.overlay.append(
             OverlayImagens(
                 img_big = img,
-                nomes = lista_mus,
+                musicas = lista_mus,
                 modo = self.modo,
-                nome = nome
+                nome = nome,
+                modo_playlist = modo_playlist
             )
         )
         self.page.update()
+        
+        Reprodução.carregar_musicas_do_modo(
+            modo = modo_playlist,
+            lista = lista_mus
+        )
+
 
     def reconstruir_imagens(self, modo : GridMode):
         from ...App.Services.gerenciador_contas import GerenciadorContas

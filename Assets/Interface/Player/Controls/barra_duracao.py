@@ -90,8 +90,8 @@ class BarraDuracaoCompacta(ft.Container):
         self.update()
 
     def detectar_arrasto_slider(self, e):
-        SessaoReproducao.usuario_arrastando = True
+        SessaoReproducao.definir_arrasto_slider(True)
     
     def mudar_pos_slider(self, e):
         SessaoReproducao.ir_para(e.control.value)
-        SessaoReproducao.usuario_arrastando = False
+        SessaoReproducao.definir_arrasto_slider(False)

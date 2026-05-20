@@ -1,3 +1,4 @@
+from .musica import Musica
 from enum import Enum
 
 class ModoReprodução(Enum):
@@ -7,13 +8,33 @@ class ModoReprodução(Enum):
     ALBUM = 'album'
     SEM_REPRODUCAO = 'sem_repdroducao'
 
+
 class Reprodução:
-    _reproducao_atual = ModoReprodução.SEM_REPRODUCAO
+    _listas_modos_reproduções : dict = {
+        ModoReprodução.PLAYLIST : [],
+        ModoReprodução.FAVORITA : [],
+        ModoReprodução.ARTISTA : [],
+        ModoReprodução.ALBUM : []
+    }
+    _reproducao_atual : ModoReprodução = ModoReprodução.SEM_REPRODUCAO
 
     @classmethod
     def definir_modo(cls, novo_modo : ModoReprodução):
-        cls.reproducao_atual = novo_modo
+        cls._reproducao_atual = novo_modo
 
     @classmethod
     def retornar_modo(cls) -> ModoReprodução:
-        return cls.reproducao_atual
+        return cls._reproducao_atual
+    
+    @classmethod
+    def carregar_musicas_do_modo(cls, modo : ModoReprodução, lista : list[Musica]):
+        if not lista:
+            return
+        
+        cls._listas_modos_reproduções[modo].clear()
+        cls._listas_modos_reproduções[modo].extend(lista)
+
+    @classmethod
+    def retornar_musicas_do_modo(cls):
+        if cls._reproducao_atual != ModoReprodução.SEM_REPRODUCAO:
+            return cls._listas_modos_reproduções[cls._reproducao_atual]

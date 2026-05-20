@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
+from ....App.Audio.Controller.sessao import SessaoReproducao
 from Assets.Interface.Others.cores import cor
 import flet as ft
 
@@ -39,7 +39,7 @@ class InfoPlayer(ft.Container):
             ]
         )
 
-        EstadoMusica.registrar_callback('musica_atual', self.att_infos)
+        SessaoReproducao.registrar_callback('musica_atual', self.att_infos)
     
     def _criar_img(self, img : str = r'Assets\Global\Images\Padrao\img_64_padrão.png') -> ft.Image:
         return ft.Image(
@@ -59,7 +59,7 @@ class InfoPlayer(ft.Container):
             color = cor.branco_puro
         )
     
-    def att_infos(self, estado : EstadoMusica):
+    def att_infos(self, estado : SessaoReproducao):
         self.nome_artista.value = f'Artista: {estado.musica_atual.artista}'
         self.nome_musica.value = estado.musica_atual.nome
         # self.imagem.content.src = estado.musica_atual.capa

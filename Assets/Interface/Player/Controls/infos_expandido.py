@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
+from ....App.Audio.Controller.sessao import SessaoReproducao
 from Assets.Interface.Others.cores import cor
 import flet as ft
 
@@ -48,6 +48,6 @@ class InfosExpandida(ft.Container):
             width = 600
         )
     
-    def att_infos_expandido(self, estado : EstadoMusica):
+    def att_infos_expandido(self, estado : SessaoReproducao):
         # self.imagem.content.src = estado.musica_atual.capa
         self.update()

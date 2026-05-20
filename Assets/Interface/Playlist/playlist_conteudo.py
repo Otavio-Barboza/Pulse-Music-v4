@@ -1,5 +1,5 @@
 from ...App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist
-from ...App.Audio.Controller.sessao import EstadoMusica
+from ...App.Audio.Controller.sessao import SessaoReproducao
 from ...App.Audio.Fontes.fonte_playlist import FontePlaylist
 from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
 from .Base.grid_playlists import GridPlaylists
@@ -72,16 +72,26 @@ class PlaylistConteudo(ft.Container):
             id (str): ID da playlist
         """
         from ...App.Playlists.Controller.estado_playlist import EstadoPlay
+        from ...App.Audio.Model.modo_reproducao import ModoReprodução
 
         card = self.grid.cards[id]
-        fonte = FontePlaylist(pasta = card.pasta)
-        EstadoMusica.definir_fonte(fonte = fonte)
 
+        fonte = FontePlaylist(
+            pasta = card.pasta,
+            modo = ModoReprodução.PLAYLIST
+        )
+        
+        lista_de_musicas = fonte.carregar()
+        
+        fonte.carregar_playlist(
+            lista_musicas = lista_de_musicas
+        )
+        
         self.abrir()
 
         list_view = ListViewMusicas(
             page = self.page,
-            musicas = EstadoMusica.fila_ativa,
+            musicas = lista_de_musicas,
             pasta_musicas = card.pasta
         )
         

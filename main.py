@@ -4,6 +4,7 @@ from Assets.Interface.Settings.config_tela import ConfiguracoesTela
 from Assets.Interface.Navigation.abas import Abas
 from Assets.Interface.Others.cores import cor
 from Assets.App.Audio.Model.audio import AudioLoop
+from Assets.App.Audio.Controller.sessao import SessaoReproducao
 from Assets.App.Services.Controllers.estado_app import EstadoApp
 from Assets.App.Services.Controllers.estado_redimensionamento import ResizeManager
 from Assets.App.Services.Auth.google_login_auth import login_google
@@ -141,8 +142,10 @@ async def main(page : ft.Page):
     tabs.pesquisa_musica.iniciar_animacao()
     
     page.on_resized = ResizeManager.executar
+   
     AudioLoop.iniciar()
-    
+    SessaoReproducao.inicar()
+     
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )

@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
+from ....App.Audio.Controller.sessao import SessaoReproducao
 from ....App.Services.Controllers.estado_redimensionamento import ResizeManager
 from ...Others.cores import cor
 import flet as ft
@@ -37,9 +37,19 @@ class BarraDuracaoCompacta(ft.Container):
         )
 
         ResizeManager.registrar(self._on_resize)
-        EstadoMusica.registrar_callback(evento='texto_barra_duracao', callback=self._att_dur_total)
-        EstadoMusica.registrar_callback(evento='tempo', callback=self._att_dur_atual)
-        EstadoMusica.registrar_callback(evento='texto_barra_duracao', callback=self._att_slider)
+
+        SessaoReproducao.registrar_callback(
+            evento = 'posicao_slider', 
+            callback = self._att_dur_atual
+        )
+        SessaoReproducao.registrar_callback(
+            evento = 'slider', 
+            callback = self._att_slider
+        )
+        SessaoReproducao.registrar_callback(
+            evento = 'tempo_total',
+            callback = self._att_dur_total
+        )
 
     def did_mount(self):
         self._on_resize()
@@ -57,27 +67,31 @@ class BarraDuracaoCompacta(ft.Container):
             text_align = ft.TextAlign.CENTER
         )
 
-    def _att_slider(self, estado : EstadoMusica):
-        self.slider.max = estado.duracao_total
+    def _att_slider(self, dados = None):
+        self.slider.max = SessaoReproducao.estado.duracao_total
         self.slider.min = 0
-        self.slider.value = estado.tempo_atual
+        self.slider.value = SessaoReproducao.estado.tempo_atual
         self.slider.update()
     
-    def _att_dur_total(self, estado : EstadoMusica):
-        self.duracao_total.value = estado._tempo_total_formatado
+    def _att_dur_total(self, dados = None):
+        self.duracao_total.value = SessaoReproducao.formatar_tempo_total()
         self.update()
 
-    def _att_dur_atual(self, estado : EstadoMusica):
-        self.duracao_atual.value = estado._tempo_atual_formatado if estado.tempo_atual != 0.0 else '00:00'
+    def _att_dur_atual(self, dados = None):
+        self.duracao_atual.value = SessaoReproducao.formatar_tempo_atual() if SessaoReproducao.estado.tempo_atual != 0.0 else '00:00'
         
-        if estado.tempo_atual > 0:
-            self.slider.value = min(estado.tempo_atual, estado.duracao_total + 0.01)
+        if (
+            SessaoReproducao.estado.tempo_atual > 0 
+             and
+            SessaoReproducao.estado.duracao_total != 0.0
+        ):
+            self.slider.value = min(SessaoReproducao.estado.tempo_atual, SessaoReproducao.estado.duracao_total)
 
         self.update()
 
     def detectar_arrasto_slider(self, e):
-        EstadoMusica.usuario_arrastando = True
+        SessaoReproducao.usuario_arrastando = True
     
     def mudar_pos_slider(self, e):
-        EstadoMusica.ir_para(e.control.value)
-        EstadoMusica.usuario_arrastando = False
+        SessaoReproducao.ir_para(e.control.value)
+        SessaoReproducao.usuario_arrastando = False

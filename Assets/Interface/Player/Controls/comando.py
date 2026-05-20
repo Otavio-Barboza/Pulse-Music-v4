@@ -1,4 +1,4 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
+from ....App.Audio.Controller.sessao import SessaoReproducao
 from Assets.Interface.Others.cores import cor
 import flet as ft
 
@@ -20,7 +20,7 @@ class ComandosPlayer(ft.Container):
             value = 100,
             max = 100,
             min = 0,
-            on_change = lambda e: EstadoMusica.definir_volume(e.control.value / 100)
+            on_change = lambda e: SessaoReproducao.definir_volume(e.control.value / 100)
         )
         self.slider_volume = ft.Slider(
             thumb_color = cor.amarelo,
@@ -30,7 +30,7 @@ class ComandosPlayer(ft.Container):
             value = 100,
             max = 100,
             min = 0,
-            on_change = lambda e: EstadoMusica.definir_volume(e.control.value / 100)
+            on_change = lambda e: SessaoReproducao.definir_volume(e.control.value / 100)
         )
         
         self.volume_overlay = ft.Container(
@@ -60,7 +60,7 @@ class ComandosPlayer(ft.Container):
         
         self.icon_volume = ft.IconButton(
             col = 6,
-            icon = self.definir_volume(EstadoMusica.volume),
+            icon = self.definir_volume(1.0),
             on_click = self._abrir_volume,
 
             style = ft.ButtonStyle(
@@ -102,7 +102,7 @@ class ComandosPlayer(ft.Container):
             ]
         )
 
-        EstadoMusica.registrar_callback('volume', self.att_volume)
+        # SessaoReproducao.registrar_callback('volume', self.att_volume)
 
     def _abrir_volume(self, e):
         if not self.player.expandido.visible:

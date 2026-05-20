@@ -1,11 +1,13 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
+from ....App.Audio.Controller.sessao import SessaoReproducao
+from ....App.Audio.Model.modo_reproducao import Reprodução
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
 from ..Containers.container_musica import RowContainer
 from ...Others.cores import cor
+from ....App.Audio.Model.musica import Musica
 import flet as ft
 
 class ListViewMusicas(ft.ListView):
-    def __init__(self, page, musicas : list | None, pasta_musicas : str):
+    def __init__(self, page, musicas : list[Musica], pasta_musicas : str):
         super().__init__(
             spacing = 10,
             expand = True
@@ -13,7 +15,6 @@ class ListViewMusicas(ft.ListView):
         self.page = page
         self.musicas = musicas
         self.pasta_das_musicas = pasta_musicas
-        self.musicas_ids = []
 
         self.controls = []
         
@@ -21,7 +22,7 @@ class ListViewMusicas(ft.ListView):
         self._callback_qtde = self.recarregar
         self._carregar()
         
-        EstadoMusica.registrar_callback(
+        SessaoReproducao.registrar_callback(
             evento = 'att_container', 
             callback = self.att_container
         )
@@ -31,31 +32,20 @@ class ListViewMusicas(ft.ListView):
         )
 
     def will_unmount(self):
-        EstadoMusica._callbacks['att_container'].remove(self._callback)
+        SessaoReproducao._callbacks['att_container'].remove(self._callback)
         EstadoPlay._callbacks['att_musicas_exibidas'].remove(self._callback_qtde)
         
     def _carregar(self):
-        from ....App.Meta.Repository.tarefas import GerenciaMetadados
-        import os
-
         if self.musicas is None:
             return
         for musica in self.musicas:
-            id_musica = GerenciaMetadados.gerar_track_id(
-                os.path.normpath(
-                    os.path.join(
-                        self.pasta_das_musicas, musica.nome + '.mp3'
-                    )
-                )
-            )
+
             container = RowContainer(
                 page = self.page,
-                musica = musica,
-                id_musica = id_musica
+                musica = musica
             )
-
+            
             self.controls.append(container)
-            self.musicas_ids.append(id_musica)
     
     def recarregar(self, _):
         if (
@@ -67,7 +57,7 @@ class ListViewMusicas(ft.ListView):
             except Exception as e:
                 print(f'CALLBACK RECARREGA PLATLIST ERROR: {e}')
 
-    def att_container(self, estado : EstadoMusica):
+    def att_container(self, sessao : SessaoReproducao):
         if not self.page:
             return
         
@@ -75,7 +65,11 @@ class ListViewMusicas(ft.ListView):
             if not container.page:
                 continue
 
-            if estado.musica_atual and container.data.id == estado.musica_atual.id:
+            if (
+                sessao.estado.musica_atual is not None and
+                container.data.chave is not None and
+                container.data.chave == sessao.estado.musica_atual.chave
+            ):
                 container.bgcolor = cor.amarelo3
             else:
                 container.bgcolor = cor.preto9

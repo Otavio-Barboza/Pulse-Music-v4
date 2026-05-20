@@ -1,23 +1,31 @@
 from ..Model.modelos import EstadoPlayer, ConfiguracaoReproducao
-from ..Fontes.fonte_reproducao import FonteReproducao
+from ..Model.modo_reproducao import Reprodução
 from ..Model.reprodutor import Reprodutor
 
 class SessaoReproducao:
     estado = EstadoPlayer()
     config = ConfiguracaoReproducao()
 
-    fonte_atual : FonteReproducao = None
+    fonte_atual : Reprodução = Reprodução._reproducao_atual
 
     fila : list = []
+    fila_aleatoria : list = []
     indice_atual : int = 0
 
+    _monitor_iniciado = False
+
     _callbacks = {
-        'tempo_total' : [],
-        'tempo_atual' : [],
         'nome_musica' : [], # callback para att o player inferior com o nome.
         'nome_artista' : [], # callback para att o player inferior com o artista.
+        
+        'tempo_total' : [],
         'posicao_slider' : [],
-        'musica_atual' : [] # callback para marcar musica que estiver tocando no momento.
+        'musica_atual' : [], # callback para marcar musica que estiver tocando no momento.
+        'slider' : [],
+        'att_container' : [],
+        'play/pause' : [],
+        'repetir' : [],
+        'aleatorio' : []
     }
 
     # CALLBACKS
@@ -33,22 +41,36 @@ class SessaoReproducao:
     
     # FONTE
     @classmethod
-    def definir_fonte(cls, fonte : FonteReproducao):
-        cls.fonte_atual = fonte
-        cls.fila = fonte.carregar()
+    def definir_fonte(cls):
+        import random
+
+        cls.fonte_atual = Reprodução.retornar_modo()
+        cls.fila = Reprodução.retornar_musicas_do_modo()
+        cls.fila_aleatoria = cls.fila[:]
+        random.shuffle(cls.fila_aleatoria)
         cls.indice_atual = 0
-        cls._notificar('fila')
 
 
     # MÚSICA
     @classmethod
-    def tocar_indice(cls, indice : int):
+    def receber_indice(cls, chave : str):
+        for indice, musica in enumerate(cls.fila):
+            if musica.chave == chave:
+                cls.indice_atual = indice
+                break
+
+    @classmethod
+    def tocar_indice(cls):
+        cls.estado.tempo_atual = 0
+
+        if not cls._monitor_iniciado:
+            cls.iniciar_monitor_tempo()
+            cls._monitor_iniciado = True
+
         if not cls.fila:
             return
         
-        cls.indice_atual = indice
-
-        musica = cls.fila[indice]
+        musica = cls.fila[cls.indice_atual] if not cls.config.aleatorio else cls.fila_aleatoria[cls.indice_atual]
 
         cls.estado.musica_atual = musica
         cls.estado.tempo_atual = 0
@@ -56,30 +78,26 @@ class SessaoReproducao:
         Reprodutor.carregar(musica.caminho)
         Reprodutor.tocar()
 
-        cls.estado.tocando = True
+        cls.definir_status_tocando(True)
 
-        cls._notificar('musica_alterada')
-        cls._notificar('musica_alterada')
+        cls._notificar('att_container')
+        cls._notificar('play/pause')
 
     @classmethod
-    def tocar_musica(cls, musica):
-        for indice, m in enumerate(cls.fila):
-            if m.id == musica.id:
-                cls.tocar_indice(indice)
-                break
+    def definir_status_tocando(cls, valor : bool):
+        cls.estado.tocando = valor
 
-    
     # CONTROLES
     @classmethod
-    def toggle_play(cls):
-        cls.estado.tocando = not cls.estado.tocando
+    def toggle_play_pause(cls):
+        cls.definir_status_tocando(not cls.estado.tocando)
 
         if cls.estado.tocando:
             Reprodutor.tocar()
         else:
             Reprodutor.pausar()
 
-        cls._notificar('')
+        cls._notificar('play/pause')
     
     @classmethod
     def proxima(cls):
@@ -91,7 +109,8 @@ class SessaoReproducao:
         if cls.indice_atual >= len(cls.fila):
             cls.indice_atual = 0
 
-        cls.tocar_indice(cls.indice_atual)
+        cls.tocar_indice()
+        print(cls.indice_atual)
 
     @classmethod
     def anterior(cls):
@@ -103,26 +122,96 @@ class SessaoReproducao:
         if cls.indice_atual < 0:
             cls.indice_atual = len(cls.fila) - 1
 
-        cls.tocar_indice(cls.indice_atual)
+        cls.tocar_indice()
 
     
     # CONFIGURAÇÕES
     @classmethod
     def toggle_aleatorio(cls):
         cls.config.aleatorio = not cls.config.aleatorio
+        cls._notificar('aleatorio')
 
     @classmethod
     def toggle_repetir(cls):
         cls.config.repetir = not cls.config.repetir
+        cls._notificar('repetir')
 
     
+    # MONITOR
+    @classmethod
+    def inicar(cls):
+        if cls._monitor_iniciado:
+            return
+        
+        cls._monitor_iniciado = True
+        cls.iniciar_monitor_tempo()
+
+    @classmethod
+    def iniciar_monitor_tempo(cls):
+        import threading
+
+        def loop():
+            import time
+
+            while True:
+                if cls.estado.tocando:
+                    duracao_pura = Reprodutor.duracao_pura()
+
+                    if (
+                        cls.estado.duracao_total != duracao_pura
+                         or
+                        duracao_pura == 0.0
+                    ):
+                        cls.atualizar_tempo_total()
+                        cls._notificar('slider')
+
+                    tempo = Reprodutor.posicao_pura()
+                    cls.atualizar_tempo(tempo)
+
+                time.sleep(0.2)
+        
+        threading.Thread(
+            target = loop,
+            daemon = True
+        ).start()
+
+
     # TEMPO
     @classmethod
     def atualizar_tempo(cls, tempo : float):
         cls.estado.tempo_atual = tempo
-        cls._notificar('')
+        cls._notificar('posicao_slider')
+
+    @classmethod
+    def atualizar_tempo_total(cls):
+        cls.estado.duracao_total = Reprodutor.duracao_pura()
+        cls._notificar('tempo_total')
+
+    @classmethod
+    def formatar_tempo_atual(cls):
+        minutos = int(SessaoReproducao.estado.tempo_atual / 60)
+        segundos = int(SessaoReproducao.estado.tempo_atual - (minutos * 60))
+        return f'{minutos:02}:{segundos:02}' or '00:00'
     
+    @classmethod
+    def formatar_tempo_total(cls):
+        minutos = int(SessaoReproducao.estado.duracao_total / 60)
+        segundos = int(SessaoReproducao.estado.duracao_total - (minutos * 60))
+        return f'{minutos:02}:{segundos:02}' or '00:00'
+
+    @classmethod
+    def ir_para(cls, valor : float):
+        ...
+
+    # VOLUME
     @classmethod
     def definir_volume(cls, volume : float):
         cls.estado.volume = volume
+        cls._notificar('')
+
+    
+    # TRATAMENTO AUTOMÁTICO DA MÚSICA
+    @classmethod
+    def tratar_fim_da_musica(cls):
+        cls.proxima()
         cls._notificar('')

@@ -1,16 +1,21 @@
+from ..Model.musica import Musica
+from ...Meta.Repository.tarefas import GerenciaMetadados
 import os, uuid
 
 class RepositorioMusica:
     @classmethod
-    def gerar_id(cls) -> str:
-        return str(uuid.uuid4())
-    
-    @classmethod
-    def _carregar_musicas(cls, pasta : str) -> list[Musica]:
+    def _carregar_musicas(cls, pasta, modo) -> list[Musica]:
         return [
             Musica(
-                nome = m.replace('.mp3', ''),
-                caminho = os.path.join(pasta, m),
-                id = cls.gerar_id()
+                nome = m.removesuffix('.mp3'),
+                caminho = os.path.normpath(
+                    os.path.join(pasta, m)
+                ),
+                chave = GerenciaMetadados.gerar_track_id(
+                    os.path.normpath(
+                        os.path.join(pasta, m)
+                    )
+                ),
+                modo = modo
             ) for m in os.listdir(pasta)
         ]

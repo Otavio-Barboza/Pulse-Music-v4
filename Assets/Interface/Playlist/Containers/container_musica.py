@@ -1,4 +1,3 @@
-from ....App.Audio.Controller.sessao import EstadoMusica
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay
 from ...Others.cores import cor
 import flet as ft
@@ -8,7 +7,6 @@ class RowContainer(ft.Container):
             self, 
             page, 
             musica, 
-            id_musica : str,
         ):
         super().__init__(
             border_radius = ft.border_radius.all(10),
@@ -16,12 +14,10 @@ class RowContainer(ft.Container):
             bgcolor = cor.preto9,
             padding = ft.padding.all(5),
             alignment = ft.alignment.center,
-            data = id_musica,
+            data = musica,
             on_click = self.tocar_ou_pausar
         )
         self.page = page
-        self.musica = musica
-        self.id_musica = id_musica
         self.imagem_capa = self.encontrar_capa()
 
         self.icon = ft.IconButton(
@@ -46,7 +42,7 @@ class RowContainer(ft.Container):
         )
 
         self.txt_musica = self._retornar_nomes(
-            nome = self.musica.nome, 
+            nome = self.data.nome, 
             tamanho = 900
         )
         self.txt_artista = self._retornar_nomes(
@@ -108,16 +104,29 @@ class RowContainer(ft.Container):
         )
     
     def tocar_ou_pausar(self, e):
-        # EstadoMusica.definir_musica_atual(e.control.data)
-        ...
+        from ....App.Audio.Model.modo_reproducao import Reprodução
+        from ....App.Audio.Controller.sessao import SessaoReproducao
+        from ....App.Audio.Model.modo_reproducao import ModoReprodução
+        
+        Reprodução.definir_modo(e.control.data.modo)
+
+        if SessaoReproducao.fonte_atual != e.control.data.modo:
+            SessaoReproducao.definir_fonte()
+
+        if SessaoReproducao.fonte_atual is ModoReprodução.SEM_REPRODUCAO:
+            print('Sem reprodução definida')
+            return
+        
+        SessaoReproducao.receber_indice(e.control.data.chave)
+        SessaoReproducao.tocar_indice()
 
     def encontrar_artista(self) -> str:
         from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-        return EstadoPlay.retornar_artista_musica(self.id_musica)
+        return EstadoPlay.retornar_artista_musica(self.data.chave)
     
     def encontrar_capa(self) -> str:
         from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-        return EstadoPlay.retornar_capa_musica(self.musica.nome)
+        return EstadoPlay.retornar_capa_musica(self.data.nome)
     
     def atualizar_atistas(self, _):
         nome_artista = self.encontrar_artista()

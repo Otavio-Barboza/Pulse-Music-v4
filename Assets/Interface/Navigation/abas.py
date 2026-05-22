@@ -3,6 +3,7 @@ from Assets.Interface.Others.pesquisa_musica import PesquisaMusica
 from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
 from ..Playlist.Base.base_playlists import ColunaCards
 from ..Grids.grid import GridImagens
+from ..Favoritas.favoritas import Favoritas
 from ...App.Services.Controllers.estado_grid import GridMode
 from ...App.Services.gerenciador_contas import GerenciadorContas
 import flet as ft
@@ -56,6 +57,11 @@ class Abas(ft.Tabs):
             caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
             page = self.page
         )
+        self.favoritas = Favoritas(
+            page = self.page,
+            lista_objetos_musica = [],
+            caminho = None
+        )
         
         self._criar_tabs()
 
@@ -76,7 +82,8 @@ class Abas(ft.Tabs):
             ),
 
             ft.Tab(
-                tab_content = self._labels_tabs[3]
+                tab_content = self._labels_tabs[3],
+                content = self.favoritas
             ),
 
             ft.Tab(

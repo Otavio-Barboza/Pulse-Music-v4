@@ -21,7 +21,8 @@ class RowContainer(ft.Container):
         self.imagem_capa = self.encontrar_capa()
 
         self.icon = ft.IconButton(
-            icon = ft.Icons.FAVORITE,
+            data = musica,
+            icon = ft.Icons.HEART_BROKEN_OUTLINED,
         
             style = ft.ButtonStyle(
                 color = cor.rosa_avermelhado,
@@ -29,7 +30,9 @@ class RowContainer(ft.Container):
                 overlay_color = {
                     ft.ControlState.HOVERED : cor.cinza2
                 }
-            )
+            ),
+            
+            on_click = self.toogle_favoritar 
         )
 
         self.imagem = ft.Image(
@@ -103,6 +106,18 @@ class RowContainer(ft.Container):
             width = tamanho
         )
     
+    def toogle_favoritar(self, e):
+        self.icon.icon = ft.Icons.FAVORITE
+        self.icon.update()
+        print(e.control.data)
+           
+    def favoritar(self, data):
+        # notificar o Estado para favoritar a música.
+        ...
+    
+    def desfavoritar(self, data):
+        ...
+        
     def tocar_ou_pausar(self, e):
         from ....App.Audio.Model.modo_reproducao import Reprodução
         from ....App.Audio.Controller.sessao import SessaoReproducao

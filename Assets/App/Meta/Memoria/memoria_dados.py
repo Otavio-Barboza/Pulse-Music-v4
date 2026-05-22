@@ -35,9 +35,11 @@ class MemoriaMetadados:
             
             # álbuns mantido nessa base ainda de operação
             caminho_alb = os.path.join(dados.get('caminho', ''), dados.get('arquivo_original', ''))
+            
             self.albuns.adicionar_album(
                 nome = dados.get('album').get('nome_album'),
-                caminho_musica = dados.get('album').get('img_big').get('caminho') or caminho_alb
+                caminho_musica = dados.get('album').get('img_big').get('caminho') or caminho_alb,
+                chave_musica = chave
             )
 
     def atualizar_artista(

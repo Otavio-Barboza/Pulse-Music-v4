@@ -61,15 +61,37 @@ class GridImagens(ft.GridView):
         else:
             modo_playlist = ModoReprodução.ALBUM
             dados = memoria.albuns.to_dict()
-            print(dados)
-            # lista_mus = memoria.albuns.albuns.get(e.control.data).get('musicas')
+            
+            for musica in dados.get(e.control.data).values():
+                for caminho_musica in musica:
+                    print(caminho_musica)
+                    lista_mus.append(
+                        Musica(
+                            modo = ModoReprodução.ALBUM,
+                            
+                            nome = os.path.basename(
+                                caminho_musica.get('caminho_da_musica_completa')
+                            ).replace('.mp3', ''),
+                            
+                            caminho = os.path.normpath(
+                                caminho_musica.get('caminho_da_musica_completa')
+                            ),
+                            
+                            chave = caminho_musica.get('chave_da_musica')
+                        ) 
+                    )                
+
+            for musica in lista_mus:
+                if musica.caminho is not None:
+                    caminho = musica.caminho
+                    break
+                
             img = ExtracaoMetadados.carregar_imagem_big_base64(
-                caminho_arquivo = lista_mus[-1], 
+                caminho_arquivo = caminho, 
                 tipo = 'album'
             )
             nome = e.control.data
 
-        # print(memoria.artistas.to_dict())
         self.page.overlay.clear()
         self.page.overlay.append(
             OverlayImagens(

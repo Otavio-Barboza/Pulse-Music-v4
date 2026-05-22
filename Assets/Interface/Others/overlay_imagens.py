@@ -58,7 +58,7 @@ class OverlayImagens(ft.Container):
 
                 ft.Container(
                     col = {'md' : 7, 'sm' : 12},
-                    bgcolor = cor.preto9,
+                    bgcolor = cor.preto8,
                     padding = ft.padding.only(
                         top = 15,
                         bottom = 15,

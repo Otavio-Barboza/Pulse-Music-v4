@@ -64,7 +64,6 @@ class GridImagens(ft.GridView):
             
             for musica in dados.get(e.control.data).values():
                 for caminho_musica in musica:
-                    print(caminho_musica)
                     lista_mus.append(
                         Musica(
                             modo = ModoReprodução.ALBUM,

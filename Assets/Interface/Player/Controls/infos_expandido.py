@@ -48,4 +48,6 @@ class InfosExpandida(ft.Container):
     
     def att_infos_expandido(self, dados = None):
         self.imagem.content.src = SessaoReproducao.buscar_capa()
-        self.update()
+        
+        if self.page:
+            self.update()

@@ -92,7 +92,7 @@ class PlaylistConteudo(ft.Container):
         list_view = ListViewMusicas(
             page = self.page,
             musicas = lista_de_musicas,
-            pasta_musicas = card.pasta
+            modo_favorita = None
         )
         
         self.content = list_view

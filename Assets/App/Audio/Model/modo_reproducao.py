@@ -10,7 +10,7 @@ class ModoReprodução(Enum):
 
 
 class Reprodução:
-    _listas_modos_reproduções : dict = {
+    _listas_modos_reproduções : dict[ModoReprodução, list] = {
         ModoReprodução.PLAYLIST : [],
         ModoReprodução.FAVORITA : [],
         ModoReprodução.ARTISTA : [],
@@ -38,3 +38,20 @@ class Reprodução:
     def retornar_musicas_do_modo(cls):
         if cls._reproducao_atual != ModoReprodução.SEM_REPRODUCAO:
             return cls._listas_modos_reproduções[cls._reproducao_atual]
+        
+
+    # FUNÇÕES APENAS PARA AS FAVORITAS
+    @classmethod
+    def adicionar_musica(cls, musica):
+        print(musica)
+
+        if musica not in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:
+            cls._listas_modos_reproduções[ModoReprodução.FAVORITA].append(musica)
+            print(cls._listas_modos_reproduções[ModoReprodução.FAVORITA])
+
+    @classmethod
+    def remover_musica(cls, musica):
+        for musica_favoritada in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:
+            if musica_favoritada.chave == musica.chave:
+                cls._listas_modos_reproduções[ModoReprodução.FAVORITA].remove(musica_favoritada)
+                break

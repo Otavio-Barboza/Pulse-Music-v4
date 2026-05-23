@@ -7,6 +7,7 @@ class RowContainer(ft.Container):
             self, 
             page, 
             musica, 
+            status_favoritada
         ):
         super().__init__(
             border_radius = ft.border_radius.all(10),
@@ -18,12 +19,13 @@ class RowContainer(ft.Container):
             on_click = self.tocar_ou_pausar
         )
         self.page = page
+        self._esta_favoritado = status_favoritada
         self.imagem_capa = self.encontrar_capa()
 
         self.icon = ft.IconButton(
             data = musica,
-            icon = ft.Icons.HEART_BROKEN_OUTLINED,
-        
+            icon = self.esta_favoritada(),
+
             style = ft.ButtonStyle(
                 color = cor.rosa_avermelhado,
 
@@ -106,23 +108,70 @@ class RowContainer(ft.Container):
             width = tamanho
         )
     
-    def toogle_favoritar(self, e):
-        self.icon.icon = ft.Icons.FAVORITE
+    def esta_favoritada(self):  
+        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
+        
+        if self._esta_favoritado == Favoritada.FAVORITADA:
+            return ft.Icons.FAVORITE_ROUNDED
+        else:
+            return ft.Icons.HEART_BROKEN_ROUNDED
+
+    def att_icon(self):
+        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
+
+        self._esta_favoritado = Favoritada.NAO_FAVORITADA
+        self.icon.icon = ft.Icons.HEART_BROKEN_ROUNDED
         self.icon.update()
-        print(e.control.data)
-           
-    def favoritar(self, data):
-        # notificar o Estado para favoritar a música.
-        ...
     
-    def desfavoritar(self, data):
-        ...
+    def att_icon_favoritado(self):
+        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
+
+        self._esta_favoritado = Favoritada.FAVORITADA
+        self.icon.icon = ft.Icons.FAVORITE_ROUNDED
+        self.icon.update()
+    
+    def toogle_favoritar(self, e):
+        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
+
+        print(e.control.data)
         
-    def tocar_ou_pausar(self, e):
-        from ....App.Audio.Model.modo_reproducao import Reprodução
+        if self._esta_favoritado == Favoritada.FAVORITADA:
+            self._esta_favoritado = Favoritada.NAO_FAVORITADA
+            self.icon.icon = ft.Icons.HEART_BROKEN_ROUNDED
+            self.desfavoritar(e.control.data)
+        else:
+            self._esta_favoritado = Favoritada.FAVORITADA
+            self.icon.icon = ft.Icons.FAVORITE
+            self.favoritar(e.control.data)
+
+        if self.page:
+            self.icon.update()
+        
+    def favoritar(self, data):
+        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
         from ....App.Audio.Controller.sessao import SessaoReproducao
-        from ....App.Audio.Model.modo_reproducao import ModoReprodução
-        
+
+        EstadoFavoritas.alterar_objeto_para_json(data)
+        EstadoFavoritas.adicionar_musica_reproducao(data)
+        SessaoReproducao.atualizar_filas()
+
+        print(SessaoReproducao.fila)
+
+    def desfavoritar(self, data):
+        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
+        from ....App.Audio.Controller.sessao import SessaoReproducao
+
+        EstadoFavoritas.remover_favorita_json(data)
+        EstadoFavoritas.remover_musica_reproducao(data)
+        SessaoReproducao.atualizar_filas()
+
+    def tocar_ou_pausar(self, e):
+        from ....App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
+        from ....App.Audio.Controller.sessao import SessaoReproducao
+
+        if e.control.data.modo == ModoReprodução.FAVORITA.value:
+            e.control.data.modo = ModoReprodução.FAVORITA
+
         if Reprodução._reproducao_atual != e.control.data.modo:
             Reprodução.definir_modo(e.control.data.modo)
         
@@ -132,7 +181,7 @@ class RowContainer(ft.Container):
         if SessaoReproducao.fonte_atual is ModoReprodução.SEM_REPRODUCAO:
             print('Sem reprodução definida')
             return
-        
+
         SessaoReproducao.receber_indice(e.control.data.chave)
         SessaoReproducao.tocar_indice()
 

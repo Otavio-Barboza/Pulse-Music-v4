@@ -54,6 +54,10 @@ class PlayerSection:
             height = 220,
             bgcolor = cor.preto7,
             alignment = ft.alignment.center,
+            border_radius = ft.border_radius.only(
+                top_left = 10,
+                top_right = 10
+            ),
             
             content = ft.Column(
                 spacing = 0,

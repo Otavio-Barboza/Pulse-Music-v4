@@ -83,7 +83,8 @@ class OverlayImagens(ft.Container):
                             ft.Container(
                                 content = ListViewMusicas(
                                     page = self.page,
-                                    musicas = self.musicas
+                                    musicas = self.musicas,
+                                    modo_favorita = None
                                 )
                             )
                         ]

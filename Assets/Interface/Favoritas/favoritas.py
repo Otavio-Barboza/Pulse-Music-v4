@@ -10,7 +10,7 @@ class Favoritas(ft.Container):
     ):
         super().__init__(
             expand = True,
-            bgcolor = '#f9f9f9'
+            padding = ft.padding.all(10)
         )
         
         self.page = page
@@ -19,6 +19,6 @@ class Favoritas(ft.Container):
         
         self.content = ListViewMusicas(
             page = self.page,
-            musicas = lista_objetos_musica,
-            pasta_musicas = caminho
+            musicas = self.listas_objetos_musicas,
+            modo_favorita = caminho
         )

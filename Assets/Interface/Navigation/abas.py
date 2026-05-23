@@ -57,11 +57,6 @@ class Abas(ft.Tabs):
             caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
             page = self.page
         )
-        self.favoritas = Favoritas(
-            page = self.page,
-            lista_objetos_musica = [],
-            caminho = None
-        )
         
         self._criar_tabs()
 
@@ -83,7 +78,7 @@ class Abas(ft.Tabs):
 
             ft.Tab(
                 tab_content = self._labels_tabs[3],
-                content = self.favoritas
+                content = None
             ),
 
             ft.Tab(
@@ -137,3 +132,20 @@ class Abas(ft.Tabs):
             modo = GridMode.ARTISTA
         )
         self.tabs[1].update()
+    
+    def carregar_favoritas(self):
+        from ...App.Favoritas.Controller.favoritas_controller import EstadoFavoritas, Favoritada
+        from ...App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
+        
+        lista_de_musicas = EstadoFavoritas.listar_objetos_favoritados()
+        self.tabs[3].content = Favoritas(
+            page = self.page,
+            lista_objetos_musica = lista_de_musicas,
+            caminho = Favoritada.FAVORITADA.value
+        )
+        self.tabs[3].update()
+
+        Reprodução.carregar_musicas_do_modo(
+            modo = ModoReprodução.FAVORITA,
+            lista = lista_de_musicas
+        )

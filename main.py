@@ -140,6 +140,7 @@ async def main(page : ft.Page):
     )
 
     tabs.pesquisa_musica.iniciar_animacao()
+    tabs.carregar_favoritas()
     
     page.on_resized = ResizeManager.executar
    

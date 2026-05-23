@@ -49,6 +49,24 @@ class SessaoReproducao:
         random.shuffle(cls.fila_aleatoria)
         cls.indice_atual = 0
 
+    @classmethod
+    def atualizar_filas(cls):
+        from ...Audio.Model.modo_reproducao import ModoReprodução
+        import random
+        
+        if (
+            cls.fila is None
+             or 
+            cls.fonte_atual != ModoReprodução.FAVORITA
+        ):
+            return
+        
+        cls.fila.clear()
+        cls.fila.extend(Reprodução.retornar_musicas_do_modo())
+
+        cls.fila_aleatoria.clear()
+        cls.fila_aleatoria.extend(cls.fila[:])
+        random.shuffle(cls.fila_aleatoria)
 
     # MÚSICA
     @classmethod

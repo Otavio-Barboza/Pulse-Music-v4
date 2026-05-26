@@ -6,7 +6,7 @@ class ModoReprodução(Enum):
     FAVORITA = 'favorita'
     ARTISTA = 'artista'
     ALBUM = 'album'
-    SEM_REPRODUCAO = 'sem_repdroducao'
+    SEM_REPRODUCAO = 'sem_reproducao'
 
 
 class Reprodução:
@@ -43,15 +43,14 @@ class Reprodução:
     # FUNÇÕES APENAS PARA AS FAVORITAS
     @classmethod
     def adicionar_musica(cls, musica):
-        print(musica)
-
         if musica not in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:
             cls._listas_modos_reproduções[ModoReprodução.FAVORITA].append(musica)
-            print(cls._listas_modos_reproduções[ModoReprodução.FAVORITA])
 
     @classmethod
     def remover_musica(cls, musica):
         for musica_favoritada in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:
             if musica_favoritada.chave == musica.chave:
-                cls._listas_modos_reproduções[ModoReprodução.FAVORITA].remove(musica_favoritada)
+                musica_a_remover = musica_favoritada
                 break
+
+        cls._listas_modos_reproduções[ModoReprodução.FAVORITA].remove(musica_a_remover)

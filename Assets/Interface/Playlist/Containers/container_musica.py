@@ -155,8 +155,6 @@ class RowContainer(ft.Container):
         EstadoFavoritas.adicionar_musica_reproducao(data)
         SessaoReproducao.atualizar_filas()
 
-        print(SessaoReproducao.fila)
-
     def desfavoritar(self, data):
         from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
         from ....App.Audio.Controller.sessao import SessaoReproducao
@@ -169,11 +167,11 @@ class RowContainer(ft.Container):
         from ....App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
         from ....App.Audio.Controller.sessao import SessaoReproducao
 
-        if e.control.data.modo == ModoReprodução.FAVORITA.value:
-            e.control.data.modo = ModoReprodução.FAVORITA
-
         if Reprodução._reproducao_atual != e.control.data.modo:
-            Reprodução.definir_modo(e.control.data.modo)
+            if e.control.data.modo == ModoReprodução.FAVORITA.value:
+                Reprodução.definir_modo(ModoReprodução.FAVORITA)
+            else:
+                Reprodução.definir_modo(e.control.data.modo)
         
         if SessaoReproducao.fonte_atual != e.control.data.modo:
             SessaoReproducao.definir_fonte()

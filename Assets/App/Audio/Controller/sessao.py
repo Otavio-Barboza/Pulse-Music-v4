@@ -44,7 +44,7 @@ class SessaoReproducao:
         import random
 
         cls.fonte_atual = Reprodução.retornar_modo()
-        cls.fila = Reprodução.retornar_musicas_do_modo()
+        cls.fila = Reprodução.retornar_musicas_do_modo()[:]
         cls.fila_aleatoria = cls.fila[:]
         random.shuffle(cls.fila_aleatoria)
         cls.indice_atual = 0
@@ -60,7 +60,7 @@ class SessaoReproducao:
             cls.fonte_atual != ModoReprodução.FAVORITA
         ):
             return
-        
+                
         cls.fila.clear()
         cls.fila.extend(Reprodução.retornar_musicas_do_modo())
 
@@ -229,6 +229,7 @@ class SessaoReproducao:
     def ir_para(cls, valor : float):
         Reprodutor.ir_para(valor)
         cls._notificar('posicao_slider')
+
 
     # VOLUME
     @classmethod

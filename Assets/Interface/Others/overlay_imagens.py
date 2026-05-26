@@ -14,7 +14,8 @@ class OverlayImagens(ft.Container):
         nome : str,
     ):
         super().__init__(
-            expand = True,
+            height = 700,
+            width = 1920,
             alignment = ft.alignment.center,
             padding = ft.padding.all(15),
             bgcolor = cor.preto2

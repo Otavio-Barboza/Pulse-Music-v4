@@ -44,6 +44,7 @@ class EstadoFavoritas:
     
     @classmethod
     def alterar_objeto_para_json(cls, dados : Musica):
+        from ...Audio.Model.modo_reproducao import ModoReprodução
         nova_chave, novo_item = FavoritasRepository.formatar_objeto_no_json(
             dado = dados, 
             status = Favoritada.FAVORITADA.value
@@ -56,7 +57,7 @@ class EstadoFavoritas:
 
         FavoritasRepository.salvar_json(json_musicas)
 
-        dados.modo = Favoritada.FAVORITADA.value
+        dados.modo = ModoReprodução.FAVORITA.value
 
         cls.notificar(
             evento = 'favoritar',

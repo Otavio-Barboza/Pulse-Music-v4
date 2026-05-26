@@ -134,14 +134,14 @@ class Abas(ft.Tabs):
         self.tabs[1].update()
     
     def carregar_favoritas(self):
-        from ...App.Favoritas.Controller.favoritas_controller import EstadoFavoritas, Favoritada
+        from ...App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
         from ...App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
         
         lista_de_musicas = EstadoFavoritas.listar_objetos_favoritados()
         self.tabs[3].content = Favoritas(
             page = self.page,
             lista_objetos_musica = lista_de_musicas,
-            caminho = Favoritada.FAVORITADA.value
+            caminho = ModoReprodução.FAVORITA
         )
         self.tabs[3].update()
 

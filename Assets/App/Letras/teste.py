@@ -2,8 +2,8 @@ from langdetect import detect
 from deep_translator import GoogleTranslator
 import dotenv, os, lyricsgenius
 
-dotenv.load_dotenv(r'Assets\App\Env\.env')
-GENIUS_TOKEN = os.getenv('teste')
+dotenv.load_dotenv(r'C:\Users\ifpr\Documents\GitHub\Pulse-Music-v4\Assets\App\Env\.env')
+GENIUS_TOKEN = os.getenv('CLIENT_ACCESS_TOKEN')
 
 def obter_letra(musica, artista):
 
@@ -11,10 +11,20 @@ def obter_letra(musica, artista):
         GENIUS_TOKEN,
         skip_non_songs = True,
         excluded_terms = ["(Remix)", "(Live)"],
-        remove_section_headers = True
+        remove_section_headers = True,
+        timeout = 30
     )
 
-    song = genius.search_song(musica, artista)
+    import requests
+
+    try:
+        song = genius.search_song(musica, artista)
+
+    except requests.exceptions.Timeout:
+        print("Timeout ao buscar letra.")
+
+    except Exception as erro:
+        print(f"Erro: {erro}")
 
     if not song:
         return None

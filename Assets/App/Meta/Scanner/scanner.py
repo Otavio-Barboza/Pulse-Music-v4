@@ -28,38 +28,41 @@ class Scanner:
         )
        
         if musicas_removidas is not None:
-            if (
-                isinstance(EstadoPlay._playlist_aberta, dict) and
-                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
-            ):
-                EstadoPlay.notificar(
-                    evento = 'att_musicas_exibidas',
-                    dados = None
-                )
-
             chaves = await cls.obter_chaves_por_caminho(musicas_removidas)
             
             if ScannerModel.esta_ocupado():
                 return
             
             await cls.exclusao_musica(
-                chaves = chaves,
-                tamanho_playlist = len_pasta,
-                id_play = dados.get('id')
+                chaves = chaves
             )
             await Persistencia.atribuir_memoria()
+            
             await asyncio.sleep(1)
 
-        if musicas_novas is not None:   
             if (
                 isinstance(EstadoPlay._playlist_aberta, dict) and
                 EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
             ):
                 EstadoPlay.notificar(
                     evento = 'att_musicas_exibidas',
-                    dados = None
+                    dados = pasta
                 )
 
+            if (
+                len_pasta is not None
+                 or
+                dados.get('id') is not None
+            ):
+                EstadoPlay.notificar(
+                    evento = 'att_qtde_play',
+                    dados = {
+                        "id": dados.get('id'), 
+                        "qtde": len_pasta
+                    }
+                )
+        
+        if musicas_novas is not None:   
             if ScannerModel.esta_ocupado():
                 return
             
@@ -72,7 +75,43 @@ class Scanner:
                 dados = dados
             )
             await Persistencia.atribuir_memoria()
+            
             await asyncio.sleep(1)
+
+            if (
+                isinstance(EstadoPlay._playlist_aberta, dict) and
+                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+            ):
+                EstadoPlay.notificar(
+                    evento = 'att_musicas_exibidas',
+                    dados = pasta
+                )
+            
+                if (
+                    len_pasta is not None
+                    or
+                    dados.get('id') is not None
+                ):
+                    EstadoPlay.notificar(
+                        evento = 'att_qtde_play',
+                        dados = {
+                            "id": dados.get('id'), 
+                            "qtde": len_pasta
+                        }
+                    )        
+                    
+            if (
+                len_pasta is not None
+                 or
+                dados.get('id') is not None
+            ):
+                EstadoPlay.notificar(
+                    evento = 'att_qtde_play',
+                    dados = {
+                        "id": dados.get('id'), 
+                        "qtde": len_pasta
+                    }
+                )        
 
         await asyncio.sleep(1)
 
@@ -153,7 +192,7 @@ class Scanner:
         }
     
     @classmethod
-    async def reconhecer_artistas_albuns_inexistentes(cls, chaves_remover : set[str], tamanho_playlist : int | None = None, id : str | None = None):
+    async def reconhecer_artistas_albuns_inexistentes(cls, chaves_remover : set[str]):
         from collections import defaultdict
         from ...Meta.Repository.normalizacao import Filtragem
         from ...Services.Controllers.estado_grid import GridMode
@@ -237,15 +276,6 @@ class Scanner:
             evento = 'att_grid',
             dados = GridMode.ALBUM
         )
-
-        if tamanho_playlist is not None:
-            EstadoPlay.notificar(
-                evento = 'att_qtde_play',
-                dados = {
-                    "id": id, 
-                    "qtde": tamanho_playlist
-                }
-            )
         
     @classmethod
     async def nova_musica(cls, pasta : str, lista : list):
@@ -274,7 +304,7 @@ class Scanner:
         )
 
     @classmethod
-    async def exclusao_musica(cls, chaves : set[str], tamanho_playlist : int, id_play : str | None = None):       
+    async def exclusao_musica(cls, chaves : set[str]):       
         from ..Models.scanner_model import ScannerModel
         from ..Controller.scanner_controller import ScannerController
         
@@ -292,9 +322,7 @@ class Scanner:
 
         try:
             await cls.reconhecer_artistas_albuns_inexistentes(
-                chaves_remover = chaves,
-                tamanho_playlist = tamanho_playlist,
-                id = id_play
+                chaves_remover = chaves
             )
         finally:
             ScannerModel.finalizar_tarefa()

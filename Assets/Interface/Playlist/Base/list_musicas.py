@@ -67,7 +67,7 @@ class ListViewMusicas(ft.ListView):
         if self.modo_favorita is not None:
             EstadoFavoritas._callbacks['favoritar'].remove(self._callback_favoritar)
             EstadoFavoritas._callbacks['desfavoritar'].remove(self._callback_desfavoritar)
-            
+    
     def _carregar(self):
         from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas, Favoritada
         
@@ -82,7 +82,7 @@ class ListViewMusicas(ft.ListView):
                 status = Favoritada.FAVORITADA
             else:
                 status = Favoritada.NAO_FAVORITADA
-                
+            
             container = RowContainer(
                 page = self.page,
                 musica = musica,
@@ -90,14 +90,27 @@ class ListViewMusicas(ft.ListView):
             )
             
             self.controls.append(container)
-    
-    def recarregar(self, _):
+            
+    def recarregar(self, pasta):
+        from ....App.Audio.Fontes.fonte_playlist import FontePlaylist
+        from ....App.Audio.Model.modo_reproducao import ModoReprodução
+        
         if (
             isinstance(EstadoPlay._playlist_aberta, dict) and
             EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
         ):
-            try:
+            try:                
+                fonte = FontePlaylist(
+                    pasta = pasta,
+                    modo = ModoReprodução.PLAYLIST if self.modo_favorita is None else ModoReprodução.FAVORITA
+                )
+
+                self.musicas = None
+                self.musicas = fonte.carregar()
+                
+                self.controls.clear()
                 self._carregar()
+                self.update()
             except Exception as e:
                 print(f'CALLBACK RECARREGA PLATLIST ERROR: {e}')
 

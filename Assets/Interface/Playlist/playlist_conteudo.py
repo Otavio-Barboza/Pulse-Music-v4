@@ -64,7 +64,7 @@ class PlaylistConteudo(ft.Container):
             Ordem: Estadoplaylist -> Grid & Repositorio -> CreatePlaylist
         """
         self.estado.criar_playlist()
-
+        
     def abrir_playlist(self, id : str, data : str):
         """
             Ordem: EstadoPlaylist ->
@@ -86,7 +86,7 @@ class PlaylistConteudo(ft.Container):
         fonte.carregar_playlist(
             lista_musicas = lista_de_musicas
         )
-        
+
         self.abrir()
 
         list_view = ListViewMusicas(

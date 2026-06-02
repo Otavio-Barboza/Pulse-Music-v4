@@ -122,7 +122,7 @@ class CardPlaylist(ft.Container):
             funcao = self.alterar_qtde_de_musicas_playlist
         )
 
-    def alterar_qtde_de_musicas_playlist(self, quantidade : int):
+    def alterar_qtde_de_musicas_playlist(self, quantidade : dict):
         if not self.page:
             return
         

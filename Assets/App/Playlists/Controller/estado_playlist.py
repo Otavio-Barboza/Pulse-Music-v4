@@ -161,6 +161,8 @@ class EstadoPlay:
         
     @classmethod
     def notificar(cls, evento : str, dados = None):
+        print(f'Notificando: {evento}')
+        
         if evento not in cls._callbacks:
             return
         

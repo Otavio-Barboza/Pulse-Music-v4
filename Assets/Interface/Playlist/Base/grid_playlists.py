@@ -64,7 +64,6 @@ class GridPlaylists(ft.GridView):
         card.pasta = path
         card.data['pasta'] = path
 
-        # print(card.data)
         if qtde_mus is not None:
             card.qtde.value = f"{qtde_mus} músicas"
 

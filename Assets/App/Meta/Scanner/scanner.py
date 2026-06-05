@@ -3,6 +3,7 @@ from ...Services.Controllers.estado_grid import EstadoGrid
 from ..Repository.persistencia import Persistencia
 from ..Controller.status import StatusScanner
 from ...Playlists.Controller.estado_playlist import EstadoPlay
+from ...Audio.Controller.sessao import SessaoReproducao
 import os, asyncio
 
 class Scanner:
@@ -12,6 +13,7 @@ class Scanner:
     async def validar_dados_json(cls, dados : dict):
         from ..Models.scanner_model import ScannerModel
         from ...Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
+        from ...Audio.Repository.musica_repositorio import RepositorioMusica
 
         pasta = dados.get('musicas').get('pasta')
         len_pasta = len(
@@ -49,18 +51,18 @@ class Scanner:
                     dados = pasta
                 )
 
-            if (
-                len_pasta is not None
-                 or
-                dados.get('id') is not None
-            ):
-                EstadoPlay.notificar(
-                    evento = 'att_qtde_play',
-                    dados = {
-                        "id": dados.get('id'), 
-                        "qtde": len_pasta
-                    }
-                )
+            # if (
+            #     len_pasta is not None
+            #      or
+            #     dados.get('id') is not None
+            # ):
+            #     EstadoPlay.notificar(
+            #         evento = 'att_qtde_play',
+            #         dados = {
+            #             "id": dados.get('id'), 
+            #             "qtde": len_pasta
+            #         }
+            #     )
         
         if musicas_novas is not None:   
             if ScannerModel.esta_ocupado():
@@ -87,31 +89,18 @@ class Scanner:
                     dados = pasta
                 )
             
-                if (
-                    len_pasta is not None
-                    or
-                    dados.get('id') is not None
-                ):
-                    EstadoPlay.notificar(
-                        evento = 'att_qtde_play',
-                        dados = {
-                            "id": dados.get('id'), 
-                            "qtde": len_pasta
-                        }
-                    )        
-                    
-            if (
-                len_pasta is not None
-                 or
-                dados.get('id') is not None
-            ):
-                EstadoPlay.notificar(
-                    evento = 'att_qtde_play',
-                    dados = {
-                        "id": dados.get('id'), 
-                        "qtde": len_pasta
-                    }
-                )        
+        if (
+            len_pasta is not None
+            or
+            dados.get('id') is not None
+        ):
+            EstadoPlay.notificar(
+                evento = 'att_qtde_play',
+                dados = {
+                    "id": dados.get('id'), 
+                    "qtde": len_pasta
+                }
+            )            
 
         await asyncio.sleep(1)
 

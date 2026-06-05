@@ -38,14 +38,14 @@ class Reprodução:
     def retornar_musicas_do_modo(cls):
         if cls._reproducao_atual != ModoReprodução.SEM_REPRODUCAO:
             return cls._listas_modos_reproduções[cls._reproducao_atual]
-        
+        return None
 
     # FUNÇÕES APENAS PARA AS FAVORITAS
     @classmethod
     def adicionar_musica(cls, musica):
         if musica not in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:
             cls._listas_modos_reproduções[ModoReprodução.FAVORITA].append(musica)
-
+    
     @classmethod
     def remover_musica(cls, musica):
         for musica_favoritada in cls._listas_modos_reproduções[ModoReprodução.FAVORITA]:

@@ -126,14 +126,11 @@ class CardPlaylist(ft.Container):
         if not self.page:
             return
         
-        if self.container_info.page is None:
-            return
-        
         if quantidade["id"] == self.data["id"]:
             self.qtde.value = f'{quantidade["qtde"]} músicas'
             
         try:
-            self.container_info.update()
+            self.update()
         except AssertionError as ase:
             print(ase)
             return

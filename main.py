@@ -11,7 +11,6 @@ from Assets.App.Services.Auth.google_login_auth import login_google
 from Assets.App.Services.gerenciador_contas import GerenciadorContas
 from Assets.App.Meta.Repository.persistencia import Persistencia
 from Assets.App.Meta.Models.scanner_model import ScannerModel
-from Assets.Interface.Grids.grid import GridMode
 from Assets.App.Meta.Memoria.memoria_global import memoria
 import asyncio, json
 import flet as ft

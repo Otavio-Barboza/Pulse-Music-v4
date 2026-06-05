@@ -1,6 +1,7 @@
 from ..Model.modelos import EstadoPlayer, ConfiguracaoReproducao
 from ..Model.modo_reproducao import Reprodução
 from ..Model.reprodutor import Reprodutor
+from ...Playlists.Controller.estado_playlist import EstadoPlay
 
 class SessaoReproducao:
     estado = EstadoPlayer()
@@ -26,6 +27,7 @@ class SessaoReproducao:
         'repetir' : [],
         'aleatorio' : []
     }
+
 
     # CALLBACKS
     @classmethod
@@ -67,6 +69,25 @@ class SessaoReproducao:
         cls.fila_aleatoria.clear()
         cls.fila_aleatoria.extend(cls.fila[:])
         random.shuffle(cls.fila_aleatoria)
+
+    @classmethod
+    def atualizar_filas_scanner(cls, *_):
+        cls.fila.clear()
+        cls.fila.extend(
+            Reprodução.retornar_musicas_do_modo()[:]
+        )
+
+        cls.fila_aleatoria.clear()
+        cls.fila_aleatoria.extend(cls.fila[:])
+        
+        if cls.estado.musica_atual is None:
+            return
+
+        for i, musica in enumerate(cls.fila):
+            if musica.chave == cls.estado.musica_atual.chave:
+                cls.indice_atual = i
+                return
+    
 
     # MÚSICA
     @classmethod

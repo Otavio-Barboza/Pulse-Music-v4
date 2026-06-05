@@ -94,20 +94,24 @@ class ListViewMusicas(ft.ListView):
     def recarregar(self, pasta):
         from ....App.Audio.Fontes.fonte_playlist import FontePlaylist
         from ....App.Audio.Model.modo_reproducao import ModoReprodução
+        # from ....App.Audio.Controller.sessao import SessaoReproducao
         
         if (
             isinstance(EstadoPlay._playlist_aberta, dict) and
             EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
         ):
             try:                
-                fonte = FontePlaylist(
-                    pasta = pasta,
-                    modo = ModoReprodução.PLAYLIST if self.modo_favorita is None else ModoReprodução.FAVORITA
-                )
+                if self.modo_favorita is None:
+                    fonte = FontePlaylist(
+                        pasta = pasta,
+                        modo = ModoReprodução.PLAYLIST
+                    )
 
-                self.musicas = None
-                self.musicas = fonte.carregar()
-                
+                    self.musicas = fonte.carregar()
+                    fonte.carregar_playlist(self.musicas)
+
+                SessaoReproducao.atualizar_filas_scanner()
+
                 self.controls.clear()
                 self._carregar()
                 self.update()

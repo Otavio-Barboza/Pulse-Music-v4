@@ -78,10 +78,13 @@ async def main(page : ft.Page):
     async def carregar_memoria():
         from Assets.App.Meta.Memoria.memoria_global import memoria
         from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
-        
+        from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
+
         dados = await Persistencia.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
         memoria.carregar(dados)
+        
         await MemoriaArtistas.carregar()
+        LetrasMemoria.carregar_memoria()
 
     def abrir_config():
         """
@@ -149,7 +152,7 @@ async def main(page : ft.Page):
     page.run_task(
         ScannerModel._async_iniciar_scanner
     )
-    
+
 if __name__ == '__main__':
     asyncio.run(
         ft.app_async(

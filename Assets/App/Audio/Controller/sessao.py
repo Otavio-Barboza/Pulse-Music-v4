@@ -2,6 +2,7 @@ from ..Model.modelos import EstadoPlayer, ConfiguracaoReproducao
 from ..Model.modo_reproducao import Reprodução
 from ..Model.reprodutor import Reprodutor
 from ...Playlists.Controller.estado_playlist import EstadoPlay
+from ...Letras.Controller.letras_services import LetrasServices
 
 class SessaoReproducao:
     estado = EstadoPlayer()
@@ -28,6 +29,10 @@ class SessaoReproducao:
         'aleatorio' : []
     }
 
+    LetrasServices.registrar_callback(
+        evento = 'buscar_letra',
+        callback = LetrasServices.buscar_letra
+    )
 
     # CALLBACKS
     @classmethod
@@ -121,6 +126,15 @@ class SessaoReproducao:
         cls._notificar('att_container')
         cls._notificar('play/pause')
         cls._notificar('musica_atual')
+        
+        LetrasServices._notificar(
+            evento = 'buscar_letra',
+            dados = {
+                'chave' : cls.estado.musica_atual.chave,
+                'nome' : cls.buscar_nome(),
+                'artista' : cls.buscar_artista()
+            }
+        )
 
     @classmethod
     def definir_status_tocando(cls, valor : bool):
@@ -275,6 +289,11 @@ class SessaoReproducao:
         from ..Repository.musica_repositorio import RepositorioMusica
         return RepositorioMusica.buscar_artista(cls.estado.musica_atual.chave)
     
+    @classmethod
+    def buscar_nome(cls) -> str:
+        from ..Repository.musica_repositorio import RepositorioMusica
+        return RepositorioMusica.buscar_musica(cls.estado.musica_atual.chave)
+
     @classmethod
     def buscar_capa(cls) -> str:
         from ..Repository.musica_repositorio import RepositorioMusica

@@ -53,3 +53,29 @@ class RepositorioMusica:
                 )
         else:
             return r'Assets\Global\Images\Padrao\capa_musicas_desconhecidas.png'
+    
+    @classmethod
+    def buscar_musica(cls, chave_musica : str):
+        from ...Services.gerenciador_contas import GerenciadorContas
+        import json
+        
+        with open(
+            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json', 
+            'r', 
+            encoding = 'utf-8'
+        ) as js:
+            json_musicas = json.load(js)
+        
+        for chave, item in json_musicas.items():
+            if chave == chave_musica:
+                musica = item
+                break
+
+        if musica['nome_musica_filtrado'].get('titulo_ID3_filtrado') is not None:
+            return musica['nome_musica_filtrado'].get('titulo_ID3_filtrado')
+        elif musica['nome_musica_filtrado'].get('arquivo_mp3_filtrado') is not None:
+            return musica['nome_musica_filtrado'].get('arquivo_mp3_filtrado')
+        elif musica['titulo_ID3_original'] is not None:
+            return musica.get('titulo_ID3_original')
+        else:
+            return musica.get('arquivo_original')

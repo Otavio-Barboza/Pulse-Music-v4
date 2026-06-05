@@ -19,9 +19,8 @@ class MenuInfos(ft.Container):
             alignment = ft.MainAxisAlignment.CENTER,
             
             controls = [
-                self._botao(texto = 'Informações', view = 'info', callback = trocar_view),
                 self._botao(texto = 'Letra', view = 'letra', callback = trocar_view),
-                self._botao(texto = 'Artista', view = 'artista', callback = trocar_view)
+                self._botao(texto = 'Traduções da Letra', view = 'artista', callback = trocar_view)
             ]
         )
 
@@ -29,7 +28,7 @@ class MenuInfos(ft.Container):
         botao = ft.TextButton(
             text = texto,
             on_click = lambda e: callback(view),
-            width = 100,
+            width = 150,
 
             style = ft.ButtonStyle(
                 bgcolor = {

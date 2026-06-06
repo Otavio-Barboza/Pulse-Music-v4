@@ -4,15 +4,18 @@ from ..Translate.tradutor import Tradutor
 import requests
 
 class LetrasServices:
+    _tela_expandida = False
     GENIUS = Genius()
     TRADUTOR = Tradutor()
+
+    _LINGUAGENS_DIPONIVEIS : dict[str, str] = TRADUTOR._languages
     
-    _callbacks = {
-        'buscar_letra' : []
-    }
+    _callbacks = {}
 
     @classmethod
     def registrar_callback(cls, evento : str, callback : callable):
+        if evento not in cls._callbacks:
+            cls._callbacks[evento] = []
         cls._callbacks[evento].append(callback)
 
     @classmethod
@@ -20,6 +23,9 @@ class LetrasServices:
         for callback in cls._callbacks.get(evento, []):
             callback(dados)
 
+    @classmethod
+    def set_tela_expandida(cls, valor : bool):
+        cls._tela_expandida = valor
 
     @classmethod
     def buscar_letra(cls, dados : dict) -> str | None:
@@ -28,7 +34,6 @@ class LetrasServices:
 
         try:    
             if dados.get('chave') in LetrasMemoria._letras:
-                print('essa letra já está salva')
                 return
             
             song = cls.GENIUS.search_song(
@@ -46,6 +51,13 @@ class LetrasServices:
             )
 
             LetrasMemoria.carregar_memoria()
+
+            if cls._tela_expandida:
+                cls._notificar(
+                    evento = 'att_letra',
+                    dados = None
+                )
+
         except requests.exceptions.Timeout:
             print("Timeout ao buscar letra.")
             return
@@ -94,3 +106,35 @@ class LetrasServices:
             })
 
         LetraRepository.salvar_json(letras_existentes)
+
+    @classmethod
+    def executar_traducao(cls, idioma : str):
+        from ..Cache.memoria_letras import LetrasMemoria
+        from ...Audio.Controller.sessao import SessaoReproducao
+
+        if SessaoReproducao.estado.musica_atual is None:
+            return 'Nenhuma música carregada para efetuar traducao'
+        
+        letra_traduzida_existente = LetrasMemoria.retornar_letra_traduzida(idioma)
+        
+        if letra_traduzida_existente is not None:
+            print('carregando letra existente')
+            return letra_traduzida_existente
+        
+        letra = LetrasMemoria.retornar_letra()
+
+        if not letra:
+            return 'A respectiva letra não foi encontrada. Portanto, não é possível traduzir!'
+        
+        letra_traduzida = cls.traduzir(letra)
+
+        if not letra_traduzida:
+            return 'Falha na tradução, tente novamente!'
+        
+        cls.atualizar_traducoes(
+            chave_da_musica = SessaoReproducao.estado.musica_atual.chave,
+            novo_idioma = idioma,
+            nova_letra = letra_traduzida
+        )
+
+        return letra_traduzida

@@ -7,6 +7,7 @@ from .Controls.infos_expandido import InfosExpandida
 from .Controls.Navigation.menu_expandido import MenuInfos
 from .Controls.Navigation.conteudo import ConteudoInfos
 from .Controls.Navigation.conteudo_letra import ContainerLetra
+from .Controls.Navigation.conteudo_traducoes import ContainerTraducao
 from ...App.Services.Controllers.estado_section import EstadoSection
 from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
 import flet as ft
@@ -90,8 +91,7 @@ class PlayerSection:
             self.comandos_compacto.icon_expandir.icon = ft.Icons.FULLSCREEN_EXIT
             self.comandos_expandido.icon_expandir.icon = ft.Icons.FULLSCREEN_EXIT
             
-        EstadoSection.alterar('view', 'info')
-        self._trocar_view('info')
+        self._trocar_view('letra')
         self.page.update()
 
     def minimizar(self, e):
@@ -109,10 +109,8 @@ class PlayerSection:
     def _trocar_view(self, view):
         if view == 'letra':
             self.conteudo_infos.trocar(ContainerLetra())
-        elif view == 'info':
-            self.conteudo_infos.trocar(ft.Container(expand = True, bgcolor = cor.azul_escuro, content = ft.Text('value')))
-        elif view == 'artista':
-            self.conteudo_infos.trocar(ft.Container(expand = True, bgcolor = cor.roxo, content = ft.Text('value')))
+        elif view == 'traducao':
+            self.conteudo_infos.trocar(ContainerTraducao())
         
         EstadoSection.alterar('view', view)
         self.page.update()
@@ -157,10 +155,11 @@ class PlayerSection:
         return ft.Container(
             col = colunas,
             expand = True,
-            content = self.conteudo_infos
+            content = self.conteudo_infos,
+            alignment = ft.alignment.center
         )
     
-    def _redimensionar(self, e  = None):
+    def _redimensionar(self, e = None):
         self.expandido.content.controls.clear()
 
         if self.page.width < 768:
@@ -169,5 +168,6 @@ class PlayerSection:
             self.expandido.content.controls.append(self._expandido_MD())
         
         self.expandido.content.controls.append(self.compacto_expandido)
-
+        
+        self._trocar_view(EstadoSection._estado['view'])
         self.expandido.update()

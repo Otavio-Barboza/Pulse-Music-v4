@@ -13,3 +13,6 @@ class ConteudoInfos(ft.Container):
     def trocar(self, novo):
         self.content.controls.clear()
         self.content.controls.append(novo)
+        
+        if self.page:
+            self.update()

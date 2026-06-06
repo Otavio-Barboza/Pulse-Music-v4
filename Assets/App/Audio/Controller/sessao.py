@@ -136,6 +136,12 @@ class SessaoReproducao:
             }
         )
 
+        if LetrasServices._tela_expandida:
+            LetrasServices._notificar(
+                evento = 'att_letra',
+                dados = None
+            )
+
     @classmethod
     def definir_status_tocando(cls, valor : bool):
         cls.estado.tocando = valor

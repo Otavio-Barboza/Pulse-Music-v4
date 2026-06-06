@@ -20,7 +20,7 @@ class MenuInfos(ft.Container):
             
             controls = [
                 self._botao(texto = 'Letra', view = 'letra', callback = trocar_view),
-                self._botao(texto = 'Traduções da Letra', view = 'artista', callback = trocar_view)
+                self._botao(texto = 'Traduções da Letra', view = 'traducao', callback = trocar_view)
             ]
         )
 

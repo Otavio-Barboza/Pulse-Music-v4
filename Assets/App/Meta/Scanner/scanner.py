@@ -249,12 +249,21 @@ class Scanner:
                     
                 chaves_para_remover.add(chave)
             
+        letras_json = await Persistencia.ler_json(
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/letras.json'
+        )
+
         for chave in chaves_para_remover:
             del musicas_json[chave]
+            del letras_json[chave]
         
         await Persistencia.salvar_json(
             caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json',
             dados = musicas_json
+        )            
+        await Persistencia.salvar_json(
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/letras.json',
+            dados = letras_json
         )            
 
         EstadoGrid._notificar(

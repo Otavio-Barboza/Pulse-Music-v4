@@ -18,14 +18,21 @@ if __name__ == "__main__":
     # print("\n=== LETRA ===\n")
     # print(letra)
 
-    # LetrasServices._definir_linguagem_saida(
+    # LetrasServices._definir_linguagem_saida(A
     #     saida = 'ptt' 
     # )
     # letra_traduzida = LetrasServices.traduzir(letra)
 
     # print("\n===  LETRA TRADUZIDA  ===\n")
     # print(letra_traduzida)
-    for chave, item in GoogleTranslator()._languages.items():
-        print(chave, item)
 
+    # traduzir chaves
+    dicio = GoogleTranslator()._languages
+    c = {}
+    for chave, item in dicio.items():
+        chave_corrigida = chave.replace(' ', '_')
+        c[chave_corrigida] = item
+
+    print(c)
+    print(GoogleTranslator()._languages)
     # print(GoogleTranslator()._languages)

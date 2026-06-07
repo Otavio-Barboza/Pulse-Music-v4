@@ -8,8 +8,12 @@ class LetrasServices:
     GENIUS = Genius()
     TRADUTOR = Tradutor()
 
-    _LINGUAGENS_DIPONIVEIS : dict[str, str] = TRADUTOR._languages
-    
+    _LINGUAGENS_DIPONIVEIS : dict[str, str] = {}    
+    for idioma, uf in TRADUTOR._languages.items():
+        _LINGUAGENS_DIPONIVEIS[
+            idioma.replace(' ', '_')
+        ] = uf
+
     _callbacks = {}
 
     @classmethod
@@ -113,12 +117,11 @@ class LetrasServices:
         from ...Audio.Controller.sessao import SessaoReproducao
 
         if SessaoReproducao.estado.musica_atual is None:
-            return 'Nenhuma música carregada para efetuar traducao'
+            return 'Nenhuma letra carregada para tradução'
         
         letra_traduzida_existente = LetrasMemoria.retornar_letra_traduzida(idioma)
         
         if letra_traduzida_existente is not None:
-            print('carregando letra existente')
             return letra_traduzida_existente
         
         letra = LetrasMemoria.retornar_letra()
@@ -136,5 +139,7 @@ class LetrasServices:
             novo_idioma = idioma,
             nova_letra = letra_traduzida
         )
+
+        LetrasMemoria.carregar_memoria()
 
         return letra_traduzida

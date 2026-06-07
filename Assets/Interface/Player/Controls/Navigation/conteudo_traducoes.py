@@ -50,7 +50,7 @@ class ContainerTraducao(ft.Container):
                 size = 18,
                 weight = ft.FontWeight.W_500,
 
-                value = 'Nenhuma letra foi traduzida ainda'
+                value = self.carregar_letra()
             )
         )
 
@@ -78,8 +78,19 @@ class ContainerTraducao(ft.Container):
             ]
         )
 
+    def carregar_letra(self):
+        from .....App.Letras.Cache.memoria_letras import LetrasMemoria
+
+        if LetrasMemoria._cache_letra is None:
+            return 'Nenhuma letra carregada para tradução'
+        else:
+            return LetrasServices.executar_traducao(LetrasMemoria._cache_letra)
+
     def selecionar_idioma(self, e):
+        from .....App.Letras.Cache.memoria_letras import LetrasMemoria
+
+        LetrasMemoria.atualizar_cache(e.control.data.get('idioma'))
         LetrasServices.TRADUTOR.target = e.control.data.get('uf')
         
         self.letra.content.value = LetrasServices.executar_traducao(e.control.data.get('idioma'))
-        self.letra. update()
+        self.update()

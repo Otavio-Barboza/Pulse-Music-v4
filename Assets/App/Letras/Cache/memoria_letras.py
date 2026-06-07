@@ -1,5 +1,6 @@
 class LetrasMemoria:
     _letras = {}
+    _cache_letra = None
 
     @classmethod
     def carregar_memoria(cls):
@@ -46,3 +47,7 @@ class LetrasMemoria:
                 return traducao.get('letra')
         else:
             return None
+        
+    @classmethod
+    def atualizar_cache(cls, idioma):
+        cls._cache_letra = idioma

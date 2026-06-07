@@ -32,7 +32,7 @@ class PlayerSection:
 
         self.info_expandido = InfosExpandida(page = self.page)
         self.menu_infos = MenuInfos(page = self.page, trocar_view = self._trocar_view)
-        self.conteudo_infos = ConteudoInfos()
+        self.conteudo_infos = None
         
         self.expandido = ft.Container(
             bgcolor = cor.preto2,
@@ -114,6 +114,8 @@ class PlayerSection:
         
         EstadoSection.alterar('view', view)
         self.page.update()
+
+        # print("CONTEUDO INFOS PAGE FINAL", self.conteudo_infos.page)
     
     def _expandido_MD(self) -> ft.ResponsiveRow:
         return ft.Column(
@@ -152,6 +154,7 @@ class PlayerSection:
         )
     
     def _conteudo_infos_menu_scrolavel(self, colunas : int) -> ft.Column:
+        self.conteudo_infos = ConteudoInfos()
         return ft.Container(
             col = colunas,
             expand = True,
@@ -159,8 +162,12 @@ class PlayerSection:
             alignment = ft.alignment.center
         )
     
-    def _redimensionar(self, e = None):
+    def _redimensionar(self, e = None): 
+        # print("CONTEUDO INFOS PAGE ANTES", self.conteudo_infos.page)
+
         self.expandido.content.controls.clear()
+
+        # print("CONTEUDO INFOS PAGE DEPOIS CLEAR", self.conteudo_infos.page)
 
         if self.page.width < 768:
             self.expandido.content.controls.append(self._expandido_SM())
@@ -171,3 +178,4 @@ class PlayerSection:
         
         self._trocar_view(EstadoSection._estado['view'])
         self.expandido.update()
+        

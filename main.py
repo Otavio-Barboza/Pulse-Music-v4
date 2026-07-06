@@ -30,16 +30,16 @@ def abrir_perfil(id_atual):
         return dados_perfil
    
 async def main(page : ft.Page):
-    page.title = 'Pulse Music'
+    page.title = "Pulse Music"
     page.padding = 0
     page.bgcolor = cor.preto_puro_4
     page.theme_mode = ft.ThemeMode.DARK
     page.fonts = {
-        'sansita' : r'Assets\Global\Fonts\SansitaSwashed-VariableFont_wght.ttf',
-        'inter' : r'Assets\Global\Fonts\Inter-VariableFont_opsz,wght.ttf'
+        "sansita" : r"Assets\Global\Fonts\SansitaSwashed.ttf",
+        "google_sans_flex" : r"Assets\Global\Fonts\GoogleSansFlex.ttf"
     }
     page.theme = ft.Theme(
-        font_family = 'inter'
+        font_family = "google_sans_flex"
     )
     
     config_painel = None
@@ -47,19 +47,19 @@ async def main(page : ft.Page):
 
     async def on_sem_conta(_ = None):
         """
-            Função chamada quando é notficado pelo EstadoApp estar ('sem_conta') existente, consequentemente chama o login_google() para realizá-lo.
+            Função chamada quando é notficado pelo EstadoApp estar ("sem_conta") existente, consequentemente chama o login_google() para realizá-lo.
         """
         page.overlay.clear()
         page.update()
         await login_google()
     
-    EstadoApp.registrar_ouvinte('sem_conta', on_sem_conta)
+    EstadoApp.registrar_ouvinte("sem_conta", on_sem_conta)
     
     async def validar_login():
         """
             Função que valida o login. 
-              →  Se tiver conta logada: notifica o EstadoApp ('conta_atual') para realizar o carregamento do usuario e informações ao player. 
-              →  Senão: notifica o EstadoApp ('sem_conta') para realizar o login pelas contas Google.
+              →  Se tiver conta logada: notifica o EstadoApp ("conta_atual") para realizar o carregamento do usuario e informações ao player. 
+              →  Senão: notifica o EstadoApp ("sem_conta") para realizar o login pelas contas Google.
         """
         id_atual = GerenciadorContas.ler_conta_atual_index()
 
@@ -73,14 +73,14 @@ async def main(page : ft.Page):
                 dados = perfil
             )
         else:
-            EstadoApp.notificar('sem_conta')
+            EstadoApp.notificar("sem_conta")
 
     async def carregar_memoria():
         from Assets.App.Meta.Memoria.memoria_global import memoria
         from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
         from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
 
-        dados = await Persistencia.ler_json(f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json')
+        dados = await Persistencia.ler_json(f"Assets/Data/Contas/{GerenciadorContas.contas_cache['conta_atual']}/Music/musicas.json")
         memoria.carregar(dados)
         
         await MemoriaArtistas.carregar()
@@ -88,7 +88,7 @@ async def main(page : ft.Page):
 
     def abrir_config():
         """
-            Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em 'abrir_config').
+            Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "abrir_config").
         """
         nonlocal config_painel
          
@@ -114,30 +114,32 @@ async def main(page : ft.Page):
         """
         tabs.playlist.carregar()
     
-    EstadoApp.registrar_ouvinte('conta_atual', on_conta_atual)
+    EstadoApp.registrar_ouvinte("conta_atual", on_conta_atual)
     
     player = PlayerSection(page = page)
     page.appbar = AppBar(page = page, abrir_config = abrir_config)
-                
-    layout = ft.Stack(
-        expand = True,
-        controls = [
-            ft.Column(
+    
+    page.add(
+        ft.SafeArea(
+            content = ft.Stack(
                 expand = True,
-                spacing = 0,
                 controls = [
-                    tabs,
-                    player.compacto
+                    ft.Column(
+                        expand = True,
+                        spacing = 0,
+                        controls = [
+                            tabs,
+                            player.compacto
+                        ]
+                    ),
+                    player.expandido
                 ]
-            ),
-            player.expandido
-        ]
+            )
+        )
     )
     
-    page.add(layout)
-    
     EstadoApp.notificar(
-        'conta_atual',
+        "conta_atual",
         GerenciadorContas.usuario()
     )
 
@@ -153,10 +155,11 @@ async def main(page : ft.Page):
         ScannerModel._async_iniciar_scanner
     )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asyncio.run(
         ft.app_async(
             target = main, 
-            assets_dir = 'Assets'
+            assets_dir = "Assets"
         )
     )

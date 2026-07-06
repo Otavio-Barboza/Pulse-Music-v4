@@ -1,8 +1,8 @@
 from ....App.Audio.Controller.sessao import SessaoReproducao
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 
-class IconsPlayer(ft.Container):
+class PlayerIcons(ft.Container):
     def __init__(self, page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
@@ -12,23 +12,23 @@ class IconsPlayer(ft.Container):
         
         self.aleatorio = self._criar_icons(
             nome_icon = ft.Icons.SHUFFLE_ROUNDED,
-            cor_fundo = cor.azul_medio,
-            cor_icon = cor.branco,
+            color_fundo = color.azul_medio,
+            color_icon = color.branco,
             on_click = self.toggle_aleatorio
         )
 
         self.tocar = self._criar_icons(
             nome_icon = ft.Icons.PAUSE if SessaoReproducao.estado.tocando else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED,
-            # cor_borda = cor.branco,
-            cor_icon = cor.amarelo,
-            cor_fundo = cor.preto2,
+            # color_borda = color.branco,
+            color_icon = color.amarelo,
+            color_fundo = color.preto2,
             tamanho = 32,
             on_click = self.toogle_tocar
         )
 
         self.repetir = self._criar_icons(
             nome_icon = ft.Icons.REPEAT_ROUNDED,
-            cor_fundo = cor.azul_medio,
+            color_fundo = color.azul_medio,
             on_click = self.toggle_repetir
         )
 
@@ -39,18 +39,18 @@ class IconsPlayer(ft.Container):
                 self.aleatorio,
                 self._criar_icons(
                     nome_icon = ft.Icons.SKIP_PREVIOUS_ROUNDED,
-                    # cor_borda = cor.branco,
-                    cor_icon = cor.amarelo,
-                    cor_fundo = cor.preto2,
+                    # color_borda = color.branco,
+                    color_icon = color.amarelo,
+                    color_fundo = color.preto2,
                     tamanho = 27.5,
                     on_click = self._anterior
                 ),
                 self.tocar,
                 self._criar_icons(
                     nome_icon = ft.Icons.SKIP_NEXT_ROUNDED,
-                    # cor_borda = cor.branco,
-                    cor_icon = cor.amarelo,
-                    cor_fundo = cor.preto2, 
+                    # color_borda = color.branco,
+                    color_icon = color.amarelo,
+                    color_fundo = color.preto2, 
                     tamanho = 27.5,
                     on_click = self._proximo
                 ),
@@ -65,9 +65,9 @@ class IconsPlayer(ft.Container):
     def _criar_icons(
             self, 
             nome_icon : ft.Icons, 
-            cor_fundo : str = cor.laranja2, 
-            cor_icon : str = cor.branco,
-            cor_borda : str | ft.Colors = ft.Colors.TRANSPARENT,
+            color_fundo : str = color.laranja2, 
+            color_icon : str = color.branco,
+            color_borda : str | ft.Colors = ft.Colors.TRANSPARENT,
             tamanho : int | float = 25,
             on_click = None
         ) -> ft.IconButton:
@@ -76,14 +76,14 @@ class IconsPlayer(ft.Container):
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor_fundo
+                    ft.ControlState.HOVERED : color_fundo
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(2, cor_borda)
+                    ft.ControlState.HOVERED : ft.BorderSide(2, color_borda)
                 },
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
-                    ft.ControlState.HOVERED : cor_icon
+                    ft.ControlState.DEFAULT : color.branco,
+                    ft.ControlState.HOVERED : color_icon
                 },
                 icon_size = tamanho
             ),
@@ -100,24 +100,24 @@ class IconsPlayer(ft.Container):
         self.repetir.style = ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                ft.ControlState.HOVERED : cor.azul_medio
+                ft.ControlState.HOVERED : color.azul_medio
             },
             side = {
                 ft.ControlState.HOVERED : ft.BorderSide(2, ft.Colors.TRANSPARENT)
             },
             color = {
-                ft.ControlState.DEFAULT : cor.branco,
-                ft.ControlState.HOVERED : cor.branco
+                ft.ControlState.DEFAULT : color.branco,
+                ft.ControlState.HOVERED : color.branco
             },
             icon_size = 25
         ) if not SessaoReproducao.config.repetir else ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                ft.ControlState.HOVERED : cor.branco
+                ft.ControlState.HOVERED : color.branco
             },
             color = {
-                ft.ControlState.DEFAULT : cor.azul_medio,
-                ft.ControlState.HOVERED : cor.azul_medio
+                ft.ControlState.DEFAULT : color.azul_medio,
+                ft.ControlState.HOVERED : color.azul_medio
             },
             icon_size = 25
         )
@@ -128,27 +128,27 @@ class IconsPlayer(ft.Container):
         self.aleatorio.style = ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                ft.ControlState.HOVERED : cor.azul_medio
+                ft.ControlState.HOVERED : color.azul_medio
             },
             side = {
                 ft.ControlState.HOVERED : ft.BorderSide(2, ft.Colors.TRANSPARENT)
             },
             color = {
-                ft.ControlState.DEFAULT : cor.branco,
-                ft.ControlState.HOVERED : cor.branco
+                ft.ControlState.DEFAULT : color.branco,
+                ft.ControlState.HOVERED : color.branco
             },
             icon_size = 25
         ) if not SessaoReproducao.config.aleatorio else ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                ft.ControlState.HOVERED : cor.branco
+                ft.ControlState.HOVERED : color.branco
             },
             side = {
                 ft.ControlState.HOVERED : ft.BorderSide(2, ft.Colors.TRANSPARENT)
             },
             color = {
-                ft.ControlState.DEFAULT : cor.branco,
-                ft.ControlState.HOVERED : cor.azul_medio
+                ft.ControlState.DEFAULT : color.branco,
+                ft.ControlState.HOVERED : color.azul_medio
             },
             icon_size = 25
         )

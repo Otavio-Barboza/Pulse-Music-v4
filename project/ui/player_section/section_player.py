@@ -1,13 +1,13 @@
-from ..Others.cores import cor
-from .Controls.infos import InfoPlayer
-from .Controls.icones import IconsPlayer
-from .Controls.comando import ComandosPlayer
-from .Controls.barra_duracao import BarraDuracaoCompacta
-from .Controls.infos_expandido import InfosExpandida
-from .Controls.Navigation.menu_expandido import MenuInfos
-from .Controls.Navigation.conteudo import ConteudoInfos
-from .Controls.Navigation.conteudo_letra import ContainerLetra
-from .Controls.Navigation.conteudo_traducoes import ContainerTraducao
+from project.ui.others.colors import color
+from project.ui.player_section.controls.information import PlayerInformation
+from project.ui.player_section.controls.icons import PlayerIcons
+from project.ui.player_section.controls.command import PlayerCommands
+from project.ui.player_section.controls.progress_bar import CompactProgressBar
+from project.ui.player_section.controls.expanded_information import ExpandedInformation
+from project.ui.player_section.controls.navigation.expanded_menu import InformationMenu
+from project.ui.player_section.controls.navigation.content import ContentInformation
+from project.ui.player_section.controls.navigation.content_lyrics import LyricsContainer
+from project.ui.player_section.controls.navigation.translation_content import TranslationContent
 from ...App.Services.Controllers.estado_section import EstadoSection
 from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
 import flet as ft
@@ -17,21 +17,21 @@ class PlayerSection:
         self.page = page
         self.overlays = []
         
-        self.barra_duração_compacta = BarraDuracaoCompacta(page = self.page)
-        self.barra_duração_expandida = BarraDuracaoCompacta(page = self.page)
+        self.barra_duração_compacta = CompactProgressBar(page = self.page)
+        self.barra_duração_expandida = CompactProgressBar(page = self.page)
         
-        self.info_compacto = InfoPlayer(page = self.page)
-        self.info_espandido = InfoPlayer(page = self.page)
-        self.icones_compacto = IconsPlayer(page = self.page)
-        self.icones_expandido = IconsPlayer(page = self.page)
-        self.comandos_compacto = ComandosPlayer(page = self.page, expandir = self.expandir, player = self)
-        self.comandos_expandido = ComandosPlayer(page = self.page, expandir = self.expandir, player = self)
+        self.info_compacto = PlayerInformation(page = self.page)
+        self.info_espandido = PlayerInformation(page = self.page)
+        self.icones_compacto = PlayerIcons(page = self.page)
+        self.icones_expandido = PlayerIcons(page = self.page)
+        self.comandos_compacto = PlayerCommands(page = self.page, expandir = self.expandir, player = self)
+        self.comandos_expandido = PlayerCommands(page = self.page, expandir = self.expandir, player = self)
         
         self.compacto = self._retornar_compacto(expandido = False)
         self.compacto_expandido = self._retornar_compacto(expandido = True)
 
-        self.info_expandido = InfosExpandida(page = self.page)
-        self.menu_infos = MenuInfos(page = self.page, trocar_view = self._trocar_view)
+        self.info_expandido = ExpandedInformation(page = self.page)
+        self.menu_infos = InformationMenu(page = self.page, trocar_view = self._trocar_view)
         self.conteudo_infos = None
         
         self.expandido = ft.Container(
@@ -108,9 +108,9 @@ class PlayerSection:
     
     def _trocar_view(self, view):
         if view == 'letra':
-            self.conteudo_infos.trocar(ContainerLetra())
+            self.conteudo_infos.trocar(LyricsContainer())
         elif view == 'traducao':
-            self.conteudo_infos.trocar(ContainerTraducao())
+            self.conteudo_infos.trocar(TranslationContent())
         
         EstadoSection.alterar('view', view)
         self.page.update()
@@ -154,7 +154,7 @@ class PlayerSection:
         )
     
     def _conteudo_infos_menu_scrolavel(self, colunas : int) -> ft.Column:
-        self.conteudo_infos = ConteudoInfos()
+        self.conteudo_infos = ContentInformation()
         return ft.Container(
             col = colunas,
             expand = True,

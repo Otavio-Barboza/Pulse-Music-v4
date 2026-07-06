@@ -1,8 +1,8 @@
 from ....App.Audio.Controller.sessao import SessaoReproducao
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 
-class ComandosPlayer(ft.Container):
+class PlayerCommands(ft.Container):
     def __init__(self, expandir, page, player):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
@@ -13,20 +13,20 @@ class ComandosPlayer(ft.Container):
         self.player = player
 
         self.slider_volume_overlay = ft.Slider(
-            thumb_color = cor.amarelo,
-            inactive_color = cor.preto8,
-            active_color = cor.amarelo,
-            overlay_color = cor.amarelo_opaco2,
+            thumb_color = color.amarelo,
+            inactive_color = color.preto8,
+            active_color = color.amarelo,
+            overlay_color = color.amarelo_opaco2,
             value = 100,
             max = 100,
             min = 0,
             on_change = lambda e: SessaoReproducao.definir_volume(e.control.value / 100)
         )
         self.slider_volume = ft.Slider(
-            thumb_color = cor.amarelo,
-            inactive_color = cor.preto8,
-            active_color = cor.amarelo,
-            overlay_color = cor.amarelo_opaco2,
+            thumb_color = color.amarelo,
+            inactive_color = color.preto8,
+            active_color = color.amarelo,
+            overlay_color = color.amarelo_opaco2,
             value = 100,
             max = 100,
             min = 0,
@@ -41,7 +41,7 @@ class ComandosPlayer(ft.Container):
             margin = ft.margin.only(right = 30, top = 340),
             
             content = ft.Container(
-                bgcolor = cor.preto6,
+                bgcolor = color.preto6,
                 padding = 10,
                 border_radius = 8,
                 width = 300,
@@ -66,11 +66,11 @@ class ComandosPlayer(ft.Container):
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor.amarelo
+                    ft.ControlState.HOVERED : color.amarelo
                 },
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
-                    ft.ControlState.HOVERED : cor.preto1
+                    ft.ControlState.DEFAULT : color.branco,
+                    ft.ControlState.HOVERED : color.preto1
                 },
                 icon_size = 25
             )
@@ -84,11 +84,11 @@ class ComandosPlayer(ft.Container):
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor.amarelo
+                    ft.ControlState.HOVERED : color.amarelo
                 },
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
-                    ft.ControlState.HOVERED : cor.preto_puro_5
+                    ft.ControlState.DEFAULT : color.branco,
+                    ft.ControlState.HOVERED : color.preto_puro_5
                 },
                 icon_size = 25
             )

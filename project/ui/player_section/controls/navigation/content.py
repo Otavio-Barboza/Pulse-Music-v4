@@ -1,7 +1,6 @@
-from Assets.Interface.Others.cores import cor
 import flet as ft
 
-class ConteudoInfos(ft.Container):
+class ContentInformation(ft.Container):
     def __init__(self):
         super().__init__(
             content = ft.Column(
@@ -11,14 +10,8 @@ class ConteudoInfos(ft.Container):
         )
 
     def trocar(self, novo):
-        # print("ANTES", novo.parent, novo.page)
-
         self.content.controls.clear()
         self.content.controls.append(novo)
         
-        # print("DEPOIS", novo.parent, novo.page)
-
         if self.page:
             self.update()
-
-        # print("UPDATE", novo.parent, novo.page)

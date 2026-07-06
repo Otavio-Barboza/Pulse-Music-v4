@@ -1,8 +1,8 @@
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 from Assets.App.Letras.Controller.letras_services import LetrasServices 
 import flet as ft
 
-class ContainerLetra(ft.Container):
+class LyricsContainer(ft.Container):
     def __init__(self):
         super().__init__(
             padding = ft.padding.only(right = 30, left = 10),

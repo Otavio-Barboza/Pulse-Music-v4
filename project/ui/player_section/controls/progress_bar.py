@@ -1,10 +1,9 @@
 from ....App.Audio.Controller.sessao import SessaoReproducao
 from ....App.Services.Controllers.estado_redimensionamento import ResizeManager
-from ...Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
-import asyncio
 
-class BarraDuracaoCompacta(ft.Container):
+class CompactProgressBar(ft.Container):
     def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center
@@ -14,10 +13,10 @@ class BarraDuracaoCompacta(ft.Container):
 
         self.slider = ft.Slider(
             col = {'md' : 9, 'sm' : 8.5, 'xs' : 12},
-            thumb_color = cor.amarelo,
-            inactive_color = cor.preto8,
-            active_color = cor.amarelo,
-            overlay_color = cor.amarelo_opaco2,
+            thumb_color = color.amarelo,
+            inactive_color = color.preto8,
+            active_color = color.amarelo,
+            overlay_color = color.amarelo_opaco2,
             on_change_end = self.mudar_pos_slider,
             on_change_start = self.detectar_arrasto_slider
         )

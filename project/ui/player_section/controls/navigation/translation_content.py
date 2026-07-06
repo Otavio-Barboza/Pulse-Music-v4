@@ -1,8 +1,8 @@
 from Assets.App.Letras.Controller.letras_services import LetrasServices
-from ....Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 
-class ContainerTraducao(ft.Container):
+class TranslationContent(ft.Container):
     def __init__(self):
         super().__init__(
             padding = ft.padding.only(right = 30, left = 10),
@@ -13,20 +13,20 @@ class ContainerTraducao(ft.Container):
 
         self.infos = ft.PopupMenuButton(
             icon = ft.Icons.G_TRANSLATE,
-            icon_color = cor.preto3,
-            surface_tint_color = cor.branco,
-            bgcolor = cor.preto3,
-            shadow_color = cor.branco,
+            icon_color = color.preto3,
+            surface_tint_color = color.branco,
+            bgcolor = color.preto3,
+            shadow_color = color.branco,
             tooltip = "Idiomas",
 
             style = ft.ButtonStyle(
                 color = {
-                    ft.ControlState.DEFAULT : cor.azul_medio2,
-                    ft.ControlState.HOVERED : cor.azul_medio
+                    ft.ControlState.DEFAULT : color.azul_medio2,
+                    ft.ControlState.HOVERED : color.azul_medio
                 },
                 overlay_color = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.DEFAULT : cor.branco
+                    ft.ControlState.DEFAULT : color.branco
                 }
             ),
 

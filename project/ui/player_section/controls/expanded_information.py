@@ -1,8 +1,7 @@
 from ....App.Audio.Controller.sessao import SessaoReproducao
-from Assets.Interface.Others.cores import cor
 import flet as ft
 
-class InfosExpandida(ft.Container):
+class ExpandedInformation(ft.Container):
     def __init__(self, page):
         super().__init__(
             col = {'md' : 5, 'sm' : 12},

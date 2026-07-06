@@ -1,8 +1,8 @@
 from ....App.Audio.Controller.sessao import SessaoReproducao
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 
-class InfoPlayer(ft.Container):
+class PlayerInformation(ft.Container):
     def __init__(self, page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
@@ -56,7 +56,7 @@ class InfoPlayer(ft.Container):
             weight = ft.FontWeight.W_300,
             max_lines = 1,
             overflow = ft.TextOverflow.FADE,
-            color = cor.branco_puro
+            color = color.branco_puro
         )
     
     def att_infos(self, dados = None):

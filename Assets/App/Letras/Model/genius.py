@@ -23,7 +23,7 @@ class Genius(lyricsgenius.Genius):
         retries=0,
         user_agent="",
         proxy=None,
-        per_page=5
+        # per_page=5
     ):
         super().__init__(
             access_token=access_token,
@@ -37,5 +37,5 @@ class Genius(lyricsgenius.Genius):
             retries=retries,
             user_agent=user_agent,
             proxy=proxy,
-            per_page=per_page
+            # per_page=per_page
         )

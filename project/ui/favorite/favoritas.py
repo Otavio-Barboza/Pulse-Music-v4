@@ -1,7 +1,7 @@
-from ..Playlist.Base.list_musicas import ListViewMusicas
+from project.ui.playlist.base.music_list import ListViewMusic
 import flet as ft
 
-class Favoritas(ft.Container):
+class Favorite(ft.Container):
     def __init__(
         self,
         page : ft.Page,
@@ -17,7 +17,7 @@ class Favoritas(ft.Container):
         self.listas_objetos_musicas = lista_objetos_musica
         self.caminho = caminho
         
-        self.content = ListViewMusicas(
+        self.content = ListViewMusic(
             page = self.page,
             musicas = self.listas_objetos_musicas,
             modo_favorita = caminho

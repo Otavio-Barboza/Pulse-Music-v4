@@ -1,9 +1,9 @@
-from Assets.Interface.Others.cores import cor
-from Assets.Interface.Others.pesquisa_musica import PesquisaMusica
+from project.ui.others.colors import color
+from project.ui.others.music_search import MusicSearch
+from project.ui.playlist.base.base_playlists import ColumnCards
+from project.ui.grid_view.grid import GridImages
+from project.ui.favorite.favoritas import Favorite
 from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
-from ..Playlist.Base.base_playlists import ColunaCards
-from ..Grids.grid import GridImagens
-from ..Favoritas.favoritas import Favoritas
 from ...App.Services.Controllers.estado_grid import GridMode
 from ...App.Services.gerenciador_contas import GerenciadorContas
 import flet as ft
@@ -13,12 +13,12 @@ class TabsNavigation(ft.Tabs):
         super().__init__(
             selected_index = 0,
             animation_duration = 300,
-            label_color = cor.amarelo,
+            label_color = color.amarelo,
             divider_color = ft.Colors.TRANSPARENT,
-            indicator_color = cor.amarelo,
+            indicator_color = color.amarelo,
             indicator_border_radius = ft.border_radius.all(50),
-            overlay_color = cor.preto8,
-            unselected_label_color = cor.branco_puro,
+            overlay_color = color.preto8,
+            unselected_label_color = color.branco_puro,
             scrollable = False,
             expand = True,
             tab_alignment = ft.TabAlignment.FILL,
@@ -45,14 +45,14 @@ class TabsNavigation(ft.Tabs):
             {'label' : 'Pesquisar', 'icon' : ft.Icons.YOUTUBE_SEARCHED_FOR_ROUNDED}
         ]
 
-        self.playlist = ColunaCards(page = self.page)
-        self.pesquisa_musica = PesquisaMusica(page = self.page)
-        self.artistas = GridImagens(
+        self.playlist = ColumnCards(page = self.page)
+        self.pesquisa_musica = MusicSearch(page = self.page)
+        self.artistas = GridImages(
             modo = GridMode.ARTISTA,
             caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas',
             page = self.page
         )
-        self.albuns = GridImagens(
+        self.albuns = GridImages(
             modo = GridMode.ALBUM,
             caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
             page = self.page
@@ -138,7 +138,7 @@ class TabsNavigation(ft.Tabs):
         from ...App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
         
         lista_de_musicas = EstadoFavoritas.listar_objetos_favoritados()
-        self.tabs[3].content = Favoritas(
+        self.tabs[3].content = Favorite(
             page = self.page,
             lista_objetos_musica = lista_de_musicas,
             caminho = ModoReprodução.FAVORITA

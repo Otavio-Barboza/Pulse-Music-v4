@@ -1,11 +1,11 @@
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 from Assets.App.Meta.Controller.scanner_controller import ScannerController
 import flet as ft
 
 class AppBar(ft.AppBar):
     def __init__(self, page, abrir_config):
         super().__init__(
-            bgcolor = cor.preto7,
+            bgcolor = color.preto7,
             leading_width = 50,
 
             title = ft.Container(
@@ -17,7 +17,7 @@ class AppBar(ft.AppBar):
                     controls = [
                         ft.CircleAvatar(
                             radius = 20,
-                            bgcolor = cor.branco,
+                            bgcolor = color.branco,
         
                             content = ft.Image(
                                 src = r'Assets/Global/Images/Logo/logo_v2.png',
@@ -61,7 +61,7 @@ class AppBar(ft.AppBar):
                 ft.Container(
                     height = 400,
                     alignment = ft.alignment.center,
-                    bgcolor = cor.preto2,
+                    bgcolor = color.preto2,
                     margin = ft.margin.all(20),
                     padding = ft.padding.only(
                         bottom = 10,
@@ -122,7 +122,7 @@ class AppBar(ft.AppBar):
     def alterar_icone(self, dados = None):
         self.icon_status.content = ft.ProgressRing(
             scale = 0.5,
-            color = cor.amarelo
+            color = color.amarelo
         )
         self.icon_status.update()
 

@@ -1,4 +1,4 @@
-from ..Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 
 class ContainerLoading(ft.Container):
@@ -6,11 +6,11 @@ class ContainerLoading(ft.Container):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
-            bgcolor = cor.preto9,
+            bgcolor = color.preto9,
             
             content = ft.ProgressRing(
                 width = 50,
                 height = 50,
-                color = cor.amarelo
+                color = color.amarelo
             )
         )

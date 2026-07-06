@@ -1,12 +1,12 @@
+from project.ui.others.overlay_images import OverlayImages
 from ...App.Services.Controllers.estado_grid import GridMode, EstadoGrid
-from ..Others.overlay_imagens import OverlayImagens
 from ...App.Meta.Memoria.memoria_global import memoria
 from ...App.Meta.Repository.extrai_metadados import ExtracaoMetadados
 from ...App.Audio.Model.modo_reproducao import ModoReprodução
 import flet as ft
 import os
 
-class GridImagens(ft.GridView):
+class GridImages(ft.GridView):
     def __init__(self, page, modo : GridMode, caminho : str):
         super().__init__(
             max_extent = 200 if modo == GridMode.ARTISTA else 250,
@@ -93,7 +93,7 @@ class GridImagens(ft.GridView):
 
         self.page.overlay.clear()
         self.page.overlay.append(
-            OverlayImagens(
+            OverlayImages(
                 img_big = img,
                 musicas = lista_mus,
                 modo = self.modo,

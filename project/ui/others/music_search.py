@@ -2,7 +2,7 @@ from project.ui.others.colors import color
 import flet as ft
 import asyncio, pywhatkit
 
-class PesquisaMusica(ft.Container):
+class MusicSearch(ft.Container):
     def __init__(self, page):
         super().__init__(
             expand = True,

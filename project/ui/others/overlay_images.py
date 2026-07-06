@@ -1,10 +1,10 @@
 from .colors import cor
+from project.ui.playlist.base.music_list import ListViewMusic
 from ...App.Services.Controllers.estado_grid import GridMode
-from ..Playlist.Base.list_musicas import ListViewMusicas
 import flet as ft
 import os
 
-class OverlayImagens(ft.Container):
+class OverlayImages(ft.Container):
     def __init__(
         self, 
         modo_playlist,
@@ -82,7 +82,7 @@ class OverlayImagens(ft.Container):
                             ),
 
                             ft.Container(
-                                content = ListViewMusicas(
+                                content = ListViewMusic(
                                     page = self.page,
                                     musicas = self.musicas,
                                     modo_favorita = None

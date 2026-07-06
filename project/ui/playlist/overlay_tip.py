@@ -1,15 +1,15 @@
+from project.ui.others.colors import color
+from project.ui.playlist.overlay import ContainerOverlay
 from ...App.Services.Config.config_service import ConfigService
 from ...App.Services.Controllers.estado_app import EstadoApp
-from ..Others.cores import cor
-from.overlay import ContainerOverlay
 import flet as ft
 
-class OverlayDica(ft.Container):
+class OverlayTip(ft.Container):
     def __init__(self, page, estado, conteudo, modo):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
-            bgcolor = ft.Colors.with_opacity(0.9, cor.preto3)
+            bgcolor = ft.Colors.with_opacity(0.9, color.preto3)
         )
         self.page = page
         self.estado = estado
@@ -22,7 +22,7 @@ class OverlayDica(ft.Container):
         self.content = ft.Container(
             height = 450,
             width = 450,
-            bgcolor = cor.preto8,
+            bgcolor = color.preto8,
             alignment = ft.alignment.center,
             border_radius = ft.border_radius.all(20),
             padding = ft.padding.only(
@@ -96,14 +96,14 @@ class OverlayDica(ft.Container):
             height = 45,
 
             style = ft.ButtonStyle(
-                color = cor.branco,
+                color = color.branco,
                 padding = ft.padding.all(10),
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor.laranja2
+                    ft.ControlState.HOVERED : color.laranja2
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(2, cor.branco)
+                    ft.ControlState.HOVERED : ft.BorderSide(2, color.branco)
                 },
                 text_style = ft.TextStyle(
                     size = 16,
@@ -119,15 +119,15 @@ class OverlayDica(ft.Container):
 
             style = ft.ButtonStyle(
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco2,
-                    ft.ControlState.HOVERED : cor.vermelho
+                    ft.ControlState.DEFAULT : color.branco2,
+                    ft.ControlState.HOVERED : color.vermelho
                 },
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor.branco2
+                    ft.ControlState.HOVERED : color.branco2
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(2.5, cor.vermelho)
+                    ft.ControlState.HOVERED : ft.BorderSide(2.5, color.vermelho)
                 },
                 padding = 0
             )

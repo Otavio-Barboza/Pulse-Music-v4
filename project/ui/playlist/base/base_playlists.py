@@ -1,15 +1,14 @@
+from project.ui.others.colors import color
+from ..content_playlist import PlaylistConteudo
+from ..overlay import ContainerOverlay
+from project.ui.playlist.overlay_tip import OverlayTip
 from ....App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist, ModoPlaylist
 from ....App.Services.Config.config_service import ConfigService
 from ....App.Playlists.Repository.playlist_reprositorio import PlaylistRepositorio
 from ....App.Services.Controllers.estado_app import EstadoApp
-from ...Others.cores import cor
-from ..playlist_conteudo import PlaylistConteudo
-from ..overlay import ContainerOverlay
-from ..overlay_dica import OverlayDica
-from flet import Colors
 import flet as ft
 
-class ColunaCards(ft.Column):
+class ColumnCards(ft.Column):
     def __init__(self, page):
         super().__init__(
             spacing = 0
@@ -27,12 +26,12 @@ class ColunaCards(ft.Column):
             
             style = ft.ButtonStyle(
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
-                    ft.ControlState.HOVERED : cor.preto_puro
+                    ft.ControlState.DEFAULT : color.branco,
+                    ft.ControlState.HOVERED : color.preto_puro
                 },
                 bgcolor = {
-                    ft.ControlState.DEFAULT : ft.Colors.with_opacity(0.4, cor.preto_puro_5),
-                    ft.ControlState.HOVERED : cor.amarelo
+                    ft.ControlState.DEFAULT : ft.Colors.with_opacity(0.4, color.preto_puro_5),
+                    ft.ControlState.HOVERED : color.amarelo
                 },
                 text_style = ft.TextStyle(
                     size = 16,
@@ -52,12 +51,12 @@ class ColunaCards(ft.Column):
 
             style = ft.ButtonStyle(
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
-                    ft.ControlState.HOVERED : cor.preto_puro
+                    ft.ControlState.DEFAULT : color.branco,
+                    ft.ControlState.HOVERED : color.preto_puro
                 },
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : cor.amarelo
+                    ft.ControlState.HOVERED : color.amarelo
                 },
                 text_style = ft.TextStyle(
                     size = 16,
@@ -101,7 +100,7 @@ class ColunaCards(ft.Column):
     def _abrir_overlay_dica(self, e):
         self.page.overlay.clear()
         self.page.overlay.append(
-            OverlayDica(
+            OverlayTip(
                 page = self.page,
                 estado = self.estado,
                 conteudo = self.conteudo,

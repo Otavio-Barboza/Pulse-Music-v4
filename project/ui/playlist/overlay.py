@@ -1,7 +1,6 @@
+from project.ui.others.colors import color
 from ...App.Playlists.Controller.estado_playlist import ModoOverlayPlaylist
-from ..Others.cores import cor
 from ...App.Meta.Pipeline.pipeline import Pipeline
-from flet import Colors
 from tkinter import filedialog, Tk
 import flet as ft
 import asyncio
@@ -34,10 +33,10 @@ class ContainerOverlay(ft.Container):
             value = 1.0,
             max = 1.0,
             min = 0,
-            thumb_color = cor.amarelo,
-            active_color = cor.amarelo,
-            inactive_color = cor.preto2,
-            overlay_color = cor.amarelo_opaco2
+            thumb_color = color.amarelo,
+            active_color = color.amarelo,
+            inactive_color = color.preto2,
+            overlay_color = color.amarelo_opaco2
         )
 
         self.texto_pasta = ft.Text(
@@ -59,7 +58,7 @@ class ContainerOverlay(ft.Container):
         self.caixa_texto = ft.TextField(
             hint_text = 'Digite o nome da sua playlist...',
             hint_style = ft.TextStyle(
-                color = cor.cinza1,
+                color = color.cinza1,
                 size = 16
             ),
 
@@ -69,20 +68,20 @@ class ContainerOverlay(ft.Container):
             max_lines = 1,
             multiline = False,
             filled = True,
-            fill_color = cor.preto4,
+            fill_color = color.preto4,
             border_color = ft.Colors.TRANSPARENT,
             col = 8,
             
             label_style = ft.TextStyle(
-                color = cor.branco
+                color = color.branco
             ),
             
             text_style = ft.TextStyle(
-                color = cor.branco,
+                color = color.branco,
                 size = 16
             ),
 
-            cursor_color = cor.amarelo,
+            cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
 
             on_submit = self._submeter_nome,
@@ -91,7 +90,7 @@ class ContainerOverlay(ft.Container):
 
         self.content = ft.Container(
             alignment = ft.alignment.center,
-            bgcolor = cor.preto8,
+            bgcolor = color.preto8,
             width = 900,
             height = 900,
             border_radius = ft.border_radius.all(20),
@@ -111,7 +110,7 @@ class ContainerOverlay(ft.Container):
                         controls = [
                             self.caixa_texto,
                             
-                            self._criar_botoes(click = 'pasta', texto = 'Selecionar Pasta com as Músicas', col = 4, on_cor_fundo = cor.laranja2, cor_texto = cor.branco)    
+                            self._criar_botoes(click = 'pasta', texto = 'Selecionar Pasta com as Músicas', col = 4, on_cor_fundo = color.laranja2, cor_texto = color.branco)    
                         ]
                     ),
 
@@ -131,11 +130,11 @@ class ContainerOverlay(ft.Container):
                         content = ft.Tabs(
                             selected_index = 0,
                             animation_duration = 300,
-                            label_color = cor.amarelo,
+                            label_color = color.amarelo,
                             divider_color = ft.Colors.TRANSPARENT,
                             indicator_color = ft.Colors.TRANSPARENT,
-                            overlay_color = cor.preto8,
-                            unselected_label_color = cor.branco_puro,
+                            overlay_color = color.preto8,
+                            unselected_label_color = color.branco_puro,
                             scrollable = False,
                             expand = True,
                             tab_alignment = ft.TabAlignment.FILL,
@@ -196,7 +195,7 @@ class ContainerOverlay(ft.Container):
 
                                                                 controls = [
                                                                     ft.Text(
-                                                                        value = 'Regule a opacidade da cor',
+                                                                        value = 'Regule a opacidade da color',
                                                                         size = 16,
                                                                         text_align = ft.TextAlign.CENTER
                                                                     ),
@@ -207,8 +206,8 @@ class ContainerOverlay(ft.Container):
                                                                         click = 'opacidade',
                                                                         col = None,
                                                                         texto = 'Salvar Opacidade',
-                                                                        on_cor_fundo = cor.azul_medio2,
-                                                                        cor_texto = cor.branco
+                                                                        on_cor_fundo = color.azul_medio2,
+                                                                        cor_texto = color.branco
                                                                     )
                                                                 ]
                                                             )
@@ -225,7 +224,7 @@ class ContainerOverlay(ft.Container):
                                                         max_extent = 150,
 
                                                         controls = [
-                                                            self._criar_cards_cores(cor) for cor in cor._paleta_de_cores()
+                                                            self._criar_cards_cores(color) for color in color._paleta_de_cores()
                                                         ]
                                                     )
                                                 )
@@ -243,16 +242,16 @@ class ContainerOverlay(ft.Container):
                                 click = 'cancelar', 
                                 texto = 'Cancelar', 
                                 col = 6,
-                                on_cor_fundo = cor.vermelho,
-                                cor_texto = cor.branco
+                                on_cor_fundo = color.vermelho,
+                                cor_texto = color.branco
                             ),
 
                             self._criar_botoes(
                                 click = 'concluir', 
                                 texto = 'Concluir', 
                                 col = 6,
-                                on_cor_fundo = cor.amarelo,
-                                cor_texto = cor.preto1
+                                on_cor_fundo = color.amarelo,
+                                cor_texto = color.preto1
                             )
                         ]
                     )
@@ -267,12 +266,12 @@ class ContainerOverlay(ft.Container):
         playlist = self.estado.playlist_config  # PlaylistDetalhada
 
         self.estado.nome = playlist.nome
-        self.estado.cor = playlist.style["cor"]
+        self.estado.color = playlist.style["color"]
         self.estado.opacidade = playlist.style["opacidade"]
         self.estado.imagem = playlist.style["pasta"]
         self.estado.pasta = playlist.musicas["pasta"]
 
-        self.container_cor_opacidade.bgcolor = playlist.style["cor"]
+        self.container_cor_opacidade.bgcolor = playlist.style["color"]
         self.container_cor_opacidade.opacity = playlist.style["opacidade"]
         self.texto_nome.value = f"Nome da playlist: {playlist.nome}"
         self.texto_pasta.value = f"Pasta: {playlist.musicas['pasta']}"
@@ -293,7 +292,7 @@ class ContainerOverlay(ft.Container):
             
             content = ft.Icon(
                 name = ft.Icons.CHECK,
-                color = cor.amarelo,
+                color = color.amarelo,
                 size = 30,
                 visible = False
             )
@@ -302,18 +301,18 @@ class ContainerOverlay(ft.Container):
         self.cards.append(card)
         return card
     
-    def _criar_cards_cores(self, cor : Colors):
+    def _criar_cards_cores(self, color : Colors):
         cont = ft.Container(
             width = 100,
             height = 100,
             border_radius = ft.border_radius.all(100),
-            bgcolor = cor,
+            bgcolor = color,
             alignment = ft.alignment.center,
-            data = cor,
+            data = color,
             on_click = self._selecionar_cor,
 
             content = ft.Text(
-                value = cor.replace('Colors.', '').upper(),
+                value = color.replace('Colors.', '').upper(),
                 text_align = ft.TextAlign.CENTER,
                 weight = ft.FontWeight.W_300
             )
@@ -354,10 +353,10 @@ class ContainerOverlay(ft.Container):
                     ft.ControlState.HOVERED : on_cor_fundo
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(2, cor.branco)
+                    ft.ControlState.HOVERED : ft.BorderSide(2, color.branco)
                 },
                 color = {
-                    ft.ControlState.DEFAULT : cor.branco,
+                    ft.ControlState.DEFAULT : color.branco,
                     ft.ControlState.HOVERED : cor_texto
                 },
                 padding = ft.padding.all(10)
@@ -384,12 +383,12 @@ class ContainerOverlay(ft.Container):
         self.container_cor_opacidade.update()
 
     def _selecionar_cor(self, e):
-        self.estado.cor = e.control.data
+        self.estado.color = e.control.data
         self.container_cor_opacidade.bgcolor = e.control.data
         self.container_cor_opacidade.update()
         
         for container in self.cores:
-            cor = container.content.value
+            color = container.content.value
 
             if container.data == e.control.data:
                 container.scale = 1.1
@@ -402,11 +401,11 @@ class ContainerOverlay(ft.Container):
 
     def _salvar_opacidade(self, e):
         cor_opc = ft.Colors.with_opacity(
-            color = self.estado.cor, 
+            color = self.estado.color, 
             opacity = self.container_cor_opacidade.opacity
         )
 
-        self.estado.cor = cor_opc
+        self.estado.color = cor_opc
         self.estado.opacidade = self.container_cor_opacidade.opacity
 
         self.page.open(
@@ -448,7 +447,7 @@ class ContainerOverlay(ft.Container):
     def _fechar_overlay(self, e):
         self.estado.imagem = r'Assets\Global\Images\Padrao\capa_playlist_padrao.png'
         self.estado.nome = None
-        self.estado.cor = '#3d3d3d'
+        self.estado.color = '#3d3d3d'
         self.estado.opacidade = 1.0
         self.estado.pasta = None
         

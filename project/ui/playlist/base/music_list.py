@@ -1,12 +1,12 @@
+from project.ui.playlist.containers.music_container import RowContainer
+from project.ui.others.colors import color
 from ....App.Audio.Controller.sessao import SessaoReproducao
 from ....App.Audio.Model.modo_reproducao import Reprodução
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
-from ..Containers.container_musica import RowContainer
-from ...Others.cores import cor
 from ....App.Audio.Model.musica import Musica
 import flet as ft
 
-class ListViewMusicas(ft.ListView):
+class ListViewMusic(ft.ListView):
     def __init__(self, page, musicas : list[Musica], modo_favorita : str | None = None):
         super().__init__(
             spacing = 10,
@@ -176,8 +176,8 @@ class ListViewMusicas(ft.ListView):
                 container.data.chave is not None and
                 container.data.chave == sessao.estado.musica_atual.chave
             ):
-                container.bgcolor = cor.amarelo3
+                container.bgcolor = color.amarelo3
             else:
-                container.bgcolor = cor.preto9
+                container.bgcolor = color.preto9
 
             container.update()

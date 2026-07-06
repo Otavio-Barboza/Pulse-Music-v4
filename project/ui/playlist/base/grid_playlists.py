@@ -1,5 +1,5 @@
-from ...Others.cores import cor
-from ..Containers.container_card import CardPlaylist
+from project.ui.others.colors import color
+from project.ui.playlist.containers.container_card import PlaylistCard
 import flet as ft
 
 class GridPlaylists(ft.GridView):
@@ -21,16 +21,16 @@ class GridPlaylists(ft.GridView):
         playlist_id : str, 
         nome : str, 
         qtde_mus : int,
-        cor : str | ft.Colors,
+        color : str | ft.Colors,
         img : str,
         path : str
     ):
-        card = CardPlaylist(
+        card = PlaylistCard(
             page = self.page,
             playlist_id = playlist_id,
             nome = nome,
             qtde_musicas = qtde_mus,
-            cor_fundo = cor,
+            color_fundo = color,
             imagem_fundo = img,
             pasta = path,
             on_abrir = lambda e: self.on_abrir(playlist_id),
@@ -47,7 +47,7 @@ class GridPlaylists(ft.GridView):
         self,
         playlist_id: str,
         nome: str,
-        cor: str | ft.Colors,
+        color: str | ft.Colors,
         img: str,
         path: str,
         qtde_mus: int | None = None
@@ -60,7 +60,7 @@ class GridPlaylists(ft.GridView):
         # Atualiza dados básicos
         card.nome_play.value = nome
         card.imagem.content.src = img
-        card.container_info.bgcolor = cor
+        card.container_info.bgcolor = color
         card.pasta = path
         card.data['pasta'] = path
 

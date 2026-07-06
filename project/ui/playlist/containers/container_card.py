@@ -1,8 +1,8 @@
+from project.ui.others.colors import color
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-from Assets.Interface.Others.cores import cor
 import flet as ft
 
-class CardPlaylist(ft.Container):
+class PlaylistCard(ft.Container):
     def __init__(
             self, 
             page, 
@@ -12,7 +12,7 @@ class CardPlaylist(ft.Container):
             playlist_id : str, 
             nome : str, 
             qtde_musicas : int,
-            cor_fundo : str | ft.Colors,
+            color_fundo : str | ft.Colors,
             imagem_fundo : str,
             pasta : str | None,
             opacidade : float = 1.0
@@ -30,7 +30,7 @@ class CardPlaylist(ft.Container):
         self.nome_playlist = nome
         self.qtde_musicas = str(qtde_musicas)
         self.playlist_id = playlist_id
-        self.cor_fundo = cor_fundo
+        self.color_fundo = color_fundo
         self.imagem_fundo = imagem_fundo
         self.opacidade = opacidade
         self.pasta = pasta
@@ -53,15 +53,15 @@ class CardPlaylist(ft.Container):
 
         self.infos = ft.PopupMenuButton(
             icon = ft.Icons.MORE_VERT_ROUNDED,
-            icon_color = cor.preto3,
-            surface_tint_color = cor.branco,
-            bgcolor = cor.preto3,
-            shadow_color = cor.branco,
+            icon_color = color.preto3,
+            surface_tint_color = color.branco,
+            bgcolor = color.preto3,
+            shadow_color = color.branco,
             tooltip = "Mais opções",
 
             style = ft.ButtonStyle(
                 bgcolor = ft.Colors.TRANSPARENT,
-                overlay_color = cor.amarelo
+                overlay_color = color.amarelo
             ),
 
             items = [
@@ -81,7 +81,7 @@ class CardPlaylist(ft.Container):
 
         self.container_info = ft.Container(
             height = 60,
-            bgcolor = self.cor_fundo,
+            bgcolor = self.color_fundo,
 
             padding = ft.padding.only(
                 top = 5,

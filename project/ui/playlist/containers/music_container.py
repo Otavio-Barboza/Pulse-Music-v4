@@ -1,5 +1,5 @@
+from project.ui.others.colors import color
 from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-from ...Others.cores import cor
 import flet as ft
 
 class RowContainer(ft.Container):
@@ -12,7 +12,7 @@ class RowContainer(ft.Container):
         super().__init__(
             border_radius = ft.border_radius.all(10),
             height = 55,
-            bgcolor = cor.preto9,
+            bgcolor = color.preto9,
             padding = ft.padding.all(5),
             alignment = ft.alignment.center,
             data = musica,
@@ -27,10 +27,10 @@ class RowContainer(ft.Container):
             icon = self.esta_favoritada(),
 
             style = ft.ButtonStyle(
-                color = cor.rosa_avermelhado,
+                color = color.rosa_avermelhado,
 
                 overlay_color = {
-                    ft.ControlState.HOVERED : cor.cinza2
+                    ft.ControlState.HOVERED : color.cinza2
                 }
             ),
             

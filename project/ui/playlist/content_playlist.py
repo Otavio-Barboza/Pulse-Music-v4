@@ -1,15 +1,14 @@
+from project.ui.playlist.overlay import ContainerOverlay
+from project.ui.playlist.base.grid_playlists import GridPlaylists
+from project.ui.playlist.base.music_list import ListViewMusic
+from project.ui.others.colors import color
 from ...App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist
 from ...App.Audio.Controller.sessao import SessaoReproducao
 from ...App.Audio.Fontes.fonte_playlist import FontePlaylist
 from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
-from .Base.grid_playlists import GridPlaylists
-from .Base.list_musicas import ListViewMusicas
-from .overlay import ContainerOverlay
-from ..Others.cores import cor
 import flet as ft
-import os
 
-class PlaylistConteudo(ft.Container):
+class ContentPlaylist(ft.Container):
     def __init__(self, page, abrir):
         super().__init__(
             padding = ft.padding.all(10),
@@ -89,7 +88,7 @@ class PlaylistConteudo(ft.Container):
 
         self.abrir()
 
-        list_view = ListViewMusicas(
+        list_view = ListViewMusic(
             page = self.page,
             musicas = lista_de_musicas,
             modo_favorita = None

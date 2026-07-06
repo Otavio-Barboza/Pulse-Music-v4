@@ -1,4 +1,4 @@
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import color
 import flet as ft
 import asyncio, pywhatkit
 
@@ -21,7 +21,7 @@ class PesquisaMusica(ft.Container):
         self.caixa_texto = ft.TextField(
             hint_text = 'Digite a musica...',
             hint_style = ft.TextStyle(
-                color = cor.cinza1,
+                color = color.cinza1,
                 size = 16
             ),
 
@@ -30,20 +30,20 @@ class PesquisaMusica(ft.Container):
             multiline = False,
             height = 100,
             filled = True,
-            fill_color = cor.preto4,
+            fill_color = color.preto4,
             border_color = ft.Colors.TRANSPARENT,
             width = 700,
             
             label_style = ft.TextStyle(
-                color = cor.branco
+                color = color.branco
             ),
             
             text_style = ft.TextStyle(
-                color = cor.branco,
+                color = color.branco,
                 size = 16
             ),
 
-            cursor_color = cor.amarelo,
+            cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
             on_submit = self._submeter_musica
         )
@@ -58,7 +58,7 @@ class PesquisaMusica(ft.Container):
             content = self._criar_textos(
                 texto = 'Ex:',
                 tamanho = 20,
-                cor_texto = cor.branco2,
+                color_texto = color.branco2,
                 max_linhas = 1,
                 negrito = ft.FontWeight.W_300
             )
@@ -72,7 +72,7 @@ class PesquisaMusica(ft.Container):
                 ft.Container(
                     content = self._criar_textos(
                         texto = 'Pesquisar Música no YouTube',
-                        cor_texto = cor.amarelo4,
+                        color_texto = color.amarelo4,
                         negrito = ft.FontWeight.BOLD,
                         tamanho = 50
                     )
@@ -86,7 +86,7 @@ class PesquisaMusica(ft.Container):
     def _criar_textos(
             self, 
             texto : str, 
-            cor_texto : str, 
+            color_texto : str, 
             negrito : ft.FontWeight, 
             tamanho : int, 
             overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
@@ -100,7 +100,7 @@ class PesquisaMusica(ft.Container):
 
         Args:
             texto (str): texto desejado colocar
-            cor_texto (str): cor a definir para o texto
+            color_texto (str): color a definir para o texto
             negrito (ft.FontWeight): expessura da fonte
             tamanho (int): tamanho da fonte
             overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
@@ -113,7 +113,7 @@ class PesquisaMusica(ft.Container):
         '''
         return ft.Text(
             value = texto,
-            color = cor_texto,
+            color = color_texto,
             weight = negrito,
             size = tamanho,
             overflow = overflow,

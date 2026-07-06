@@ -1,9 +1,9 @@
+from project.ui.others.colors import colors
 from ...App.Services.Controllers.estado_app import EstadoApp
 from ...App.Services.Config.config_service import ConfigService
-from ..Others.cores import cor
 import flet as ft
 
-class SettingsOutros(ft.Container):
+class OtherSettings(ft.Container):
     def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center
@@ -14,10 +14,10 @@ class SettingsOutros(ft.Container):
             label = '   Ativar dicas',
             value = ConfigService.ler_overlay(),
             on_change = self._mudou_valor_switch,
-            active_track_color = cor.preto_puro_5,
-            inactive_track_color = cor.branco,
-            active_color = cor.amarelo4,
-            inactive_thumb_color = cor.preto1,
+            active_track_color = colors.preto_puro_5,
+            inactive_track_color = colors.branco,
+            active_color = colors.amarelo4,
+            inactive_thumb_color = colors.preto1,
             label_position = ft.LabelPosition.RIGHT,
             
             label_style = ft.TextStyle(

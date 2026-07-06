@@ -1,9 +1,9 @@
-from Assets.Interface.Others.cores import cor
+from project.ui.others.colors import colors
 from Assets.App.Services.email_service import enviar_email_suporte
 from Assets.App.Services.gerenciador_contas import GerenciadorContas
 import flet as ft
 
-class SettingsSuporte(ft.Container):
+class SettingsSupport(ft.Container):
     def __init__(self, page):
         super().__init__(
             expand = True
@@ -13,7 +13,7 @@ class SettingsSuporte(ft.Container):
         self.caixa_texto = ft.TextField(
             hint_text = 'Digite a mensagem...',
             hint_style = ft.TextStyle(
-                color = cor.cinza1,
+                color = colors.cinza1,
                 size = 16
             ),
 
@@ -24,20 +24,20 @@ class SettingsSuporte(ft.Container):
             multiline = True,
             height = 150,
             filled = True,
-            fill_color = cor.preto4,
+            fill_color = colors.preto4,
             border_color = ft.Colors.TRANSPARENT,
             width = 700,
             
             label_style = ft.TextStyle(
-                color = cor.branco
+                color = colors.branco
             ),
             
             text_style = ft.TextStyle(
-                color = cor.branco,
+                color = colors.branco,
                 size = 16
             ),
 
-            cursor_color = cor.amarelo,
+            cursor_color = colors.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10)
         )
 
@@ -62,7 +62,7 @@ class SettingsSuporte(ft.Container):
                             controls = [
                                 ft.CircleAvatar(
                                     radius = 40,
-                                    bgcolor = cor.branco,
+                                    bgcolor = colors.branco,
                                     content = ft.Image(
                                         src = r'Assets\Global\Images\Logo\logo_v2.png',
                                         border_radius = ft.border_radius.all(100),
@@ -72,7 +72,7 @@ class SettingsSuporte(ft.Container):
                                 ),
                                 self._criar_textos(
                                     texto = 'Suporte Pulse Music',
-                                    cor_texto = cor.branco_puro,
+                                    colors_texto = colors.branco_puro,
                                     negrito = ft.FontWeight.BOLD,
                                     tamanho = 48,
                                     max_linhas = 2
@@ -88,7 +88,7 @@ class SettingsSuporte(ft.Container):
                     
                             content = self._criar_textos(
                                 texto = '→  Aqui você possui o suporte do que necessitar referente ao app. Envie dúvidas, problemas ou feedbacks. \n→   Basta digitar a mensagem na caixa de texto e para confirmar, clique em salvar.',
-                                cor_texto = cor.branco_puro,
+                                colors_texto = colors.branco_puro,
                                 negrito = ft.FontWeight.W_400,
                                 tamanho = 20,
                                 max_linhas = 7,
@@ -108,7 +108,7 @@ class SettingsSuporte(ft.Container):
                                 controls = [
                                     self._criar_textos(
                                         texto = ' E-mail do suporte: barbozaotavio17@gmail.com',
-                                        cor_texto = cor.branco_puro,
+                                        colors_texto = colors.branco_puro,
                                         negrito = ft.FontWeight.W_400,
                                         tamanho = 18,
                                         max_linhas = 5,
@@ -131,12 +131,12 @@ class SettingsSuporte(ft.Container):
 
                                     style = ft.ButtonStyle(
                                         bgcolor = {
-                                            ft.ControlState.DEFAULT : cor.amarelo,
-                                            ft.ControlState.HOVERED : cor.amarelo2
+                                            ft.ControlState.DEFAULT : colors.amarelo,
+                                            ft.ControlState.HOVERED : colors.amarelo2
                                         },
 
                                         padding = ft.padding.all(10),
-                                        color = cor.preto_puro_5,
+                                        color = colors.preto_puro_5,
                                         shape = ft.RoundedRectangleBorder(radius = 20),
                                         alignment = ft.alignment.center,
                                         text_style = ft.TextStyle(
@@ -155,7 +155,7 @@ class SettingsSuporte(ft.Container):
     def _criar_textos(
             self, 
             texto : str, 
-            cor_texto : str, 
+            colors_texto : str, 
             negrito : ft.FontWeight, 
             tamanho : int, 
             overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
@@ -168,7 +168,7 @@ class SettingsSuporte(ft.Container):
 
         Args:
             texto (str): texto desejado colocar
-            cor_texto (str): cor a definir para o texto
+            colors_texto (str): colors a definir para o texto
             negrito (ft.FontWeight): expessura da fonte
             tamanho (int): tamanho da fonte
             overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
@@ -181,7 +181,7 @@ class SettingsSuporte(ft.Container):
         """
         return ft.Text(
             value = texto,
-            color = cor_texto,
+            color = colors_texto,
             weight = negrito,
             size = tamanho,
             overflow = overflow,

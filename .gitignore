@@ -1,9 +1,17 @@
 .env
 client_secret_google.json
 contas.json
+
+# pycache e elementos do VsCode
 __pycache__/
 *.pyc
 .vscode/
+
 Assets/Data/Contas/*
 !Assets/Data/Contas/EXEMPLO/
 !Assets/Data/Contas/EXEMPLO/**
+
+project\data\contas\*
+!project\data\contas\EXEMPLO\**
+# Instaladores
+release\windows\**

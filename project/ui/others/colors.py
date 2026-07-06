@@ -1,6 +1,6 @@
 import flet as ft
 
-class Cores:
+class Colors:
     def __init__(self):
         self.branco = '#ececec'
         self.branco2 = '#f9f9f9'
@@ -94,4 +94,4 @@ class Cores:
             ft.Colors.WHITE70
         ]
     
-cor = Cores()
+color = Colors()

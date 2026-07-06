@@ -1,8 +1,8 @@
-from Assets.Interface.AppBar.app_bar import AppBar
-from Assets.Interface.Player.section_player import PlayerSection
-from Assets.Interface.Settings.config_tela import ConfiguracoesTela
-from Assets.Interface.Navigation.abas import Abas
-from Assets.Interface.Others.cores import cor
+from project.ui.app_bar.app_bar import AppBar
+from project.ui.player_section.section_player import PlayerSection
+from project.ui.settings.screen_settings import ScreenSettings
+from project.ui.navigation.tabs import TabsNavigation
+from project.ui.others.colors import color
 from Assets.App.Audio.Model.audio import AudioLoop
 from Assets.App.Audio.Controller.sessao import SessaoReproducao
 from Assets.App.Services.Controllers.estado_app import EstadoApp
@@ -32,7 +32,7 @@ def abrir_perfil(id_atual):
 async def main(page : ft.Page):
     page.title = "Pulse Music"
     page.padding = 0
-    page.bgcolor = cor.preto_puro_4
+    page.bgcolor = color.preto_puro_4
     page.theme_mode = ft.ThemeMode.DARK
     page.fonts = {
         "sansita" : r"Assets\Global\Fonts\SansitaSwashed.ttf",
@@ -93,7 +93,7 @@ async def main(page : ft.Page):
         nonlocal config_painel
          
         if config_painel is None:
-            config_painel = ConfiguracoesTela(page)
+            config_painel = ScreenSettings(page)
             page.overlay.append(config_painel)
         else:
             if config_painel not in page.overlay:
@@ -103,7 +103,7 @@ async def main(page : ft.Page):
     await validar_login()
     await carregar_memoria()
 
-    tabs = Abas(page = page)
+    tabs = TabsNavigation(page = page)
 
     async def on_conta_atual(usuario):
         """

@@ -1,4 +1,4 @@
-from .cores import cor
+from .colors import cor
 from ...App.Services.Controllers.estado_grid import GridMode
 from ..Playlist.Base.list_musicas import ListViewMusicas
 import flet as ft

@@ -7,7 +7,7 @@ from Assets.Interface.Settings.settings_suporte import SettingsSuporte
 from Assets.App.Services.Controllers.estado_app import EstadoApp
 from .settings_outros import SettingsOutros
 
-class ConfiguracoesTela(ft.Container):
+class ScreenSettings(ft.Container):
     def __init__(self, page):
         super().__init__(
             expand = True,

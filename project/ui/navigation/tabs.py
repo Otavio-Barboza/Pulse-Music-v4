@@ -8,7 +8,7 @@ from ...App.Services.Controllers.estado_grid import GridMode
 from ...App.Services.gerenciador_contas import GerenciadorContas
 import flet as ft
 
-class Abas(ft.Tabs):
+class TabsNavigation(ft.Tabs):
     def __init__(self, page):
         super().__init__(
             selected_index = 0,

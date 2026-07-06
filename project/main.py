@@ -35,8 +35,8 @@ async def main(page : ft.Page):
     page.bgcolor = color.preto_puro_4
     page.theme_mode = ft.ThemeMode.DARK
     page.fonts = {
-        "sansita" : r"Assets\Global\Fonts\SansitaSwashed.ttf",
-        "google_sans_flex" : r"Assets\Global\Fonts\GoogleSansFlex.ttf"
+        "sansita" : r"assets\fonts\SansitaSwashed.ttf",
+        "google_sans_flex" : r"assets\fonts\GoogleSansFlex.ttf"
     }
     page.theme = ft.Theme(
         font_family = "google_sans_flex"
@@ -160,6 +160,6 @@ if __name__ == "__main__":
     asyncio.run(
         ft.app_async(
             target = main, 
-            assets_dir = "Assets"
+            assets_dir = "assets"
         )
     )

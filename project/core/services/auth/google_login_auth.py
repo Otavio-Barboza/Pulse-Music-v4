@@ -1,6 +1,6 @@
-import aiohttp, os, json
+from project.core.services.account_anager import AccountManager
 from google_auth_oauthlib.flow import InstalledAppFlow
-from Assets.App.Services.gerenciador_contas import GerenciadorContas
+import aiohttp, os, json
 
 def criar_pastas(caminho : str):
     """
@@ -11,6 +11,7 @@ def criar_pastas(caminho : str):
     """
     os.makedirs(caminho, exist_ok = True)
 
+
 def criar_jsons(caminho : str, conteudo : dict | None):
     """
         Função para criar os JSONs de cada conta nova.
@@ -20,6 +21,7 @@ def criar_jsons(caminho : str, conteudo : dict | None):
     """
     with open(caminho, 'w', encoding = 'utf-8') as js:
         json.dump(conteudo if conteudo is not None else {}, js, indent = 4, ensure_ascii = False)
+
 
 async def login_google():
     """
@@ -67,7 +69,6 @@ async def login_google():
         imagem = imagem.replace('s96', 's256')
 
     dados_user = {'nome': nome, 'email': email, 'imagem': imagem}
-    dados_json = {'id' : id_conta, 'nome': nome, 'email': email, 'pasta_base': f'Assets/Data/Contas/{id_conta}'}
     dados_config = {
         "Overlays" : {
             "ON_overlay_dica_tamanho_da_playlist" : True
@@ -105,10 +106,10 @@ async def login_google():
     criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens/Artistas'))
     criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens/Albuns'))
 
-    GerenciadorContas.carregar_conta(
-        id_conta = id_conta,
-        pasta_base = pasta_base,
-        dados = dados_user
+    AccountManager.load_account(
+        account_id = id_conta,
+        base_path = pasta_base,
+        data = dados_user
     )
-    GerenciadorContas.usuario().salvar()
-    GerenciadorContas.adicionar_conta_no_index(id_conta = id_conta, nome = nome, pasta_base = pasta_base, email = email)
+    AccountManager.user().save_json()
+    AccountManager.add_account_to_index(account_id = id_conta, name = nome, base_path = pasta_base, email = email)

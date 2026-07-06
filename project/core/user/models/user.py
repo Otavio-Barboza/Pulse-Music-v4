@@ -1,36 +1,36 @@
 import os, json
 from typing import Callable
 
-class Usuario:
-    def __init__(self, id_conta, pasta_base, nome, email, imagem):
-        self._id_conta = id_conta
-        self._pasta_base = pasta_base
-        self._nome = nome
+class User:
+    def __init__(self, account_id: str, base_path: str, name: str, email: str, image: str):
+        self._account_id = account_id
+        self._base_path = base_path
+        self._name = name
         self._email = email
-        self._imagem = imagem
+        self._image = image
         self._callbacks = []
         self._dirty = False
 
     # properties (encapsulamento)
     @property
     def id(self) -> str:
-        return self._id_conta
+        return self._account_id
     
     @property
-    def pasta_base(self) -> str:
-        return self._pasta_base
+    def base_path(self) -> str:
+        return self._base_path
     
     @property
-    def nome(self) -> str:
-        return self._nome
+    def name(self) -> str:
+        return self._name
     
-    @nome.setter
-    def nome(self, valor : str):
+    @name.setter
+    def name(self, valor : str):
         if valor is None:
             return
         
-        if valor != self._nome:
-            self._nome = valor
+        if valor != self._name:
+            self._name = valor
             self._dirty = True
             self._executar_callbacks()
 
@@ -39,25 +39,25 @@ class Usuario:
         return self._email
     
     @property
-    def imagem(self) -> str:
-        return self._imagem
+    def image(self) -> str:
+        return self._image
 
-    @imagem.setter
-    def imagem(self, valor : str):
+    @image.setter
+    def image(self, valor : str):
         if valor is None:
             return
         
-        if valor != self._imagem:
-            self._imagem = valor
+        if valor != self._image:
+            self._image = valor
             self._dirty = True
             self._executar_callbacks()
     
     # callbacks
-    def registrar_callback(self, func : callable):
+    def register_callback(self, func : callable):
         if callable(func):
             self._callbacks.append(func)
 
-    def _executar_callbacks(self):
+    def notify_callbacks(self):
         for func in self._callbacks:
             try:
                 func(self)
@@ -65,26 +65,26 @@ class Usuario:
                 pass
     
     # carregar
-    def retorna_dict(self) -> dict:
+    def return_dict(self) -> dict[str, str]:
         return {
-            'id' : self._id_conta,
-            'nome' : self._nome,
+            'id' : self._account_id,
+            'nome' : self._name,
             "email" : self._email,
-            "imagem" : self._imagem
+            "imagem" : self._image
         }
 
-    def salvar(self):
+    def save_json(self):
         """
             Função para salvar os dados no perfil.json quando uma nova conta é criada.
         """
-        caminho = os.path.join(self._pasta_base, 'perfil.json')
-        os.makedirs(self._pasta_base, exist_ok=True)
+        path: str = os.path.join(self._base_path, 'perfil.json')
+        os.makedirs(self._base_path, exist_ok=True)
 
-        with open(caminho, 'w', encoding = 'utf-8') as js:
+        with open(path, 'w', encoding = 'utf-8') as js:
             json.dump(self.retorna_dict(), js, indent = 4, ensure_ascii = False)
         self._dirty = True
 
-    def carregar_perfil_json(cls, pasta_base : str):
+    def load_profile_json(cls, pasta_base: str) -> dict:
         """
             Função para carregar o perfil.json
 
@@ -94,9 +94,9 @@ class Usuario:
         Returns:
             None | dict : nada ou dicionário com os dados do perfil.json
         """
-        caminho = os.path.join(pasta_base, "perfil.json")
+        path: str = os.path.join(pasta_base, "perfil.json")
 
-        if not os.path.exists(caminho):
+        if not os.path.exists(path):
             return None
-        with open(caminho, "r", encoding="utf-8") as js:
+        with open(path, "r", encoding="utf-8") as js:
             return json.load(js)

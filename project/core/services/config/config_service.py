@@ -1,32 +1,34 @@
-from ..gerenciador_contas import GerenciadorContas
+from project.core.services.account_anager import AccountManager
 import os, json
 
 class ConfigService:
+    
     @classmethod
     def ler_overlay(cls) -> True | False:
-        dados = cls._ler()
-        if dados.keys():
-            return dados['Overlays']['ON_overlay_dica_tamanho_da_playlist']
+        data: dict = cls._ler()
+        
+        if data.keys():
+            return data['Overlays']['ON_overlay_dica_tamanho_da_playlist']
         return None
     
     @classmethod
     def salvar_overlay_dicas(cls, valor : bool):
-        dados = cls._ler()
-        dados['Overlays']["ON_overlay_dica_tamanho_da_playlist"] = valor
-        cls._salvar(dados)
+        data: dict = cls._ler()
+        data['Overlays']["ON_overlay_dica_tamanho_da_playlist"] = valor
+        cls._salvar(data)
     
     @classmethod
     def _ler(cls) -> dict:
-        usuario = GerenciadorContas.contas_cache
-        CAMINHO = f'Assets/Data/Contas/{usuario["conta_atual"]}/config.json'
-        if not os.path.exists(CAMINHO):
+        path: str = f'Assets/Data/Contas/{AccountManager.accounts_cache["conta_atual"]}/config.json'
+        
+        if not os.path.exists(path):
             return {}
-        with open(CAMINHO, 'r', encoding = 'utf-8') as js:
+        with open(path, 'r', encoding = 'utf-8') as js:
             return json.load(js)
         
     @classmethod
     def _salvar(cls, dados):
-        usuario = GerenciadorContas.contas_cache
-        CAMINHO = f'Assets/Data/Contas/{usuario["conta_atual"]}/config.json'
-        with open(CAMINHO, 'w', encoding = 'utf-8') as js:
+        path: str = f'Assets/Data/Contas/{AccountManager.accounts_cache["conta_atual"]}/config.json'
+        
+        with open(path, 'w', encoding = 'utf-8') as js:
             json.dump(dados, js, indent = 4, ensure_ascii = False)

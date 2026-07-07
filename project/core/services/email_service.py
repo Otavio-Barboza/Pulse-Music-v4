@@ -5,32 +5,34 @@ from datetime import datetime
 dotenv.load_dotenv(r'Assets\App\Env\.env')
 SENHA_APP = os.getenv('SENHA_APP')
 
-def enviar_email_suporte(
-    mensagem: str,
-    email_usuario: str,
-    assunto: str = "Pulse Music | Nova mensagem de suporte"
+def send_email(
+    message: str,
+    email_user: str,
+    subject: str = "Pulse Music | Nova mensagem de suporte"
 ):
     EMAIL_SUPORTE = "barbozaotavio17@gmail.com"
     EMAIL_APP = "otolif2023@gmail.com"
-    EMAIL_USER = email_usuario
+    EMAIL_USER = email_user
 
-    data_hora = datetime.now().strftime("%d/%m/%Y às %H:%M")
+    date_hours = datetime.now().strftime("%d/%m/%Y às %H:%M")
 
     msg = EmailMessage()
     msg["From"] = EMAIL_APP
     msg["To"] = EMAIL_SUPORTE
     msg['Reply-To'] = EMAIL_USER
-    msg["Subject"] = assunto
+    msg["Subject"] = subject
 
-    msg.set_content(f"""
-📬 Nova mensagem recebida pelo Pulse Music
+    msg.set_content(
+        f"""
+        📬 Nova mensagem recebida pelo Pulse Music
 
-👤 Usuário: {email_usuario}
-🕒 Data/Hora: {data_hora}
+        👤 Usuário: {email_user}
+        🕒 Data/Hora: {date_hours}
 
-📝 Mensagem:\n
-{mensagem}
-""")
+        📝 Mensagem:\n
+        {message}
+        """
+    )
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(EMAIL_APP, SENHA_APP)

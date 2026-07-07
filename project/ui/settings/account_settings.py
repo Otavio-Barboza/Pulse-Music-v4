@@ -1,9 +1,9 @@
 import flet as ft
 from project.ui.others.colors import colors
-from Assets.App.Services.Controllers.estado_app import EstadoApp
-from Assets.App.Services.Auth.google_login_auth import login_google
-from Assets.App.Services.gerenciador_contas import GerenciadorContas
-from ...App.Usuario.Models.usuario import Usuario
+from project.core.services.controllers.state_app import StateApp
+from project.core.services.auth.google_login_auth import login_google
+from project.core.services.account_manager import AccountManager
+from project.core.user.models.user import User
 
 class AccountSettings(ft.Container):
     def __init__(self, page):
@@ -57,9 +57,9 @@ class AccountSettings(ft.Container):
             bgcolor = ft.Colors.TRANSPARENT
         )
 
-        EstadoApp.registrar_ouvinte('conta_atual', self._quando_conta_atualizar)
+        StateApp.register_callback('current_account', self._quando_conta_atualizar)
 
-        usuario = GerenciadorContas.usuario()
+        usuario = AccountManager.User()
         if usuario is not None:
             usuario.registrar_callback(self._atualizar_campos)
             self._atualizar_campos(usuario)
@@ -173,7 +173,7 @@ class AccountSettings(ft.Container):
         Returns:
             list : lista das contas disponíveis.
         """
-        conta = GerenciadorContas.contas_cache
+        conta = AccountManager.accounts_cache
         return conta['contas']
     
     # widgets
@@ -228,7 +228,7 @@ class AccountSettings(ft.Container):
               →  Senão: cria um ft.Text informando que não há outras contas a selecionar. 
         """
         lista = self.retornar_contas_disponiveis()
-        id_atual = GerenciadorContas.ler_conta_atual_index()
+        id_atual = AccountManager.read_current_account_index()
         
         self.selecao_contas.controls.clear()
 
@@ -317,32 +317,33 @@ class AccountSettings(ft.Container):
         self.caixa_texto.value = ''
         self.update()
 
-        GerenciadorContas.usuario().nome = novo_nome
-        GerenciadorContas.usuario().salvar()
-        GerenciadorContas.atualizar_nome_no_index(id_conta = self.data, novo_nome = novo_nome)
+        AccountManager.User().nome = novo_nome
+        AccountManager.User().salvar()
+        AccountManager.update_name_in_index(account_id = self.data, new_name = novo_nome)
 
-    def _atualizar_campos(self, usuario : Usuario):
+    def _atualizar_campos(self, usuario : User):
         """
             Função para atualizar os campos principais chamada em self._quando_conta_atualizar.
 
         Args:
-            usuario (class Usuario): atributos de Usuario.
+            usuario (class User): atributos de User.
         """
-        self.nome_user.value = usuario.nome
+
+        self.nome_user.value = usuario.name
         self.email.value = usuario.email
-        self.imagem.foreground_image_src = usuario.imagem
+        self.imagem.foreground_image_src = usuario.image
         self.data = usuario.id
         self.update()
 
-    def _quando_conta_atualizar(self, dados : Usuario | dict):
+    def _quando_conta_atualizar(self, dados : User | dict):
         """
-            Callback do EstadoApp: 'dados' será o objeto Usuario (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
+            Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
         """
-        # se vier um objeto Usuario, atualiza direto
-        if isinstance(dados, Usuario):
+        # se vier um objeto User, atualiza direto
+        if isinstance(dados, User):
             usuario = dados
             # registra callback para atualizações futuras
-            usuario.registrar_callback(self._atualizar_campos)
+            usuario.register_callback(self._atualizar_campos)
             self._atualizar_campos(usuario)
             return
 
@@ -353,30 +354,31 @@ class AccountSettings(ft.Container):
                 id_atual = dados.get("conta_atual")
                 if id_atual:
                     # tentar selecionar conta (isso chamará carregar_conta() e notificar novamente)
-                    GerenciadorContas.selecionar_conta_por_id(id_atual)
+                    AccountManager.select_account_by_id(id_atual)
             except Exception:
                 pass
 
         self._criar_selecoes()
 
-    def _trocar_conta_obrigatoria(self, id_nova_conta : str):
+    def _trocar_conta_obrigatoria(self, id_new_account : str):
         """
             Função para realizar a troca obrigatória da conta ao excluir a atual.
         Args:
             id_nova_conta (str): ID da nova conta selecionada para carregar.
         """
-        id_a_ser_excluido = GerenciadorContas.ler_conta_atual_index()
 
-        GerenciadorContas.excluir_conta(id_a_ser_excluido)
-        GerenciadorContas.selecionar_conta_por_id(id_nova_conta)
+        id_a_ser_excluido = AccountManager.read_current_account_index()
+
+        AccountManager.delete_account(id_a_ser_excluido)
+        AccountManager.select_account_by_id(id_new_account)
         
     def excluir_conta_atual(self):
         """
             Função para excluir a atual conta.
               →  Se o as contas disponíveis forem mais de que 2: Abre overlay na classe SelecionarContaObrigatoria para a seleção de outra conta.
-              →  Senão: Chama diretamente o GerenciadorContas para a exclusão, caso haja uma única disponível, é alterado automáticamente para essa; senão é notificado o EstadoApp ('sem_conta') para realizar o novo login.
+              →  Senão: Chama diretamente o AccountManager para a exclusão, caso haja uma única disponível, é alterado automáticamente para essa; senão é notificado o StateApp ('sem_conta') para realizar o novo login.
         """
-        contas = GerenciadorContas.contas_cache['contas']
+        contas = AccountManager.accounts_cache['account']
 
         if len(contas) > 2:
             self.page.overlay.clear()
@@ -388,7 +390,7 @@ class AccountSettings(ft.Container):
             )
             self.page.update()
         else:
-            GerenciadorContas.excluir_conta(self.data)
+            AccountManager.delete_account(self.data)
         
     async def _toggle_trocar_conta(self):
         self.selecao_contas.visible = not self.selecao_contas.visible
@@ -402,13 +404,14 @@ class AccountSettings(ft.Container):
             await self._toggle_trocar_conta()
         elif e.control.data.get('acao') == 'selecionar':
             id_conta = e.control.data['id']
-            GerenciadorContas.selecionar_conta_por_id(id_conta)
+            AccountManager.select_account_by_id(id_conta)
             self._criar_selecoes()
         elif e.control.data.get('acao') == 'excluir':
             self.excluir_conta_atual()
             self._criar_selecoes()
         else:
             print(e.control.data)
+
 
 class SelecionarContaObrigatória(ft.Container):
     def __init__(self, page, on_selecionar):
@@ -421,8 +424,8 @@ class SelecionarContaObrigatória(ft.Container):
 
         self.page = page
         self.on_selecionar = on_selecionar
-        self.contas = GerenciadorContas.contas_cache
-        self.id_atual = GerenciadorContas.ler_conta_atual_index()
+        self.contas = AccountManager.accounts_cache
+        self.id_atual = AccountManager.read_current_account_index()
         self.opcoes = ft.Column(controls = [])
 
         self.content = ft.Container(

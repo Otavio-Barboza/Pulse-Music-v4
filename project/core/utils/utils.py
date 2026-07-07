@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 
-class CreateItens:
+class Utils:
 
     @classmethod
     def create_path(cls, path: Path):
@@ -16,8 +16,9 @@ class CreateItens:
             json.dump(data or {}, js, indent = 4, ensure_ascii = False)
 
     @classmethod
-    def sync_load_json(cls, path, data: dict):
-        ...
+    def sync_load_json(cls, path: Path) -> dict:
+        with open(path, 'r', encoding = 'utf-8') as js:
+            return json.load(js)
 
     @classmethod
     def async_load_json(cls, path, data: dict):

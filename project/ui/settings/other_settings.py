@@ -1,6 +1,11 @@
+# import de interface
 from project.ui.others.colors import colors
-from ...App.Services.Controllers.estado_app import EstadoApp
-from ...App.Services.Config.config_service import ConfigService
+
+# imports de back-end
+from project.core.services.account_manager import StateApp
+from project.core.services.settings.service_settings import ServiceSettings
+
+# import geral
 import flet as ft
 
 class OtherSettings(ft.Container):
@@ -11,8 +16,8 @@ class OtherSettings(ft.Container):
         self.page = page
         
         self.switch = ft.Switch(
-            label = '   Ativar dicas',
-            value = ConfigService.ler_overlay(),
+            label = 'Ativar dicas',
+            value = ServiceSettings.load_overlay(),
             on_change = self._mudou_valor_switch,
             active_track_color = colors.preto_puro_5,
             inactive_track_color = colors.branco,
@@ -35,7 +40,7 @@ class OtherSettings(ft.Container):
             ]
         )
 
-        EstadoApp.registrar_ouvinte('att_switch', self.alterar_switch)
+        StateApp.register_callback('atualization_switch', self.alterar_switch)
 
     def _text(self, text : str, tamanho : int):
         return ft.Text(
@@ -46,9 +51,10 @@ class OtherSettings(ft.Container):
     def _mudou_valor_switch(self, e):
         self.switch.value = e.control.value
         self.update()
-        EstadoApp.notificar('overlay_dicas', dados = e.control.value)
-        EstadoApp.notificar('att_on_click', dados = e.control.value)
+
+        StateApp.notify(event = "overlay_tips", data = e.control.value)
+        StateApp.notify(event = "atualization_on_click", data = e.control.value)
     
-    def alterar_switch(self, valor):
-        self.switch.value = valor
+    def alterar_switch(self, value):
+        self.switch.value = value
         self.update()

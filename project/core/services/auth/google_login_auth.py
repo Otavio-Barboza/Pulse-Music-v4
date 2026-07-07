@@ -1,6 +1,6 @@
 from project.core.services.account_manager import AccountManager
 from project.core.utils.path import AppPaths
-from project.core.utils.create import CreateItens
+from project.core.utils.utils import CreateItens
 from google_auth_oauthlib.flow import InstalledAppFlow
 import aiohttp, datetime
 

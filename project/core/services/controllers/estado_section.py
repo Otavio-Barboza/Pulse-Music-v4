@@ -1,35 +1,34 @@
 class EstadoSection:
-    view_atual = None
-    _estado = {
+    _state = {
         'view' : []
     }
-    _observadores = {
+    _callbacks = {
         'view' : []
     }
 
     @classmethod
-    def registrar(cls, chave : str, callback : callable):
-        if chave not in cls._observadores:
-            cls._observadores[chave] = []
+    def register(cls, key : str, callback : callable):
+        if key not in cls._callbacks:
+            cls._callbacks[key] = []
         
-        if callback not in cls._observadores[chave]:
-            cls._observadores[chave].append(callback)
+        if callback not in cls._callbacks[key]:
+            cls._callbacks[key].append(callback)
 
     @classmethod
-    def remover(cls, chave : str, callback : callable):
-        if chave in cls._observadores:
-            if callback in cls._observadores[chave]:
-                cls._observadores[chave].remove(callback)
+    def remove(cls, key : str, callback : callable):
+        if key in cls._callbacks:
+            if callback in cls._callbacks[key]:
+                cls._callbacks[key].remove(callback)
 
     @classmethod
-    def alterar(cls, chave : str, valor):
-        cls._estado[chave] = valor
-        cls._notificar(chave = chave, valor = valor)
+    def alter_view(cls, key : str, value):
+        cls._state[key] = value
+        cls.notify(key = key, value = value)
 
     @classmethod
-    def _notificar(cls, chave : str, valor):
-        for callback in list(cls._observadores.get(chave, [])):
+    def notify(cls, key : str, value):
+        for callback in list(cls._callbacks.get(key, [])):
             try:
-                callback(valor)
+                callback(value)
             except Exception:
                 pass

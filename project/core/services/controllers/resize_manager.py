@@ -2,18 +2,18 @@ class ResizeManager:
     _callbacks = []
 
     @classmethod
-    def registrar(cls, func):
+    def register(cls, func):
         cls._callbacks.append(func)
 
     @classmethod
-    def executar(cls, e):
-        for f in cls._callbacks:
+    def to_execute(cls, event):
+        for function in cls._callbacks:
             try:
-                f(e)
+                function(event)
             except Exception:
                 pass
     
     @classmethod
-    def remover(cls, call):
+    def remove(cls, call):
         if call in cls._callbacks:
             cls._callbacks.remove(call)

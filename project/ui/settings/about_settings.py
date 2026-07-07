@@ -11,7 +11,7 @@ class AboutSettings(ft.Container):
 
         self.page = page
 
-        self.CONTEUDOS_CARDS = [
+        self._CARD_CONTENT = [
             (ft.Icons.PLAY_ARROW_ROUNDED, 'Reprodução', 'Reprodução completa no melhor estilo player clássico, com avanço automático de faixas e controle de volume — do jeitinho que um player de verdade deve ser.'),
             (ft.Icons.MUSIC_NOTE_ROUNDED, 'Playlists', 'Crie, organize e personalize suas playlists do seu jeito, porque suas músicas merecem mais do que uma bagunça aleatória.'),
             (ft.Icons.FULLSCREEN_ROUNDED, 'Tela Expandida', 'Expanda a visualização e aproveite tudo com mais conforto — letras, informações e menos esforço para enxergar.'),
@@ -25,7 +25,7 @@ class AboutSettings(ft.Container):
             (ft.Icons.PALETTE_ROUNDED, 'Aparência Geral', 'Personalize temas e detalhes visuais do player, porque ouvir música fica melhor quando o app combina com você.'),
             (ft.Icons.SUPPORT_AGENT_ROUNDED, 'Suporte', 'Precisa de ajuda, encontrou um problema ou só quer dar aquele feedback? O suporte está sempre pronto para ouvir.'),
         ]
-        self.DICAS = [
+        self._TIPS = [
             ('Já tentou expandir o player? Às vezes a melhor parte está escondida 🫣.', colors.preto_cinza),
             ('Favoritar músicas não é só decolorsação — facilita a sua vida depois 😉', colors.preto_cinza),
             ('Se a música tiver letra... não se sinta envergonhado de cantá-la 🎶 (mesmo que errado 😅)', colors.preto_cinza),
@@ -40,30 +40,36 @@ class AboutSettings(ft.Container):
             ('Tem preguiça de clicar em botões? Aqui a LUNA faz por você! Ah, não vire um preguiçoso, ok?', colors.preto_cinza)
         ]
 
-        self.row_icons = ft.Row(alignment = ft.MainAxisAlignment.CENTER, vertical_alignment = ft.CrossAxisAlignment.END, controls = [])
-        self._criar_icons()
-        self.c = self.DICAS[random.randint(0, len(self.DICAS) - 1)]
+        self.row_icons = ft.Row(
+            alignment = ft.MainAxisAlignment.CENTER, 
+            vertical_alignment = ft.CrossAxisAlignment.END, 
+            controls = []
+        )
+        
+        self._create_icons()
+        
+        self.random_tips = self._TIPS[random.randint(0, len(self._TIPS) - 1)]
 
-        self.texto_dica = self._criar_textos(
-            texto = self.c[0],
+        self.text_tip = self._create_texts(
+            texto = self.random_tips[0],
             colors_texto = colors.branco_puro,
             negrito = ft.FontWeight.BOLD,
             tamanho = 16,
             max_linhas = 2
         )
 
-        self.container_dicas = ft.Container(
+        self.container_tips = ft.Container(
             width = 800,
             height = 90,
             alignment = ft.alignment.center,
-            bgcolor = self.c[1],
+            bgcolor = self.random_tips[1],
             border_radius = ft.border_radius.all(25),
             margin = ft.margin.only(
                 bottom = 20,
                 top = 55
             ),
             padding = ft.padding.all(10),
-            on_click = self.atualizar_dica,
+            on_click = self.update_tip,
 
             content = ft.Column(
                 horizontal_alignment = ft.CrossAxisAlignment.CENTER,
@@ -72,14 +78,14 @@ class AboutSettings(ft.Container):
                 controls = [
                     ft.ResponsiveRow(
                         vertical_alignment = ft.CrossAxisAlignment.CENTER,
-                        controls = [self.texto_dica]
+                        controls = [self.text_tip]
                     ),
                     self.row_icons
                 ]
             )
         )
         
-        self.carrossel = ft.Row(
+        self.carousel = ft.Row(
             scroll = ft.ScrollMode.AUTO,
         
             controls = [
@@ -87,11 +93,11 @@ class AboutSettings(ft.Container):
                     icon = item[0],
                     titulo = item[1],
                     texto = item[2]
-                ) for item in self.CONTEUDOS_CARDS
+                ) for item in self._CARD_CONTENT
             ]
         )
 
-        self.conteudo_principal = ft.Column(
+        self.main_content = ft.Column(
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
             scroll = ft.ScrollMode.HIDDEN,
             expand = True,
@@ -137,20 +143,20 @@ class AboutSettings(ft.Container):
                                     spacing = 0,
                                     
                                     controls = [
-                                        self._criar_textos(
+                                        self._create_texts(
                                             texto = 'Pulse Music',
                                             colors_texto = colors.branco,
                                             negrito = ft.FontWeight.BOLD,
                                             tamanho = 36,
-                                            alinhamento = ft.TextAlign.LEFT,
+                                            alignment = ft.TextAlign.LEFT,
                                             fonte = 'sansita'
                                         ),
-                                        self._criar_textos(
+                                        self._create_texts(
                                             texto = 'A música ao seu alcance',
                                             colors_texto = colors.branco,
                                             negrito = ft.FontWeight.W_400,
                                             tamanho = 18,
-                                            alinhamento = ft.TextAlign.LEFT
+                                            alignment = ft.TextAlign.LEFT
                                         )
                                     ]
                                 )
@@ -194,19 +200,19 @@ class AboutSettings(ft.Container):
                                 spacing = 7.5,
                         
                                 controls = [
-                                    self._criar_textos(
+                                    self._create_texts(
                                         texto = 'Qual a Finidade?',
                                         colors_texto = colors.branco,
                                         negrito = ft.FontWeight.BOLD,
                                         tamanho = 30
                                     ),
-                                    self._criar_textos(
+                                    self._create_texts(
                                         texto = 'Pulse Music — nostalgia de um player clássico com recursos modernos.',
                                         colors_texto = colors.branco,
                                         negrito = ft.FontWeight.W_400,
                                         tamanho = 18,
                                         max_linhas = 4,
-                                        alinhamento = ft.TextAlign.JUSTIFY
+                                        alignment = ft.TextAlign.JUSTIFY
                                     )
                                 ]
                             )
@@ -215,7 +221,7 @@ class AboutSettings(ft.Container):
                 ),
 
                 # dicas
-                self.container_dicas,
+                self.container_tips,
                 
                 # Carrossel das funcionalidades: o que cada uma faz?
                 ft.Container(
@@ -227,7 +233,7 @@ class AboutSettings(ft.Container):
                     
                     content = ft.Column(
                         controls = [
-                            self.carrossel,
+                            self.carousel,
 
                             ft.Row(
                                 alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -235,7 +241,7 @@ class AboutSettings(ft.Container):
                                 controls = [
                                     ft.IconButton(
                                         icon = ft.Icons.KEYBOARD_ARROW_LEFT,
-                                        on_click = self._mover_carrossel_esquerda,
+                                        on_click = self._move_carousel_left,
                                         
                                         icon_size = 25,
                                         style = ft.ButtonStyle(
@@ -251,7 +257,7 @@ class AboutSettings(ft.Container):
                                     ),
                                     ft.IconButton(
                                         icon = ft.Icons.KEYBOARD_ARROW_RIGHT,
-                                        on_click = self._mover_carrossel_direita,
+                                        on_click = self._move_carousel_right,
                                         
                                         icon_size = 25,
                                         style = ft.ButtonStyle(
@@ -273,7 +279,7 @@ class AboutSettings(ft.Container):
             ]
         )
 
-        self.rodape = ft.Container(
+        self.footer = ft.Container(
             height = 100,
             alignment = ft.alignment.bottom_center,
         
@@ -282,7 +288,7 @@ class AboutSettings(ft.Container):
                 alignment = ft.MainAxisAlignment.END,
 
                 controls = [
-                    self._criar_textos(
+                    self._create_texts(
                         texto = 'Pulse Music: a nostalgia do player clássico reinventada.',
                         colors_texto = colors.branco,
                         negrito = ft.FontWeight.W_400,
@@ -297,7 +303,7 @@ class AboutSettings(ft.Container):
                         spacing = 6,
 
                         controls = [
-                            self._criar_textos(
+                            self._create_texts(
                                 texto = '© 2025 Pulse Music. Software desenvolvido para fins acadêmicos.',
                                 colors_texto = colors.branco,
                                 negrito = ft.FontWeight.W_500,
@@ -315,52 +321,57 @@ class AboutSettings(ft.Container):
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
             
             controls = [
-                self.conteudo_principal,
-                self.rodape  
+                self.main_content,
+                self.footer  
             ]
         )
     
-    def _criar_textos(
+    def _create_texts(
             self, 
-            texto : str, 
-            colors_texto : str, 
-            negrito : ft.FontWeight, 
-            tamanho : int, 
+            text: str, 
+            text_color: str, 
+            weight: ft.FontWeight, 
+            size: int, 
             overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
-            max_linhas : int = 1, 
-            alinhamento : ft.TextAlign = ft.TextAlign.CENTER,
-            colunas : int | None = None,
-            fonte : str = 'inter'
+            max_lines: int = 1, 
+            alignment: ft.TextAlign = ft.TextAlign.CENTER,
+            columns: int | None = None,
+            font: str = 'google_sans_flex'
         ):
         """
             Função para criar os textos da tela sobre o app.
 
         Args:
-            texto (str): texto desejado colocar
-            colors_texto (str): colors a definir para o texto
-            negrito (ft.FontWeight): expessura da fonte
-            tamanho (int): tamanho da fonte
+            text (str): texto desejado colocar
+            text_color (str): colors a definir para o texto
+            weight (ft.FontWeight): expessura da font
+            size (int): size da font
             overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
-            max_linhas (int, optional): máximo de linhas para quebra de texto. { Defaults to 1 }
-            alinhamento (ft.TextAlign, optional): posicionamento do texto. { Defaults to ft.TextAlign.CENTER} 
-            colunas (int | None, optional): colunas que ocupará. { Defaults to None }
+            max_lines (int, optional): máximo de linhas para quebra de texto. { Defaults to 1 }
+            alignment (ft.TextAlign, optional): posicionamento do texto. { Defaults to ft.TextAlign.CENTER} 
+            columns (int | None, optional): columns que ocupará. { Defaults to None }
 
         Returns:
             ft.Text : Texto a ser atríbuido
         """
         return ft.Text(
-            value = texto,
-            color = colors_texto,
-            weight = negrito,
-            size = tamanho,
+            value = text,
+            color = text_color,
+            weight = weight,
+            size = size,
             overflow = overflow,
-            max_lines = max_linhas,
-            text_align = alinhamento,
-            col = colunas,
-            font_family = fonte
+            max_lines = max_lines,
+            text_align = alignment,
+            col = columns,
+            font_family = font
         )
     
-    def _criar_cards(self, icon, titulo, texto):
+    def _criar_cards(
+        self, 
+        icon: ft.Icons, 
+        title: str, 
+        text: str
+    ):
         return ft.Container(
             width = 350,
             height = 250,
@@ -389,29 +400,29 @@ class AboutSettings(ft.Container):
                                 color = colors.branco_puro,
                                 size = 35
                             ),
-                            self._criar_textos(
-                                texto = titulo,
-                                colors_texto = colors.branco_puro,
-                                tamanho = 30,
-                                max_linhas = 1,
-                                negrito = ft.FontWeight.BOLD,
+                            self._create_texts(
+                                text = title,
+                                text_color = colors.branco_puro,
+                                size = 30,
+                                max_lines = 1,
+                                weight = ft.FontWeight.BOLD,
                             )
                         ]
                     ),
-                    self._criar_textos(
-                        texto = texto,
-                        colors_texto = colors.branco_puro,
-                        tamanho = 18,
-                        max_linhas = 7,
-                        negrito = ft.FontWeight.W_400,
-                        alinhamento = ft.TextAlign.JUSTIFY
+                    self._create_texts(
+                        text = text,
+                        text_color = colors.branco_puro,
+                        size = 18,
+                        max_lines = 7,
+                        weight = ft.FontWeight.W_400,
+                        alignment = ft.TextAlign.JUSTIFY
                     )
                 ]
             )
         )
     
-    def _criar_icons(self):
-        for i in range(len(self.DICAS)):
+    def _create_icons(self):
+        for i in range(len(self._TIPS)):
             self.row_icons.controls.append(
                 ft.Icon(
                     name = ft.Icons.CIRCLE,
@@ -423,49 +434,49 @@ class AboutSettings(ft.Container):
         
         self.update()
     
-    def atualizar_dica(self, *_):
+    def update_tip(self, *_):
         if not self.page:
             return
         
-        indice = random.randint(0, len(self.DICAS) - 1)
-        self.texto_dica.value = self.DICAS[indice][0]
+        indice = random.randint(0, len(self._TIPS) - 1)
+        self.text_tip.value = self._TIPS[indice][0]
         
         for icon in self.row_icons.controls:
             icon.color = colors.amarelo4 if icon.data == indice else colors.branco
 
-        self.container_dicas.bgcolor = self.DICAS[indice][1]        
+        self.container_tips.bgcolor = self._TIPS[indice][1]        
         self.update()
     
-    def iniciar_loop(self):
+    def star_loop(self):
         if hasattr(self, '_task_dicas'):
             return
-        self._task_dicas = self.page.run_task(self.loop_dicas)
+        self._task_dicas = self.page.run_task(self.loop_tips)
     
-    def parar_loop(self):
+    def stop_loop(self):
         if hasattr(self, '_task_dicas'):
             self._task_dicas.cancel()
             self._task_dicas = None
 
-    async def loop_dicas(self):
+    async def loop_tips(self):
         try:
             while True:
                 await asyncio.sleep(10)
                 if not self.page:
                     break
-                self.atualizar_dica()
+                self.update_tip()
         except asyncio.CancelledError:
             pass
 
-    def _mover_carrossel_esquerda(self, e):
-        self.carrossel.scroll_to(
+    def _move_carousel_left(self, e):
+        self.carousel.scroll_to(
             delta = -300,
             duration = 250,
             curve = ft.AnimationCurve.DECELERATE
         )
         self.update()
         
-    def _mover_carrossel_direita(self, e):
-        self.carrossel.scroll_to(
+    def _move_carousel_right(self, e):
+        self.carousel.scroll_to(
             delta = 300,
             duration = 250,
             curve = ft.AnimationCurve.DECELERATE

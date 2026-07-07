@@ -1,9 +1,14 @@
+# imports de interface
 from project.ui.others.colors import colors
 from project.ui.settings.account_settings import AccountSettings
 from project.ui.settings.about_settings import AboutSettings
 from project.ui.settings.settings_support import SettingsSupport
 from project.ui.settings.other_settings import OtherSettings
-from Assets.App.Services.Controllers.estado_app import EstadoApp
+
+# imports de back-end
+from project.core.services.controllers.state_app import StateApp
+
+# import geral
 import flet as ft
 
 class ScreenSettings(ft.Container):
@@ -16,14 +21,14 @@ class ScreenSettings(ft.Container):
         self.page = page
 
         # dicionário que guarda todos os botões
-        self.botoes = {}
+        self.buttons = {}
 
         # registrar para escutar mudanças de seção
-        EstadoApp.registrar_ouvinte('secao_config', self._quando_secao_mudar)
+        StateApp.register_callback("configurations_session", self._quando_secao_mudar)
         
-        self.menu_lateral = self._menu_lateral()
+        self.side_menu = self._menu_lateral()
 
-        self.area_conteudo = ft.Container(
+        self.content_area = ft.Container(
             expand = True,
             padding = 20,
             bgcolor = colors.preto2,
@@ -38,8 +43,8 @@ class ScreenSettings(ft.Container):
         self.content = ft.Row(
             spacing = 5,
             controls = [
-                self.menu_lateral,
-                self.area_conteudo
+                self.side_menu,
+                self.content_area
             ]
         )
 
@@ -62,22 +67,22 @@ class ScreenSettings(ft.Container):
             content = ft.Column(
                 controls = [
                     ft.Text(
-                        value = 'Configurações', 
+                        value = "Configurações", 
                         size = 26, 
                         weight = ft.FontWeight.BOLD,
                         text_align = ft.TextAlign.CENTER
                     ),
                     ft.Divider(),
 
-                    self._criar_botao(texto = 'Conta', id_secao = 'conta'),
-                    self._criar_botao(texto = 'Sobre o Player', id_secao = 'sobre'),
-                    self._criar_botao(texto = 'Aparência', id_secao = 'aparencia'),
-                    self._criar_botao(texto = 'Outras Configurações', id_secao = 'outros'),
-                    self._criar_botao(texto = 'Suporte', id_secao = 'suporte'),
+                    self._create_button(text = "Conta", section_id = "account"),
+                    self._create_button(text = "Sobre o Player", section_id = "about"),
+                    self._create_button(text = "Aparência", section_id = "appearance"),
+                    self._create_button(text = "Outras Configurações", section_id = "others"),
+                    self._create_button(text = "Suporte", section_id = "support"),
 
                     ft.Divider(),
                     ft.TextButton(
-                        text = 'Fechar',
+                        text = "Fechar",
                         width = 200,
                         icon = ft.Icons.CLOSE_ROUNDED,
 
@@ -107,22 +112,22 @@ class ScreenSettings(ft.Container):
             )
         )
 
-    def _criar_botao(self, texto : str, id_secao : str):
+    def _create_button(self, text : str, section_id : str):
         """
-            Cria os botões do menú lateral das configurações e depois armazena eles no dict self.botoes
+            Cria os botões do menú lateral das configurações e depois armazena eles no dict self.buttons
 
         Args:
-            texto (str): Texto que irá compor o nome do botão
-            id_secao (str): Seção a qual será destinada ao botão
+            text (str): Texto que irá compor o nome do botão
+            section_id (str): Seção a qual será destinada ao botão
 
         Returns:
-            ft.TextButton: Botoão de texto
+            ft.TextButton: Botoão de text
         """
 
         botao = ft.TextButton(
-            text = texto,
+            text = text,
             width = 200,
-            on_click = lambda e: self._selecionar(id_secao),
+            on_click = lambda e: self._selecionar(section_id),
         
             style = ft.ButtonStyle(
                 bgcolor = {
@@ -144,52 +149,53 @@ class ScreenSettings(ft.Container):
             )
         )
 
-        self.botoes[id_secao] = botao
+        self.buttons[section_id] = botao
         return botao
 
-    def _selecionar(self, id_secao : str):
+    def _selecionar(self, section : str):
         """
-            Quando é clicado em algum botão a ação é registrada no ouvinte do EstadoApp com o id_secao 
+            Quando é clicado em algum botão a ação é registrada no ouvinte do StateApp com o section 
 
         Args:
-            id_secao (str): Seção responsável de conteúdo
+            section (str): Seção responsável de conteúdo
         """
-        EstadoApp.selecionar_secao_config(id_secao)
+        StateApp.select_config_section(section)
 
-    def _quando_secao_mudar(self, id_secao : str):
+    def _quando_secao_mudar(self, section_id : str):
         """
             1. Altera o Conteúdo da seção principal conforme o botão clicado
-            2. Navega nos intens do dict de botões para atualizar a colors, isso caso a seção da chave seja a mesma que o id_secao informado
+            2. Navega nos intens do dict de botões para atualizar a colors, isso caso a seção da chave seja a mesma que o section_id informado
 
         Args:
-            id_secao (str): Seção responsável
+            section_id (str): Seção responsável
         """
 
-        conteudo_atual = self.area_conteudo.content
-        if hasattr(conteudo_atual, 'parar_loop'):
-            conteudo_atual.parar_loop()
-        if id_secao == 'conta':
-            self.area_conteudo.content = AccountSettings(page = self.page)
-        elif id_secao == 'sobre':
-            sobre = AboutSettings(page = self.page)
-            self.area_conteudo.content = sobre
-            sobre.iniciar_loop()
-        elif id_secao == 'aparencia':
-            self.area_conteudo.content = ft.Column(
+        current_content = self.content_area.content
+
+        if hasattr(current_content, "parar_loop"):
+            current_content.parar_loop()
+        if section_id == "account":
+            self.content_area.content = AccountSettings(page = self.page)
+        elif section_id == "about":
+            about = AboutSettings(page = self.page)
+            self.content_area.content = about
+            about.iniciar_loop()
+        elif section_id == "appearance":
+            self.content_area.content = ft.Column(
                 expand = True,
                 controls = [
-                    ft.Text('Em Desenvolvimento Configurações de Aparência', size=18)
+                    ft.Text("Em Desenvolvimento Configurações de Aparência", size=18)
                 ]
             )
-        elif id_secao == 'outros':
-            self.area_conteudo.content = OtherSettings(page = self.page)
-        elif id_secao == 'suporte':
-            self.area_conteudo.content = SettingsSupport(page = self.page)
+        elif section_id == "others":
+            self.content_area.content = OtherSettings(page = self.page)
+        elif section_id == "support":
+            self.content_area.content = SettingsSupport(page = self.page)
 
-        self.area_conteudo.update()
+        self.content_area.update()
 
-        for chave, botao in self.botoes.items():
-            if chave == id_secao:
+        for chave, botao in self.buttons.items():
+            if chave == section_id:
                 # botão selecionado → colors diferente
                 botao.style.bgcolor = {
                     ft.ControlState.DEFAULT: colors.amarelo3,

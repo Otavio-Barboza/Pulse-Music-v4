@@ -1,6 +1,11 @@
+# import de interface
 from project.ui.others.colors import colors
-from Assets.App.Services.email_service import enviar_email_suporte
-from Assets.App.Services.gerenciador_contas import GerenciadorContas
+
+# imports de back-end
+from project.core.services.email_service import send_email
+from project.core.services.account_manager import AccountManager
+
+# import geral
 import flet as ft
 
 class SettingsSupport(ft.Container):
@@ -10,7 +15,8 @@ class SettingsSupport(ft.Container):
             )
 
         self.page = page
-        self.caixa_texto = ft.TextField(
+
+        self.text_field = ft.TextField(
             hint_text = 'Digite a mensagem...',
             hint_style = ft.TextStyle(
                 color = colors.cinza1,
@@ -70,12 +76,12 @@ class SettingsSupport(ft.Container):
                                         fit = ft.ImageFit.COVER
                                     )
                                 ),
-                                self._criar_textos(
-                                    texto = 'Suporte Pulse Music',
-                                    colors_texto = colors.branco_puro,
-                                    negrito = ft.FontWeight.BOLD,
-                                    tamanho = 48,
-                                    max_linhas = 2
+                                self._create_texts(
+                                    text = 'Suporte Pulse Music',
+                                    text_color = colors.branco_puro,
+                                    weight = ft.FontWeight.BOLD,
+                                    size = 48,
+                                    max_lines = 2
                                 )
                             ]
                         ),
@@ -86,17 +92,17 @@ class SettingsSupport(ft.Container):
                                 bottom = 15
                             ),
                     
-                            content = self._criar_textos(
-                                texto = '→  Aqui você possui o suporte do que necessitar referente ao app. Envie dúvidas, problemas ou feedbacks. \n→   Basta digitar a mensagem na caixa de texto e para confirmar, clique em salvar.',
-                                colors_texto = colors.branco_puro,
-                                negrito = ft.FontWeight.W_400,
-                                tamanho = 20,
-                                max_linhas = 7,
-                                alinhamento = ft.TextAlign.JUSTIFY
+                            content = self._create_texts(
+                                text = '→  Aqui você possui o suporte do que necessitar referente ao app. Envie dúvidas, problemas ou feedbacks. \n→   Basta digitar a mensagem na caixa de text e para confirmar, clique em salvar.',
+                                text_color = colors.branco_puro,
+                                weight = ft.FontWeight.W_400,
+                                size = 20,
+                                max_lines = 7,
+                                alignment = ft.TextAlign.JUSTIFY
                             )
                         ),    
                     
-                        self.caixa_texto,
+                        self.text_field,
                     
                         ft.Container(
                             margin = ft.margin.only(
@@ -106,13 +112,13 @@ class SettingsSupport(ft.Container):
 
                             content = ft.Column(
                                 controls = [
-                                    self._criar_textos(
-                                        texto = ' E-mail do suporte: barbozaotavio17@gmail.com',
-                                        colors_texto = colors.branco_puro,
-                                        negrito = ft.FontWeight.W_400,
-                                        tamanho = 18,
-                                        max_linhas = 5,
-                                        alinhamento = ft.TextAlign.JUSTIFY
+                                    self._create_texts(
+                                        text = ' E-mail do suporte: barbozaotavio17@gmail.com',
+                                        text_color = colors.branco_puro,
+                                        weight = ft.FontWeight.W_400,
+                                        size = 18,
+                                        max_lines = 5,
+                                        alignment = ft.TextAlign.JUSTIFY
                                     )
                                 ]
                             )
@@ -127,7 +133,7 @@ class SettingsSupport(ft.Container):
                                     icon = ft.Icons.SEND_ROUNDED,
                                     width = 200,
                                     height = 50,
-                                    on_click = self.enviar_email,
+                                    on_click = self.send,
 
                                     style = ft.ButtonStyle(
                                         bgcolor = {
@@ -152,49 +158,49 @@ class SettingsSupport(ft.Container):
             )
         )
     
-    def _criar_textos(
+    def _create_texts(
             self, 
-            texto : str, 
-            colors_texto : str, 
-            negrito : ft.FontWeight, 
-            tamanho : int, 
+            text : str, 
+            text_color : str, 
+            weight : ft.FontWeight, 
+            size : int, 
             overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
-            max_linhas : int = 1, 
-            alinhamento : ft.TextAlign = ft.TextAlign.CENTER,
-            colunas : int | None = None
+            max_lines : int = 1, 
+            alignment : ft.TextAlign = ft.TextAlign.CENTER,
+            columns : int | None = None
         ):
         """
             Função para criar os textos da tela sobre o app.
 
         Args:
-            texto (str): texto desejado colocar
-            colors_texto (str): colors a definir para o texto
-            negrito (ft.FontWeight): expessura da fonte
-            tamanho (int): tamanho da fonte
-            overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
-            max_linhas (int, optional): máximo de linhas para quebra de texto. { Defaults to 1 }
-            alinhamento (ft.TextAlign, optional): posicionamento do texto. { Defaults to ft.TextAlign.CENTER} 
-            colunas (int | None, optional): colunas que ocupará. { Defaults to None }
+            text (str): text desejado colocar
+            text_color (str): colors a definir para o text
+            weight (ft.FontWeight): expessura da fonte
+            size (int): size da fonte
+            overflow (ft.TextOverflow, optional): Encolhimento do text conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
+            max_lines (int, optional): máximo de linhas para quebra de text. { Defaults to 1 }
+            alignment (ft.TextAlign, optional): posicionamento do text. { Defaults to ft.TextAlign.CENTER} 
+            columns (int | None, optional): columns que ocupará. { Defaults to None }
 
         Returns:
             ft.Text : Texto a ser atríbuido
         """
         return ft.Text(
-            value = texto,
-            color = colors_texto,
-            weight = negrito,
-            size = tamanho,
+            value = text,
+            color = text_color,
+            weight = weight,
+            size = size,
             overflow = overflow,
-            max_lines = max_linhas,
-            text_align = alinhamento,
-            col = colunas
+            max_lines = max_lines,
+            text_align = alignment,
+            col = columns
         )
     
-    def enviar_email(self, e):
-        mensagem = self.caixa_texto.value.strip()
-        print(len(mensagem))
+    def send(self, e):
+        message = self.text_field.value.strip()
+        print(len(message))
         
-        if len(mensagem) > 1500:
+        if len(message) > 1500:
             self.page.open(
                 ft.SnackBar(
                    ft.Text("A mensagem pode ter no máximo 1000 caracteres.")
@@ -203,7 +209,7 @@ class SettingsSupport(ft.Container):
             self.page.update()
             return
         
-        if not mensagem:
+        if not message:
             self.page.open(ft.SnackBar(
                 ft.Text("Digite uma mensagem antes de enviar 😅")
             ))
@@ -212,15 +218,15 @@ class SettingsSupport(ft.Container):
             return
         
         try:
-            email_usuario = GerenciadorContas.usuario().email
+            email_user = AccountManager.user().email
 
-            enviar_email_suporte(
-                mensagem = mensagem,
-                email_usuario = email_usuario
+            send_email(
+                message = message,
+                email_user = email_user
             )
 
-            self.caixa_texto.value = ''
-            self.caixa_texto.update()
+            self.text_field.value = ''
+            self.text_field.update()
 
             self.page.open(ft.SnackBar(
                 ft.Text("Mensagem enviada com sucesso! 📬")

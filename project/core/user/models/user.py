@@ -1,7 +1,7 @@
 import os, json
-from typing import Callable
 
 class User:
+
     def __init__(self, account_id: str, base_path: str, name: str, email: str, image: str):
         self._account_id = account_id
         self._base_path = base_path
@@ -10,6 +10,7 @@ class User:
         self._image = image
         self._callbacks = []
         self._dirty = False
+
 
     # properties (encapsulamento)
     @property
@@ -25,14 +26,14 @@ class User:
         return self._name
     
     @name.setter
-    def name(self, valor : str):
+    def name(self, valor: str):
         if valor is None:
             return
         
         if valor != self._name:
             self._name = valor
             self._dirty = True
-            self._executar_callbacks()
+            self.notify_callbacks()
 
     @property
     def email(self) -> str:
@@ -43,17 +44,18 @@ class User:
         return self._image
 
     @image.setter
-    def image(self, valor : str):
+    def image(self, valor: str):
         if valor is None:
             return
         
         if valor != self._image:
             self._image = valor
             self._dirty = True
-            self._executar_callbacks()
+            self.notify_callbacks()
     
+
     # callbacks
-    def register_callback(self, func : callable):
+    def register_callback(self, func: callable):
         if callable(func):
             self._callbacks.append(func)
 
@@ -63,6 +65,7 @@ class User:
                 func(self)
             except Exception:
                 pass
+    
     
     # carregar
     def return_dict(self) -> dict[str, str]:
@@ -78,25 +81,25 @@ class User:
             Função para salvar os dados no perfil.json quando uma nova conta é criada.
         """
         path: str = os.path.join(self._base_path, 'perfil.json')
-        os.makedirs(self._base_path, exist_ok=True)
+        os.makedirs(self._base_path, exist_ok = True)
 
         with open(path, 'w', encoding = 'utf-8') as js:
             json.dump(self.retorna_dict(), js, indent = 4, ensure_ascii = False)
         self._dirty = True
 
-    def load_profile_json(cls, pasta_base: str) -> dict:
+    def load_profile_json(cls, base_path: str) -> dict:
         """
             Função para carregar o perfil.json
 
         Args:
-            pasta_base (str): pasta da conta + perfil.json
+            base_path (str): pasta da conta + perfil.json
 
         Returns:
             None | dict : nada ou dicionário com os dados do perfil.json
         """
-        path: str = os.path.join(pasta_base, "perfil.json")
+        path: str = os.path.join(base_path, "perfil.json")
 
         if not os.path.exists(path):
             return None
-        with open(path, "r", encoding="utf-8") as js:
+        with open(path, "r", encoding = "utf-8") as js:
             return json.load(js)

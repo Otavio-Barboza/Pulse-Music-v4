@@ -1,5 +1,7 @@
 from project.core.user.models.user import User
 from .Controllers.estado_app import EstadoApp
+from project.core.utils.create import CreateItens
+from project.core.utils.path import AppPaths
 from typing import Optional
 from pathlib import Path
 import json, os, shutil
@@ -10,6 +12,36 @@ class AccountManager:
     _ACCOUNTS_JSON_PATH: str = r'Assets\Data\contas.json'
 
     accounts_cache: dict | None = None
+
+
+    @classmethod
+    def create_account_structure(
+        cls, 
+        base_path: Path, 
+        data_profile: dict[str, str], 
+        data_playlist: dict[str, str | int | dict],
+        data_settings: dict[str, dict[str, bool]]
+    ):
+        # geral da conta
+        CreateItens.create_json(caminho = base_path / "profile.json", conteudo = data_profile)
+        CreateItens.create_json(caminho = base_path / "settings.json", conteudo = data_settings)
+        CreateItens.create_json(caminho = base_path / "playlists.json", conteudo = data_playlist)
+
+        # playlist
+        CreateItens.create_path(caminho = base_path / "playlists")
+
+        # Music e metas
+        CreateItens.create_path(caminho = base_path / "music")
+        CreateItens.create_json(caminho = base_path / "lyrics.json", conteudo = {})
+        CreateItens.create_json(caminho = base_path / "artists.json", conteudo = {})
+        CreateItens.create_json(caminho = base_path / "favorite.json", conteudo = {})
+        CreateItens.create_json(caminho = base_path / "music.json", conteudo = {})
+
+        # imagens
+        CreateItens.create_path(caminho = base_path / "images")
+        CreateItens.create_path(caminho = base_path / "images" / "covers")
+        CreateItens.create_path(caminho = base_path / "images" / "albums")
+        CreateItens.create_path(caminho = base_path / "images" / "artists")
 
 
     # leitura contas.json
@@ -70,6 +102,7 @@ class AccountManager:
         # se faltar alguma chave, tenta carregar do disco
         if not profile.get("nome") or not profile.get("email") or not profile.get("imagem"):
             caminho_perfil = os.path.join(base_path, "perfil.json")
+            
             if os.path.exists(caminho_perfil):
                 with open(caminho_perfil, "r", encoding = "utf-8") as f:
                     try:

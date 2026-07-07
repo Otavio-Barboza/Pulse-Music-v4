@@ -1,4 +1,4 @@
-from project.core.services.account_anager import AccountManager
+from project.core.services.account_manager import AccountManager
 import os, json
 
 class ConfigService:

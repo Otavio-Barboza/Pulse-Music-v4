@@ -1,26 +1,8 @@
-from project.core.services.account_anager import AccountManager
+from project.core.services.account_manager import AccountManager
+from project.core.utils.path import AppPaths
+from project.core.utils.create import CreateItens
 from google_auth_oauthlib.flow import InstalledAppFlow
-import aiohttp, os, json
-
-def criar_pastas(caminho : str):
-    """
-        Função para criar as pastas da conta nova.
-
-    Args:
-        caminho (str): caminho de cada pasta a ser criada
-    """
-    os.makedirs(caminho, exist_ok = True)
-
-
-def criar_jsons(caminho : str, conteudo : dict | None):
-    """
-        Função para criar os JSONs de cada conta nova.
-
-    Args:
-        caminho (str): caminho de cada JSON novo.
-    """
-    with open(caminho, 'w', encoding = 'utf-8') as js:
-        json.dump(conteudo if conteudo is not None else {}, js, indent = 4, ensure_ascii = False)
+import aiohttp, datetime
 
 
 async def login_google():
@@ -31,85 +13,89 @@ async def login_google():
         →  foto_perfil (URL)
         →  token (caso precise para People API futuramente)
     """
+    
+    # criando (C:\Users\barbo\AppData\Local\Pulse Music\)
+    AppPaths.ROOT.mkdir(parents = True, exist_ok = True)
 
-    SCOPES = [
-        'openid',
-        'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile'
+    # criando: (C:\Users\barbo\AppData\Local\Pulse Music\accounts.json)
+    CreateItens.create_json(path = AppPaths.ROOT / "accounts.json", data = {})
+
+    # criando: (C:\Users\barbo\AppData\Local\Pulse Music\account\)
+    AppPaths.ACCOUNT.mkdir(parents = True, exist_ok = True)
+
+
+    _SCOPES = [
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile"
     ]
 
     # O fluxo de autenticação OAuth DO GOOGLE NÃO É ASSÍNCRONO
     # então essa parte continua síncrona mesmo (não tem como mudar),
     # mas o resto (requisição da foto) será async.
 
-    flow = InstalledAppFlow.from_client_secrets_file(
+    _FLOW = InstalledAppFlow.from_client_secrets_file(
         r'Assets\App\Services\Auth\client_secret_google.json',
-        scopes = SCOPES
+        scopes = _SCOPES
     )
 
-    creds = flow.run_local_server(port=0)
+    _CREDS = _FLOW.run_local_server(port=0)
 
     # Agora buscamos as informações do usuário via chamada async
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            'https://www.googleapis.com/oauth2/v3/userinfo',
-            headers={'Authorization': f'Bearer {creds.token}'}
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {_CREDS.token}"}
         ) as resp:
-            dados = await resp.json()
+            data = await resp.json()
 
-    # Extrair dados retornados
-    nome = dados.get('name')
-    email = dados.get('email')
-    imagem = dados.get('picture')
-    id_conta = dados.get("sub")
-    pasta_base = f'Assets/Data/Contas/{id_conta}'
+    # Extrair data retornados
+    _name: str = data.get("name")
+    _email: str = data.get("email")
+    _image: str = data.get("picture")
+    _account_id: str = data.get("sub")
+    _base_path: str = AppPaths.ACCOUNT / _account_id
 
-    # aumentar qualidade da imagem da conta (trocar s96 por s256)
-    if imagem and 's96' in imagem:
-        imagem = imagem.replace('s96', 's256')
+    # aumentar qualidade da image da conta (trocar s96 por s256)
+    if image and "s96" in image:
+        image = image.replace("s96", "s256")
 
-    dados_user = {'nome': nome, 'email': email, 'imagem': imagem}
-    dados_config = {
-        "Overlays" : {
-            "ON_overlay_dica_tamanho_da_playlist" : True
+
+    # criando estrutura dos jsons referentes a conta
+    data_profile = {
+        "account_id" : _account_id,
+        "name": _name, 
+        "email": _email, 
+        "image": _image
+    }
+    data_settings = {
+        "overlays" : {
+            "ON_overlay_playlist_size_tip" : True
         }
     }
-    dados_play = {
-        "ultima_atualizacao" : None,
-        "ultimo_id" : 0,
+    data_playlist = {
+        "latest_actualization" : datetime.datetime.now().isoformat(),
+        "latest_id" : 0,
         "playlists" : {}
     }
-    caminho_conta = f'Assets/Data/Contas/{id_conta}'
 
-    # geral da conta
-    criar_pastas(caminho = caminho_conta)
-    criar_jsons(caminho = os.path.join(caminho_conta, 'perfil.json'), conteudo = None)
-    criar_jsons(caminho = os.path.join(caminho_conta, 'config.json'), conteudo = dados_config)
-    criar_jsons(caminho = os.path.join(caminho_conta, 'playlists.json'), conteudo = dados_play)
 
-    # playlist
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Playlists'))
-
-    # estado
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Estado'))
-    criar_jsons(caminho = os.path.join(caminho_conta, 'Estado/favoritas.json'), conteudo = None) 
-    criar_jsons(caminho = os.path.join(caminho_conta, 'Estado/historico.json'), conteudo = None)
-    
-    # Music e metas
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Music'))
-    criar_jsons(caminho = os.path.join(caminho_conta, 'Music/letra.json'), conteudo = None)
-    criar_jsons(caminho = os.path.join(caminho_conta, 'Music/musicas.json'), conteudo = None)
-
-    # imagens
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens'))
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens/Capa Musica'))
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens/Artistas'))
-    criar_pastas(caminho = os.path.join(caminho_conta, 'Imagens/Albuns'))
-
+    # caminho da conta agora é: (C:\Users\barbo\AppData\Local\Pulse Music\account)
+    AccountManager.create_account_structure(
+        base_path = _base_path,
+        data_profile = data_profile,
+        data_playlist = data_playlist,
+        data_settings = data_settings
+    )
     AccountManager.load_account(
-        account_id = id_conta,
-        base_path = pasta_base,
-        data = dados_user
+        account_id = _account_id,
+        base_path = _base_path,
+        data = data_profile
     )
     AccountManager.user().save_json()
-    AccountManager.add_account_to_index(account_id = id_conta, name = nome, base_path = pasta_base, email = email)
+    AccountManager.add_account_to_index(
+        account_id = _account_id, 
+        name = _name, 
+        base_path = _base_path, 
+        email = _email
+    )

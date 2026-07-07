@@ -1,34 +1,29 @@
-# imports de interface
-from project.ui.others.colors import color
+from .colors import cor
 from project.ui.playlist.base.music_list import ListViewMusic
-
-# import de back-end
-from project.core.services.controllers.grid_state import GridMode
-
-# import geral
+from ...App.Services.Controllers.estado_grid import GridMode
 import flet as ft
-
+import os
 
 class OverlayImages(ft.Container):
     def __init__(
         self, 
-        playlist_mode,
-        mode : GridMode, 
+        modo_playlist,
+        modo : GridMode, 
         img_big : str, 
-        music : list, 
-        name : str,
+        musicas : list, 
+        nome : str,
     ):
         super().__init__(
             height = 700,
             width = 1920,
             alignment = ft.alignment.center,
             padding = ft.padding.all(15),
-            bgcolor = color.preto2
+            bgcolor = cor.preto2
         )
         
-        self.playlist_mode = playlist_mode
-        self.mode = mode
-        self.music = music
+        self.modo_playlist = modo_playlist
+        self.modo = modo
+        self.musicas = musicas
 
         self.content = ft.ResponsiveRow(
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
@@ -49,11 +44,11 @@ class OverlayImages(ft.Container):
                         controls = [
                             ft.Image(
                                 src_base64 = img_big,
-                                border_radius = ft.border_radius.all(10) if self.mode == GridMode.ARTIST else ft.border_radius.all(10),
+                                border_radius = ft.border_radius.all(10) if self.modo == GridMode.ARTISTA else ft.border_radius.all(10),
                                 fit = ft.ImageFit.COVER
                             ),
                             ft.Text(
-                                value = name,
+                                value = nome,
                                 text_align = ft.TextAlign.CENTER,
                                 size = 26,
                                 weight = ft.FontWeight.W_500
@@ -64,14 +59,14 @@ class OverlayImages(ft.Container):
 
                 ft.Container(
                     col = {'md' : 7, 'sm' : 12},
-                    bgcolor = color.preto8,
+                    bgcolor = cor.preto8,
                     padding = ft.padding.only(
                         top = 15,
                         bottom = 15,
                         left = 10,
                         right = 10
                     ),
-                    border_radius = ft.border_radius.all(20) if self.mode == GridMode.ARTIST else ft.border_radius.all(10),
+                    border_radius = ft.border_radius.all(20) if self.modo == GridMode.ARTISTA else ft.border_radius.all(10),
                     alignment = ft.alignment.top_center,
 
                     content = ft.Column(
@@ -80,7 +75,7 @@ class OverlayImages(ft.Container):
 
                         controls = [
                             ft.Text(
-                                value = f'Músicas do{"(a)" if self.mode == GridMode.ARTIST else ""} {"artista" if self.mode == GridMode.ARTIST else "álbum"}',
+                                value = f'Músicas do{"(a)" if self.modo == GridMode.ARTISTA else ""} {"artista" if self.modo == GridMode.ARTISTA else "álbum"}',
                                 size = 18,
                                 weight = ft.FontWeight.W_500,
                                 text_align = ft.TextAlign.CENTER
@@ -89,7 +84,7 @@ class OverlayImages(ft.Container):
                             ft.Container(
                                 content = ListViewMusic(
                                     page = self.page,
-                                    music = self.music,
+                                    musicas = self.musicas,
                                     modo_favorita = None
                                 )
                             )

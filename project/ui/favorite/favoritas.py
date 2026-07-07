@@ -4,19 +4,21 @@ import flet as ft
 class Favorite(ft.Container):
     def __init__(
         self,
-        list_object_music: list,
-        path: str
+        page : ft.Page,
+        lista_objetos_musica : list,
+        caminho : str
     ):
         super().__init__(
             expand = True,
             padding = ft.padding.all(10)
         )
         
-        self.list_object_music = list_object_music
-        self.path = path
+        self.page = page
+        self.listas_objetos_musicas = lista_objetos_musica
+        self.caminho = caminho
         
         self.content = ListViewMusic(
             page = self.page,
-            musicas = self.list_object_music,
-            modo_favorita = path
+            musicas = self.listas_objetos_musicas,
+            modo_favorita = caminho
         )

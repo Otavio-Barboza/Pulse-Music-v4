@@ -3,7 +3,7 @@ from Assets.App.Meta.Controller.scanner_controller import ScannerController
 import flet as ft
 
 class AppBar(ft.AppBar):
-    def __init__(self, abrir_config):
+    def __init__(self, page, abrir_config):
         super().__init__(
             bgcolor = color.preto7,
             leading_width = 50,
@@ -34,7 +34,7 @@ class AppBar(ft.AppBar):
                 )
             )
         )
-
+        self.page = page
         self.abrir_config = abrir_config
         
         self.config_btn = ft.IconButton(

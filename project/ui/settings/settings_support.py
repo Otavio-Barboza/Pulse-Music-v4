@@ -9,10 +9,12 @@ from project.core.services.account_manager import AccountManager
 import flet as ft
 
 class SettingsSupport(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             expand = True
-        )
+            )
+
+        self.page = page
 
         self.text_field = ft.TextField(
             hint_text = 'Digite a mensagem...',

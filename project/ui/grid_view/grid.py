@@ -7,7 +7,7 @@ import flet as ft
 import os
 
 class GridImages(ft.GridView):
-    def __init__(self, modo : GridMode, caminho : str):
+    def __init__(self, page, modo : GridMode, caminho : str):
         super().__init__(
             max_extent = 200 if modo == GridMode.ARTISTA else 250,
             expand = True,
@@ -15,6 +15,7 @@ class GridImages(ft.GridView):
             run_spacing = 15,
             padding = ft.padding.all(15)
         )
+        self.page = page
         self.modo = modo
 
         self.controls = []

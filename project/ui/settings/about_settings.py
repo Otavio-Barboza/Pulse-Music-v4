@@ -3,11 +3,13 @@ import flet as ft
 import random, asyncio
 
 class AboutSettings(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center,
             padding = 0
         )
+
+        self.page = page
 
         self._CARD_CONTENT = [
             (ft.Icons.PLAY_ARROW_ROUNDED, 'Reprodução', 'Reprodução completa no melhor estilo player clássico, com avanço automático de faixas e controle de volume — do jeitinho que um player de verdade deve ser.'),

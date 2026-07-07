@@ -6,12 +6,12 @@ import flet as ft
 import asyncio
 
 class ContainerOverlay(ft.Container):
-    def __init__(self, estado, conteudo, modo : ModoOverlayPlaylist):
+    def __init__(self, page, estado, conteudo, modo : ModoOverlayPlaylist):
         super().__init__(
             alignment = ft.alignment.center,
             expand = True
         )
-
+        self.page = page
         self.conteudo = conteudo
         self.estado = estado
         self.modo = modo

@@ -6,10 +6,11 @@ from project.core.services.account_manager import AccountManager
 from project.core.user.models.user import User
 
 class AccountSettings(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center,
         )
+        self.page = page
         self.data = None
 
         self.caixa_texto = ft.TextField(

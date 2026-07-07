@@ -1,19 +1,16 @@
-# imports de interface
 from project.ui.others.colors import color
-
-# imports gerais
-import asyncio, pywhatkit
 import flet as ft
-
+import asyncio, pywhatkit
 
 class MusicSearch(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             expand = True,
             padding = ft.padding.all(10)
         )
+        self.page = page
 
-        self._EXAMPLE_LIST: list[str] = [
+        self.lista_ex = [
             'Ex: Infinity - Guru Josh',
             'Ex: Imagine Dragons - Believer',
             'Ex: Coldplay - Yellow',
@@ -21,8 +18,8 @@ class MusicSearch(ft.Container):
             'Ex: Linkin Park - Numb'
         ]
 
-        self.text_field = ft.TextField(
-            hint_text = 'Digite a music...',
+        self.caixa_texto = ft.TextField(
+            hint_text = 'Digite a musica...',
             hint_style = ft.TextStyle(
                 color = color.cinza1,
                 size = 16
@@ -48,24 +45,22 @@ class MusicSearch(ft.Container):
 
             cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
-            on_submit = self.submit_music
+            on_submit = self._submeter_musica
         )
 
-        self.container_text = ft.Container(
+        self.container_texto = ft.Container(
             alignment = ft.alignment.center_left,
             width = 700,
-
             margin = ft.margin.only(
                 top = 20,
                 bottom = 15
             ),
-
-            content = self._create_text(
-                text = 'Ex:',
-                size = 20,
-                text_color = color.branco2,
-                max_lines = 1,
-                weight = ft.FontWeight.W_300
+            content = self._criar_textos(
+                texto = 'Ex:',
+                tamanho = 20,
+                color_texto = color.branco2,
+                max_linhas = 1,
+                negrito = ft.FontWeight.W_300
             )
         )
 
@@ -75,101 +70,101 @@ class MusicSearch(ft.Container):
 
             controls = [
                 ft.Container(
-                    content = self._create_text(
-                        text = 'Pesquisar Música no YouTube',
-                        text_color = color.amarelo4,
-                        weight = ft.FontWeight.BOLD,
-                        size = 50
+                    content = self._criar_textos(
+                        texto = 'Pesquisar Música no YouTube',
+                        color_texto = color.amarelo4,
+                        negrito = ft.FontWeight.BOLD,
+                        tamanho = 50
                     )
                 ),
             
-                self.container_text,
-                self.text_field
+                self.container_texto,
+                self.caixa_texto
             ]
         )
     
-    def _create_text(
+    def _criar_textos(
             self, 
-            text : str, 
-            text_color : str, 
-            weight : ft.FontWeight, 
-            size : int, 
+            texto : str, 
+            color_texto : str, 
+            negrito : ft.FontWeight, 
+            tamanho : int, 
             overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
-            max_lines : int = 1, 
-            alignment : ft.TextAlign = ft.TextAlign.CENTER,
-            columns : int | None = None,
-            font : str = 'inter'
+            max_linhas : int = 1, 
+            alinhamento : ft.TextAlign = ft.TextAlign.CENTER,
+            colunas : int | None = None,
+            fonte : str = 'inter'
         ):
         '''
             Função para criar os textos da tela sobre o app.
 
         Args:
-            text (str): text desejado colocar
-            text_color (str): color a definir para o text
-            weight (ft.FontWeight): expessura da font
-            size (int): size da font
-            overflow (ft.TextOverflow, optional): Encolhimento do text conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
-            max_lines (int, optional): máximo de linhas para quebra de text. { Defaults to 1 }
-            alignment (ft.TextAlign, optional): posicionamento do text. { Defaults to ft.TextAlign.CENTER} 
-            columns (int | None, optional): columns que ocupará. { Defaults to None }
+            texto (str): texto desejado colocar
+            color_texto (str): color a definir para o texto
+            negrito (ft.FontWeight): expessura da fonte
+            tamanho (int): tamanho da fonte
+            overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
+            max_linhas (int, optional): máximo de linhas para quebra de texto. { Defaults to 1 }
+            alinhamento (ft.TextAlign, optional): posicionamento do texto. { Defaults to ft.TextAlign.CENTER} 
+            colunas (int | None, optional): colunas que ocupará. { Defaults to None }
 
         Returns:
             ft.Text : Texto a ser atríbuido
         '''
         return ft.Text(
-            value = text,
-            color = text_color,
-            weight = weight,
-            size = size,
+            value = texto,
+            color = color_texto,
+            weight = negrito,
+            size = tamanho,
             overflow = overflow,
-            max_lines = max_lines,
-            text_align = alignment,
-            col = columns,
-            font_family = font
+            max_lines = max_linhas,
+            text_align = alinhamento,
+            col = colunas,
+            font_family = fonte
         )
     
-    async def animation_example(self):
-        previous: str = ''
+    async def animacao_ex(self):
+        anterior = ''
 
         while True:
-            for example in self._EXAMPLE_LIST:
-                for i in range(len(example)):
-                    current = example[i]
+            for letra in self.lista_ex:
+                for i in range(len(letra)):
+                    atual = letra[i]
 
-                    if len(previous) == len(example) - 1:
-                        previous = ''
+                    if len(anterior) == len(letra) - 1:
+                        anterior = ''
                     else:
-                        previous += current
+                        anterior += atual
                     
-                    self.container_text.content.value = previous
-                    self.container_text.update()
+                    self.container_texto.content.value = anterior
+                    self.container_texto.update()
                         
                     await asyncio.sleep(0.4)
             
-    def start_animation(self):
-        self.page.run_task(self.animation_example)
+    def iniciar_animacao(self):
+        self.page.run_task(self.animacao_ex)
 
-    def search(self, music):
+    def pesquisar(self, musica):
         try:
-            pywhatkit.playonyt(music)
+            pywhatkit.playonyt(musica)
             return True
         except Exception as erro:
             print(erro)
             return False
 
-    def submit_music(self, e):
-        name: str = self.text_field.value
-        result: bool = self.search(name)
+    def _submeter_musica(self, e):
+        nome = self.caixa_texto.value
+        resultado = self.pesquisar(nome)
         
-        if result:
+        if resultado:
             self.page.open(ft.SnackBar(
-                ft.Text(f'Música {name} encontrada com sucesso!')
+                ft.Text(f'Música {nome} encontrada com sucesso!')
             ))
-            self.text_field.value = ''
-            self.text_field.update()
+            self.caixa_texto.value = ''
+            self.caixa_texto.update()
             self.page.update()
         else:
             self.page.open(ft.SnackBar(
-                ft.Text(f'Música {name} não encontrada, tente novamente!')
+                ft.Text(f'Música {nome} não encontrada, tente novamente!')
             ))
             self.page.update()

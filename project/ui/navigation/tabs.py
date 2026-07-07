@@ -1,15 +1,21 @@
+# imports de interface
 from project.ui.others.colors import color
 from project.ui.others.music_search import MusicSearch
 from project.ui.playlist.base.base_playlists import ColumnCards
 from project.ui.grid_view.grid import GridImages
 from project.ui.favorite.favoritas import Favorite
-from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
-from ...App.Services.Controllers.estado_grid import GridMode
-from ...App.Services.gerenciador_contas import GerenciadorContas
+
+# imports de back-end
+from project.core.services.controllers.resize_manager import ResizeManager
+from project.core.services.controllers.grid_state import GridMode
+from project.core.services.account_manager import AccountManager
+
+# import gertal
 import flet as ft
 
+
 class TabsNavigation(ft.Tabs):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             selected_index = 0,
             animation_duration = 300,
@@ -34,10 +40,9 @@ class TabsNavigation(ft.Tabs):
             )
         )
         
-        self.page = page
-        self._icones_tabs = []
+        self._tabs_icons = []
         self._labels_tabs = []
-        self.lista_labels = [
+        self.label_list = [
             {'label' : 'Playlists', 'icon' : ft.Icons.MUSIC_NOTE_SHARP},
             {'label' : 'Artistas', 'icon' : ft.Icons.PERSON_SEARCH_ROUNDED}, 
             {'label' : 'Álbuns', 'icon' : ft.Icons.QUEUE_MUSIC_ROUNDED}, 
@@ -45,20 +50,21 @@ class TabsNavigation(ft.Tabs):
             {'label' : 'Pesquisar', 'icon' : ft.Icons.YOUTUBE_SEARCHED_FOR_ROUNDED}
         ]
 
-        self.playlist = ColumnCards(page = self.page)
-        self.pesquisa_musica = MusicSearch(page = self.page)
-        self.artistas = GridImages(
-            modo = GridMode.ARTISTA,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas',
-            page = self.page
-        )
-        self.albuns = GridImages(
-            modo = GridMode.ALBUM,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
-            page = self.page
+        self.playlist = ColumnCards()
+        
+        self.music_search = MusicSearch()
+        
+        self.artist = GridImages(
+            modo = GridMode.ARTIST,
+            caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Artistas',
         )
         
-        self._criar_tabs()
+        self.album = GridImages(
+            modo = GridMode.ALBUM,
+            caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Albuns',
+        )
+        
+        self._create_tabs()
 
         self.tabs = [
             ft.Tab(
@@ -68,12 +74,12 @@ class TabsNavigation(ft.Tabs):
 
             ft.Tab(
                 tab_content = self._labels_tabs[1],
-                content = self.artistas
+                content = self.artist
             ),
 
             ft.Tab(
                 tab_content = self._labels_tabs[2],
-                content = self.albuns
+                content = self.album
             ),
 
             ft.Tab(
@@ -83,69 +89,70 @@ class TabsNavigation(ft.Tabs):
 
             ft.Tab(
                 tab_content = self._labels_tabs[4],
-                content = self.pesquisa_musica
+                content = self.music_search
             ),
         ]
 
-        ResizeManager.registrar(self._ajustar_tabs)
+        ResizeManager.register(self._tabs_resize)
 
-    def _criar_tabs(self):
-        for l in self.lista_labels:
-            label, icone = self._tab_label(
-                icon=l["icon"],
-                texto=l["label"]
+    def _create_tabs(self):
+        for l in self.label_list:
+            label, icon = self._tab_label(
+                icon_label = l["icon"],
+                text = l["label"]
             )
 
             self._labels_tabs.append(label)
-            self._icones_tabs.append(icone)
+            self._tabs_icons.append(icon)
 
-    def _tab_label(self, icon, texto):
-        icone = ft.Icon(icon, size=18)
+    def _tab_label(self, icon_label: ft.Icons, text: str):
+        icon = ft.Icon(icon_label, size = 18)
 
         row = ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=8,
-            
-            controls=[
-                icone,
+            alignment = ft.MainAxisAlignment.CENTER,
+            vertical_alignment = ft.CrossAxisAlignment.CENTER,
+            spacing = 8,
+             
+            controls = [
+                icon,
+
                 ft.Text(
-                    texto,
-                    size=14,
-                    weight=ft.FontWeight.W_700
+                    text,
+                    size = 14,
+                    weight = ft.FontWeight.W_700
                 )
             ]
         )
 
-        return row, icone
+        return row, icon
 
-    def _ajustar_tabs(self, e=None):
-        compacto = self.page.width < 576
+    def _tabs_resize(self, e = None):
+        compact = self.page.width < 576
 
-        for icone in self._icones_tabs:
-            icone.visible = not compacto
+        for icon in self._tabs_icons:
+            icon.visible = not compact
 
         self.update()
         
-    def atualizar_grids(self):
+    def update_grids(self):
         self.tabs[1].content.reconstruir_imagens(
-            modo = GridMode.ARTISTA
+            modo = GridMode.ARTIST
         )
         self.tabs[1].update()
     
-    def carregar_favoritas(self):
+    def load_favorites(self):
         from ...App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
         from ...App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
         
-        lista_de_musicas = EstadoFavoritas.listar_objetos_favoritados()
+        music_list = EstadoFavoritas.listar_objetos_favoritados()
+        
         self.tabs[3].content = Favorite(
-            page = self.page,
-            lista_objetos_musica = lista_de_musicas,
-            caminho = ModoReprodução.FAVORITA
+            list_object_music = music_list,
+            path = ModoReprodução.FAVORITA
         )
         self.tabs[3].update()
 
         Reprodução.carregar_musicas_do_modo(
             modo = ModoReprodução.FAVORITA,
-            lista = lista_de_musicas
+            lista = music_list
         )

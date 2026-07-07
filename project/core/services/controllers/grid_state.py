@@ -1,15 +1,18 @@
+# imports gerais
 from enum import Enum
 import inspect, asyncio
+
 
 class GridMode(Enum):
     ARTIST = 'artist'
     ALBUM = 'album'
     
+
 class GridState:
     _callbacks = {}
     
     @classmethod
-    def registrar_callback(cls, event: str, func: callable):
+    def register_callback(cls, event: str, func: callable):
         if event not in cls._callbacks:
             cls._callbacks[event] = []
         cls._callbacks[event].append(func)

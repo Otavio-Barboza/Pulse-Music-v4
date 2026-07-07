@@ -105,7 +105,7 @@ async def main(page : ft.Page):
         """     
 
         if settings is None:
-            settings = ScreenSettings(page)
+            settings = ScreenSettings()
             page.overlay.append(settings)
         else:
             if settings not in page.overlay:
@@ -115,7 +115,7 @@ async def main(page : ft.Page):
     await validate_login()
     await carregar_memoria()
 
-    tabs = TabsNavigation(page = page)
+    tabs = TabsNavigation()
 
     async def on_current_account(usuario):
         """
@@ -135,6 +135,7 @@ async def main(page : ft.Page):
         ft.SafeArea(
             content = ft.Stack(
                 expand = True,
+                
                 controls = [
                     ft.Column(
                         expand = True,
@@ -157,8 +158,8 @@ async def main(page : ft.Page):
         AccountManager.user()
     )
 
-    tabs.pesquisa_musica.iniciar_animacao()
-    tabs.carregar_favoritas()
+    tabs.pesquisa_musica.start_animation()
+    tabs.load_favorites()
     
     page.on_resized = ResizeManager.to_execute
    

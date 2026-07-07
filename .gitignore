@@ -1,5 +1,4 @@
 .env
-client_secret_google.json
 contas.json
 
 # pycache e elementos do VsCode

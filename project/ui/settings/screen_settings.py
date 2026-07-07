@@ -12,13 +12,12 @@ from project.core.services.controllers.state_app import StateApp
 import flet as ft
 
 class ScreenSettings(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             expand = True,
             bgcolor = colors.preto6,
             padding = 0
         )
-        self.page = page
 
         # dicionário que guarda todos os botões
         self.buttons = {}

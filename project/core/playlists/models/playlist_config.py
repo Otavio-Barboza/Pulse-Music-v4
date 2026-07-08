@@ -2,22 +2,22 @@ class PlaylistConfig:
     def __init__(
         self, 
         id,
-        nome, 
+        name, 
         style,
-        musicas,
-        datas
+        music,
+        date
     ):
         self.id = id
         self.style = style
-        self.musicas = musicas
-        self.datas = datas
-        self.nome = nome
+        self.music = music
+        self.date = date
+        self.name = name
 
     # setters para atualização de informações na "memória" da classe (facilitando a att depois no JSON).
-    def set_nome(self, nome):
-        if not nome:
+    def set_nome(self, name):
+        if not name:
             raise ValueError("Nome inválido")
-        self.nome = nome
+        self.name = name
 
     def set_cor(self, cor):
         self.style["cor"] = cor
@@ -29,4 +29,4 @@ class PlaylistConfig:
         self.style["pasta"] = imagem
 
     def set_pasta_musicas(self, pasta):
-        self.musicas["pasta"] = pasta
+        self.music["pasta"] = pasta

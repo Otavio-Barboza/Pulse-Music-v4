@@ -1,17 +1,15 @@
-from .playlist_config import PlaylistConfig
+from project.core.playlists.models.playlist_config import PlaylistConfig
 
 class Playlist:
     def __init__(
-            self, 
-            id : str, 
-            nome : str, 
-            tipo : str,
-            caminho : str = ''
-        ):
+        self, 
+        id : str, 
+        name : str, 
+        path : str = ''
+    ):
         self.id = id
-        self.nome = nome
-        self.tipo = tipo
-        self.caminho = caminho
+        self.name = name
+        self.path = path
         self._config = None
 
     def carregar_config(self):

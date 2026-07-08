@@ -3,20 +3,26 @@ import os
 
 class AppPaths:
 
-    ROOT = Path(os.getenv("LOCALAPPDATA")) / "Pulse Music"
+    # assets local
+    LOCAL_ASSETS: Path = "project"
+
+    # assets
+    ASSETS: Path = LOCAL_ASSETS / "assets" / "auth"
+
+
+    # local app data do windows
+    LOCAL_APP_DATA: Path = Path(os.getenv("LOCALAPPDATA")) / "Pulse Music"
     
     # pastas
-    ACCOUNT = ROOT / "account"
-
-    CONFIG = ROOT / "config"
-
-    CACHE = ROOT / "cache"
+    ACCOUNT: Path = LOCAL_APP_DATA / "account"
+    CONFIG: Path = LOCAL_APP_DATA / "config"
+    CACHE: Path = LOCAL_APP_DATA / "cache"
 
     # jsons
-    ACCOUNT_JSON = ROOT / "accounts.json"
+    ACCOUNT_JSON: Path = LOCAL_APP_DATA / "accounts.json"
 
 
-print(AppPaths.ROOT)
+print(AppPaths.LOCAL_APP_DATA)
 print(AppPaths.ACCOUNT)
 print(AppPaths.CONFIG)
 print(AppPaths.CACHE)

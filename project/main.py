@@ -93,8 +93,8 @@ async def main(page : ft.Page):
         from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
         from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
 
-        dados = await Persistencia.ler_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
-        memoria.carregar(dados)
+        data: dict = await Persistencia.ler_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
+        memoria.carregar(data)
         
         await MemoriaArtistas.carregar()
         LetrasMemoria.carregar_memoria()
@@ -115,7 +115,7 @@ async def main(page : ft.Page):
     await validate_login()
     await carregar_memoria()
 
-    tabs = TabsNavigation(page = page)
+    tabs = TabsNavigation()
 
     async def on_current_account(usuario):
         """
@@ -135,6 +135,7 @@ async def main(page : ft.Page):
         ft.SafeArea(
             content = ft.Stack(
                 expand = True,
+                
                 controls = [
                     ft.Column(
                         expand = True,

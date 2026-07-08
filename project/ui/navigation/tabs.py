@@ -44,17 +44,15 @@ class TabsNavigation(ft.Tabs):
             {'label' : 'Pesquisar', 'icon' : ft.Icons.YOUTUBE_SEARCHED_FOR_ROUNDED}
         ]
 
-        self.playlist = ColumnCards(page = self.page)
-        self.pesquisa_musica = MusicSearch(page = self.page)
+        self.playlist = ColumnCards()
+        self.pesquisa_musica = MusicSearch()
         self.artistas = GridImages(
             modo = GridMode.ARTISTA,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas',
-            page = self.page
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         )
         self.albuns = GridImages(
             modo = GridMode.ALBUM,
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns',
-            page = self.page
+            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         )
         
         self._criar_tabs()

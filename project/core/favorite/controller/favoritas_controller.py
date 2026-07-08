@@ -1,36 +1,37 @@
-from ...Audio.Model.musica import Musica
-from ..Repository.favorita_repository import FavoritasRepository
-from enum import Enum
+# imports de back-end
+from project.core.song.model.song import Song
+from project.core.favorite.repository.favorite_repository import FavoriteRepository
+from project.core.favorite.enum.favorite_enum import Favorited
 
-class Favoritada(Enum):
-    FAVORITADA = 'favoritada'
-    NAO_FAVORITADA = 'não-favoritada'
+# import geral
+import inspect, asyncio
 
 
-class EstadoFavoritas:
-    _callbacks : dict[str, list] = {}
-    # lista com objetos Musica
-    _lista_favoritas : list[Musica] = []
+class FavoriteState:
 
-    @classmethod
-    def registrar_callback(cls, evento : str, callback : callable):
-        if evento not in cls._callbacks:
-            cls._callbacks[evento] = []
-        cls._callbacks[evento].append(callback)
+    _callbacks: dict[str, list] = {}
+
+    # lista com objetos Song
+    favorite_list: list[Song] = []
 
     @classmethod
-    def notificar(cls, evento : str, dados = None):
-        import inspect, asyncio
+    def register_callback(cls, event: str, callback : callable):
+        if event not in cls._callbacks:
+            cls._callbacks[event] = []
+        cls._callbacks[event].append(callback)
 
-        if evento not in cls._callbacks:
+    @classmethod
+    def notify(cls, event: str, data = None):
+
+        if event not in cls._callbacks:
             return
         
-        for func in cls._callbacks[evento]:
+        for func in cls._callbacks[event]:
             try:
                 if inspect.iscoroutinefunction(func):
-                    asyncio.create_task(func(dados))
+                    asyncio.create_task(func(data))
                 else:
-                    res = func(dados)
+                    res = func(data)
                     if inspect.isawaitable(res):
                         asyncio.create_task(res)
             except Exception as e:
@@ -39,38 +40,39 @@ class EstadoFavoritas:
                 traceback.print_exc()
 
     @classmethod
-    def listar_objetos_favoritados(cls) -> list[Musica]:
-        return FavoritasRepository.listar_objetos_favoritados()
+    def list_favorited_objects(cls) -> list[Song]:
+        return FavoriteRepository.list_favorite_objects()
     
     @classmethod
-    def alterar_objeto_para_json(cls, dados : Musica):
+    def convert_object_to_json(cls, data: Song):
         from ...Audio.Model.modo_reproducao import ModoReprodução
-        nova_chave, novo_item = FavoritasRepository.formatar_objeto_no_json(
-            dado = dados, 
-            status = Favoritada.FAVORITADA.value
+
+        nova_chave, novo_item = FavoriteRepository.format_object_in_json(
+            dado = data, 
+            status = Favorited.FAVORITED.value
         )
 
-        json_musicas = FavoritasRepository.ler_json()
+        json_musicas = FavoriteRepository.ler_json()
 
         if nova_chave not in json_musicas:
             json_musicas[nova_chave] = novo_item
 
-        FavoritasRepository.salvar_json(json_musicas)
+        FavoriteRepository.salvar_json(json_musicas)
 
-        dados.modo = ModoReprodução.FAVORITA.value
+        data.mode = ModoReprodução.FAVORITA.value
 
-        cls.notificar(
-            evento = 'favoritar',
-            dados = dados
+        cls.notify(
+            evento = 'add_to_favorites',
+            data = data
         )
 
     @classmethod
-    def remover_favorita_json(cls, dado : Musica):
-        json_favorita = FavoritasRepository.ler_json()
+    def remove_favorite_json(cls, data: Song):
+        json_favorita = FavoriteRepository.ler_json()
         chave_para_remover = None
 
         for chave, _ in json_favorita.items():
-            if chave == dado.chave:
+            if chave == data.chave:
                 chave_para_remover = chave
                 break
         
@@ -78,23 +80,23 @@ class EstadoFavoritas:
             return 
         
         del json_favorita[chave_para_remover]
-        FavoritasRepository.salvar_json(json_favorita)
+        FavoriteRepository.salvar_json(json_favorita)
 
-        cls.notificar(
-            'desfavoritar',
-            dado
+        cls.notify(
+            'unfavorite',
+            data
         )  
         
     @classmethod
-    def listar_favoritas(cls) -> list[str]:
-        return FavoritasRepository.listar_favoritas()
+    def list_favorite(cls) -> list[str]:
+        return FavoriteRepository.list_favorite()
     
     @classmethod
-    def adicionar_musica_reproducao(cls, musica : Musica):
+    def add_music_to_playback(cls, musica : Song):
         from ...Audio.Model.modo_reproducao import Reprodução
         Reprodução.adicionar_musica(musica)
 
     @classmethod
-    def remover_musica_reproducao(cls, musica : Musica):
+    def remove_music_to_playback(cls, musica : Song):
         from ...Audio.Model.modo_reproducao import Reprodução
         Reprodução.remover_musica(musica)

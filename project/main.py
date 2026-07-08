@@ -17,8 +17,10 @@ from Assets.App.Audio.Controller.sessao import SessaoReproducao
 from Assets.App.Meta.Repository.persistencia import Persistencia
 from Assets.App.Meta.Models.scanner_model import ScannerModel
 from Assets.App.Meta.Memoria.memoria_global import memoria
+from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
+from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
 
-# imports de bibliotecas 
+# imports de bibliotecas  gerais
 from pathlib import Path
 import asyncio
 import flet as ft
@@ -89,10 +91,6 @@ async def main(page : ft.Page):
             StateApp.notify("no_account")
 
     async def carregar_memoria():
-        from Assets.App.Meta.Memoria.memoria_global import memoria
-        from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
-        from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
-
         data: dict = await Persistencia.ler_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
         memoria.carregar(data)
         

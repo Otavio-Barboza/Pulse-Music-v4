@@ -1,6 +1,6 @@
 # imports do back-end
 from project.core.playlists.repository.playlist_reprositorio import PlaylistRepository
-from project.core.playlists.models.playlist_mode import PlaylistLoaded
+from project.core.playlists.enum.playlist_enum import PlaylistLoaded
 
 # imports gerais
 import inspect, asyncio
@@ -38,7 +38,7 @@ class PlaylistState:
     def open_playlist(cls, id: str, status: PlaylistLoaded):
         cls._playlist_loaded = {
             'id' : id,
-            'aberta' : status
+            'open_or_close' : status
         }
 
     @classmethod

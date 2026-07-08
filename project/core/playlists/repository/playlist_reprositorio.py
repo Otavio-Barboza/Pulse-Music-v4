@@ -225,7 +225,7 @@ class PlaylistRepository:
 
         pasta = leitura_json.get('musicas').get('pasta')
         
-        chaves_para_remover = PlaylistRepositorio.recognize_song_keys(id)
+        chaves_para_remover = cls.recognize_song_keys(id)
 
         asyncio.run(
             Scanner.reconhecer_artistas_albuns_inexistentes(

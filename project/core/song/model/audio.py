@@ -1,29 +1,38 @@
+# import de back-end
+from project.core.song.model.monitoring import Monitoring
+
+# import geral
 import threading
+import pyglet as pyg
+
 
 class AudioLoop:
-    _iniciado = False
-    player = None
+
+    _initialized: bool = False
+    player: pyg.media.Player | None = None
 
     @classmethod
+    def set_player(cls, content: pyg.media.Player):
+        cls.player = content
+        
+    @classmethod
     def iniciar(cls):
-        if cls._iniciado:
+        if cls._initialized:
             return
-        cls._iniciado = True
+        
+        cls._initialized = True
 
         threading.Thread(
-            target=cls._run,
-            daemon=True
+            target = cls._run,
+            daemon = True
         ).start()
 
     @classmethod
     def _run(cls):
-        import pyglet
-
-        cls.player = pyglet.media.Player()
+        cls.player = pyg.media.Player()
 
         @cls.player.event
         def on_eos():
-            from .monitor import Monitor
-            Monitor.notificar_fim()
+            Monitoring.notify_end()
 
-        pyglet.app.run()
+        pyg.app.run()

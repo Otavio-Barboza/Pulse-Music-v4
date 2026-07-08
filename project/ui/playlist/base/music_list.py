@@ -1,13 +1,19 @@
-from project.ui.playlist.containers.music_container import RowContainer
+# import de interface
 from project.ui.others.colors import color
+from project.ui.playlist.containers.music_container import RowContainer
+
+# import de back-end
 from ....App.Audio.Controller.sessao import SessaoReproducao
 from ....App.Audio.Model.modo_reproducao import Reprodução
-from ....App.Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
-from ....App.Audio.Model.musica import Musica
+from project.core.playlists.controller.estado_playlist import PlaylistState
+from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+from project.core.song.model.song import Song
+
+# import geral
 import flet as ft
 
 class ListViewMusic(ft.ListView):
-    def __init__(self, musicas : list[Musica], modo_favorita : str | None = None):
+    def __init__(self, musicas : list[Song], modo_favorita : ModoReprodução | None = None):
         super().__init__(
             spacing = 10,
             expand = True
@@ -25,19 +31,19 @@ class ListViewMusic(ft.ListView):
         self._carregar()
         
         SessaoReproducao.registrar_callback(
-            evento = 'att_container', 
+            evento = 'actualization_container', 
             callback = self.att_container
         )
-        EstadoPlay.registar_callback(
-            evento = 'att_musicas_exibidas',
+        PlaylistState.registar_callback(
+            evento = 'update_displayed_musics',
             funcao = self.recarregar
         )
-        EstadoPlay.registar_callback(
-            evento = 'att_favoritadas',
+        PlaylistState.registar_callback(
+            evento = 'actualization_not_favorited',
             funcao = self.att_nao_favoritas
         )
-        EstadoPlay.registar_callback(
-            evento = 'att_favoritada',
+        PlaylistState.registar_callback(
+            evento = 'actualization_favorited',
             funcao = self.att_favoritas
         )
 
@@ -48,25 +54,25 @@ class ListViewMusic(ft.ListView):
             self._callback_desfavoritar = self.remover_favorita
 
             EstadoFavoritas.registrar_callback(
-                evento = 'favoritar',
+                evento = 'add_to_favorites',
                 callback = self.adicionar_favorita
             )
             EstadoFavoritas.registrar_callback(
-                evento = 'desfavoritar',
+                evento = 'unfavorite',
                 callback = self.remover_favorita
             )
 
     def will_unmount(self):
         from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
         
-        SessaoReproducao._callbacks['att_container'].remove(self._callback)
-        EstadoPlay._callbacks['att_musicas_exibidas'].remove(self._callback_qtde)
-        EstadoPlay._callbacks['att_favoritadas'].remove(self._callback_favoritas)
-        EstadoPlay._callbacks['att_favoritada'].remove(self._callback_favorita)
+        SessaoReproducao._callbacks['actualization_container'].remove(self._callback)
+        PlaylistState._callbacks['update_displayed_musics'].remove(self._callback_qtde)
+        PlaylistState._callbacks['actualization_not_favorited'].remove(self._callback_favoritas)
+        PlaylistState._callbacks['actualization_favorited'].remove(self._callback_favorita)
         
         if self.modo_favorita is not None:
-            EstadoFavoritas._callbacks['favoritar'].remove(self._callback_favoritar)
-            EstadoFavoritas._callbacks['desfavoritar'].remove(self._callback_desfavoritar)
+            EstadoFavoritas._callbacks['add_to_favorites'].remove(self._callback_favoritar)
+            EstadoFavoritas._callbacks['unfavorite'].remove(self._callback_desfavoritar)
     
     def _carregar(self):
         from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas, Favoritada
@@ -97,8 +103,8 @@ class ListViewMusic(ft.ListView):
         # from ....App.Audio.Controller.sessao import SessaoReproducao
         
         if (
-            isinstance(EstadoPlay._playlist_aberta, dict) and
-            EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+            isinstance(PlaylistState._playlist_aberta, dict) and
+            PlaylistState._playlist_aberta['open_or_close'] == PlaylistLoaded.OPEN
         ):
             try:                
                 if self.modo_favorita is None:
@@ -131,8 +137,8 @@ class ListViewMusic(ft.ListView):
         )
         self.update()
 
-        EstadoPlay.notificar(
-            evento = 'att_favoritada',
+        PlaylistState.notificar(
+            evento = 'actualization_favorited',
             dados = data.chave
         )
     
@@ -146,7 +152,7 @@ class ListViewMusic(ft.ListView):
         self.controls.remove(container_para_remover)
         self.update()
 
-        EstadoPlay.notificar(
+        PlaylistState.notificar(
             'att_favoritadas',
             data.chave
         )

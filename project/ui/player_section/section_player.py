@@ -13,8 +13,8 @@ from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
 import flet as ft
 
 class PlayerSection:
-    def __init__(self, page):
-        self.page = page
+
+    def __init__(self):
         self.overlays = []
         
         self.barra_duração_compacta = CompactProgressBar(page = self.page)

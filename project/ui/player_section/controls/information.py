@@ -3,13 +3,12 @@ from project.ui.others.colors import color
 import flet as ft
 
 class PlayerInformation(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center_right,
             padding = ft.padding.only(left = 10)
         )
-        self.page = page
         
         self.imagem = ft.Container(
             height = 64,

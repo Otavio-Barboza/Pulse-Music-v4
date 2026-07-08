@@ -3,7 +3,7 @@ from Assets.App.Services.Controllers.estado_section import EstadoSection
 import flet as ft
 
 class InformationMenu(ft.Container):
-    def __init__(self, page, trocar_view):
+    def __init__(self, trocar_view):
         super().__init__(
             height = 60,
             bgcolor = color.preto6,
@@ -11,7 +11,7 @@ class InformationMenu(ft.Container):
             border_radius= ft.border_radius.all(15),
             margin = ft.margin.symmetric(vertical = 5, horizontal = 10) 
         )
-        self.page = page
+
         self.botoes = {}
 
         self.content = ft.Row(

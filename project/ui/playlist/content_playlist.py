@@ -9,12 +9,12 @@ from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
 import flet as ft
 
 class ContentPlaylist(ft.Container):
-    def __init__(self, page, abrir):
+    def __init__(self, abrir):
         super().__init__(
             padding = ft.padding.all(10),
             expand = True
         )
-        self.page = page
+
         self.abrir = abrir
 
         self.grid = GridPlaylists(

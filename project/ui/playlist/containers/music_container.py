@@ -5,7 +5,6 @@ import flet as ft
 class RowContainer(ft.Container):
     def __init__(
             self, 
-            page, 
             musica, 
             status_favoritada
         ):
@@ -18,7 +17,7 @@ class RowContainer(ft.Container):
             data = musica,
             on_click = self.tocar_ou_pausar
         )
-        self.page = page
+
         self._esta_favoritado = status_favoritada
         self.imagem_capa = self.encontrar_capa()
 

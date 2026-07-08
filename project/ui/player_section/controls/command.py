@@ -3,12 +3,12 @@ from project.ui.others.colors import color
 import flet as ft
 
 class PlayerCommands(ft.Container):
-    def __init__(self, expandir, page, player):
+    def __init__(self, expandir, player):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center
         )
-        self.page = page
+
         self.expandir = expandir
         self.player = player
 

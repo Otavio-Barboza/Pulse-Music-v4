@@ -3,12 +3,11 @@ import flet as ft
 import asyncio, pywhatkit
 
 class MusicSearch(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             expand = True,
             padding = ft.padding.all(10)
         )
-        self.page = page
 
         self.lista_ex = [
             'Ex: Infinity - Guru Josh',

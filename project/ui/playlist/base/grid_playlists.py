@@ -3,14 +3,14 @@ from project.ui.playlist.containers.container_card import PlaylistCard
 import flet as ft
 
 class GridPlaylists(ft.GridView):
-    def __init__(self, page, on_abrir, on_remover, carregar_musicas):
+    def __init__(self, on_abrir, on_remover, carregar_musicas):
         super().__init__(
             max_extent = 270,
             spacing = 12,
             run_spacing = 12,
             clip_behavior = ft.ClipBehavior.NONE
         )
-        self.page = page
+
         self.on_abrir = on_abrir
         self.on_remover = on_remover
         self.carregar_musicas = carregar_musicas

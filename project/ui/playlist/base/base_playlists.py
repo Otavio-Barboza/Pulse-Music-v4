@@ -9,12 +9,12 @@ from ....App.Services.Controllers.estado_app import EstadoApp
 import flet as ft
 
 class ColumnCards(ft.Column):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             spacing = 0
         )
-        self.page = page
-        self.conteudo = PlaylistConteudo(page = self.page, abrir = self.abrir)
+
+        self.conteudo = PlaylistConteudo(abrir = self.abrir)
         self.estado = EstadoPlaylist(grid = self.conteudo.grid)
 
         self.button_add_play = ft.TextButton(

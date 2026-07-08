@@ -9,7 +9,7 @@ from ...App.Services.gerenciador_contas import GerenciadorContas
 import flet as ft
 
 class TabsNavigation(ft.Tabs):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             selected_index = 0,
             animation_duration = 300,
@@ -34,7 +34,6 @@ class TabsNavigation(ft.Tabs):
             )
         )
         
-        self.page = page
         self._icones_tabs = []
         self._labels_tabs = []
         self.lista_labels = [

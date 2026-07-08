@@ -9,11 +9,10 @@ from project.core.services.settings.service_settings import ServiceSettings
 import flet as ft
 
 class OtherSettings(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             alignment = ft.alignment.center
         )
-        self.page = page
         
         self.switch = ft.Switch(
             label = 'Ativar dicas',

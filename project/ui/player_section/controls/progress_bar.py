@@ -4,12 +4,10 @@ from project.ui.others.colors import color
 import flet as ft
 
 class CompactProgressBar(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             alignment = ft.alignment.center
         )
-
-        self.page = page
 
         self.slider = ft.Slider(
             col = {'md' : 9, 'sm' : 8.5, 'xs' : 12},

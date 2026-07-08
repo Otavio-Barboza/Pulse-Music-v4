@@ -7,12 +7,12 @@ from ....App.Audio.Model.musica import Musica
 import flet as ft
 
 class ListViewMusic(ft.ListView):
-    def __init__(self, page, musicas : list[Musica], modo_favorita : str | None = None):
+    def __init__(self, musicas : list[Musica], modo_favorita : str | None = None):
         super().__init__(
             spacing = 10,
             expand = True
         )  
-        self.page = page
+
         self.musicas = musicas
         self.modo_favorita = modo_favorita
 

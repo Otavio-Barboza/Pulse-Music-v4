@@ -2,13 +2,12 @@ from ....App.Audio.Controller.sessao import SessaoReproducao
 import flet as ft
 
 class ExpandedInformation(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             col = {'md' : 5, 'sm' : 12},
             alignment = ft.alignment.center,
             padding = ft.padding.all(10),
         )
-        self.page = page
 
         self.imagem = ft.Container(
             col = 12,

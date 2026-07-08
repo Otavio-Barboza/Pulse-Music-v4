@@ -5,7 +5,6 @@ import flet as ft
 class PlaylistCard(ft.Container):
     def __init__(
             self, 
-            page, 
             on_abrir, 
             on_remover, 
             carregar_playlist,
@@ -26,7 +25,7 @@ class PlaylistCard(ft.Container):
             animate = ft.Animation(200, ft.AnimationCurve.SLOW_MIDDLE),
             on_hover = self._hover,
         )
-        self.page = page
+
         self.nome_playlist = nome
         self.qtde_musicas = str(qtde_musicas)
         self.playlist_id = playlist_id

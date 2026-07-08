@@ -3,12 +3,11 @@ from project.ui.others.colors import color
 import flet as ft
 
 class PlayerIcons(ft.Container):
-    def __init__(self, page):
+    def __init__(self):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center
         )
-        self.page = page
         
         self.aleatorio = self._criar_icons(
             nome_icon = ft.Icons.SHUFFLE_ROUNDED,

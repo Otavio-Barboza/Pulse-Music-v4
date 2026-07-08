@@ -5,13 +5,13 @@ from ...App.Services.Controllers.estado_app import EstadoApp
 import flet as ft
 
 class OverlayTip(ft.Container):
-    def __init__(self, page, estado, conteudo, modo):
+    def __init__(self, estado, conteudo, modo):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
             bgcolor = ft.Colors.with_opacity(0.9, color.preto3)
         )
-        self.page = page
+
         self.estado = estado
         self.conteudo = conteudo
         self.modo = modo

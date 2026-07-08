@@ -1,6 +1,12 @@
+# import de interface
 from project.ui.others.colors import color
-from ....App.Playlists.Controller.estado_playlist import EstadoPlay
+
+# import de back-end
+from project.core.services.controllers.state_app import StateApp
+
+# import geral
 import flet as ft
+
 
 class PlaylistCard(ft.Container):
     def __init__(
@@ -116,9 +122,9 @@ class PlaylistCard(ft.Container):
             ]
         )
 
-        EstadoPlay.registar_callback(
-            evento = 'att_qtde_play',
-            funcao = self.alterar_qtde_de_musicas_playlist
+        StateApp.register_callback(
+            event = 'actualization_number_songs_of_playlist',
+            func = self.alterar_qtde_de_musicas_playlist
         )
 
     def alterar_qtde_de_musicas_playlist(self, quantidade : dict):
@@ -149,7 +155,7 @@ class PlaylistCard(ft.Container):
         self.update()
 
     def dispose(self):
-        callbacks = EstadoPlay._callbacks.get('att_qtde_play', [])
+        callbacks = StateApp._callbacks.get('actualization_number_songs_of_playlist', [])
         
         if self.alterar_qtde_de_musicas_playlist in callbacks:
             callbacks.remove(

@@ -1,5 +1,5 @@
 # imports do back-end
-from project.core.playlists.repository.playlist_reprositorio import PlaylistRepository
+from project.core.playlists.repository.playlist_repository import PlaylistRepository
 from project.core.playlists.enum.playlist_enum import PlaylistLoaded
 
 # imports gerais

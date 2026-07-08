@@ -1,6 +1,12 @@
-from ....App.Audio.Controller.sessao import SessaoReproducao
+# import de interface
 from project.ui.others.colors import color
+
+# import de back-end
+from project.core.song.controller.reproduction_manager import ReproductionManager
+
+# import geral
 import flet as ft
+
 
 class PlayerInformation(ft.Container):
     def __init__(self):
@@ -38,7 +44,7 @@ class PlayerInformation(ft.Container):
             ]
         )
 
-        SessaoReproducao.registrar_callback('musica_atual', self.att_infos)
+        ReproductionManager.register_callback('current_song', self.att_infos)
     
     def _criar_img(self, img : str = r'Assets\Global\Images\Padrao\img_64_padrão.png') -> ft.Image:
         return ft.Image(
@@ -59,7 +65,7 @@ class PlayerInformation(ft.Container):
         )
     
     def att_infos(self, dados = None):
-        self.nome_artista.value = SessaoReproducao.buscar_artista()
-        self.nome_musica.value = SessaoReproducao.estado.musica_atual.nome
-        self.imagem.content.src = SessaoReproducao.buscar_capa()
+        self.nome_artista.value = ReproductionManager.get_artista()
+        self.nome_musica.value = ReproductionManager.state.current_song.name
+        self.imagem.content.src = ReproductionManager.get_cover()
         self.update()

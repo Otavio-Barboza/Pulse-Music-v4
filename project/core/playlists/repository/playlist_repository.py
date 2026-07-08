@@ -4,7 +4,7 @@ from project.core.services.account_manager import AccountManager
 from project.core.playlists.models.playlist import Playlist
 from project.core.playlists.models.playlist_config import PlaylistConfig
 from project.core.playlists.models.playlist_card import PlaylistCard
-from project.core.playlists.repository.pastas import CreatePlaylist
+from project.core.playlists.repository.path import CreatePlaylist
 
 # imports gerais
 from pathlib import Path

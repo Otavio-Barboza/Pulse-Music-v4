@@ -1,6 +1,12 @@
-from ....App.Audio.Controller.sessao import SessaoReproducao
+# import de interface
 from project.ui.others.colors import color
+
+# import de back-end
+from project.core.song.controller.reproduction_manager import ReproductionManager
+
+# import geral
 import flet as ft
+
 
 class PlayerIcons(ft.Container):
     def __init__(self):
@@ -9,7 +15,7 @@ class PlayerIcons(ft.Container):
             alignment = ft.alignment.center
         )
         
-        self.aleatorio = self._criar_icons(
+        self.shuffle = self._criar_icons(
             nome_icon = ft.Icons.SHUFFLE_ROUNDED,
             color_fundo = color.azul_medio,
             color_icon = color.branco,
@@ -17,7 +23,7 @@ class PlayerIcons(ft.Container):
         )
 
         self.tocar = self._criar_icons(
-            nome_icon = ft.Icons.PAUSE if SessaoReproducao.estado.tocando else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED,
+            nome_icon = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED,
             # color_borda = color.branco,
             color_icon = color.amarelo,
             color_fundo = color.preto2,
@@ -25,7 +31,7 @@ class PlayerIcons(ft.Container):
             on_click = self.toogle_tocar
         )
 
-        self.repetir = self._criar_icons(
+        self.repeat = self._criar_icons(
             nome_icon = ft.Icons.REPEAT_ROUNDED,
             color_fundo = color.azul_medio,
             on_click = self.toggle_repetir
@@ -35,7 +41,7 @@ class PlayerIcons(ft.Container):
             alignment = ft.MainAxisAlignment.CENTER,
 
             controls = [
-                self.aleatorio,
+                self.shuffle,
                 self._criar_icons(
                     nome_icon = ft.Icons.SKIP_PREVIOUS_ROUNDED,
                     # color_borda = color.branco,
@@ -53,13 +59,13 @@ class PlayerIcons(ft.Container):
                     tamanho = 27.5,
                     on_click = self._proximo
                 ),
-                self.repetir
+                self.repeat
             ]
         )
 
-        SessaoReproducao.registrar_callback('play/pause', self._atualizar_play_pause)
-        SessaoReproducao.registrar_callback('repetir', self.att_repetir)
-        SessaoReproducao.registrar_callback('aleatorio', self.att_aleatorio)
+        ReproductionManager.register_callback('play/pause', self._atualizar_play_pause)
+        ReproductionManager.register_callback('repeat', self.att_repetir)
+        ReproductionManager.register_callback('shuffle', self.att_aleatorio)
     
     def _criar_icons(
             self, 
@@ -90,13 +96,13 @@ class PlayerIcons(ft.Container):
         )
 
     def _atualizar_play_pause(self, dados = None):
-        self.tocar.icon = ft.Icons.PAUSE if SessaoReproducao.estado.tocando else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED
+        self.tocar.icon = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED
         self.tocar.update()
 
     def att_repetir(self, dados = None):
-        self.repetir.icon = ft.Icons.REPEAT_ONE_ON_ROUNDED if SessaoReproducao.config.repetir else ft.Icons.REPEAT_ROUNDED
+        self.repeat.icon = ft.Icons.REPEAT_ONE_ON_ROUNDED if ReproductionManager.configuration.repeat else ft.Icons.REPEAT_ROUNDED
 
-        self.repetir.style = ft.ButtonStyle(
+        self.repeat.style = ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
                 ft.ControlState.HOVERED : color.azul_medio
@@ -109,7 +115,7 @@ class PlayerIcons(ft.Container):
                 ft.ControlState.HOVERED : color.branco
             },
             icon_size = 25
-        ) if not SessaoReproducao.config.repetir else ft.ButtonStyle(
+        ) if not ReproductionManager.configuration.repeat else ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
                 ft.ControlState.HOVERED : color.branco
@@ -120,11 +126,11 @@ class PlayerIcons(ft.Container):
             },
             icon_size = 25
         )
-        self.repetir.update()
+        self.repeat.update()
 
     def att_aleatorio(self, dados = None):
-        self.aleatorio.icon = ft.Icons.SHUFFLE_ON_ROUNDED if SessaoReproducao.config.aleatorio else ft.Icons.SHUFFLE_ROUNDED
-        self.aleatorio.style = ft.ButtonStyle(
+        self.shuffle.icon = ft.Icons.SHUFFLE_ON_ROUNDED if ReproductionManager.configuration.shuffle else ft.Icons.SHUFFLE_ROUNDED
+        self.shuffle.style = ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
                 ft.ControlState.HOVERED : color.azul_medio
@@ -137,7 +143,7 @@ class PlayerIcons(ft.Container):
                 ft.ControlState.HOVERED : color.branco
             },
             icon_size = 25
-        ) if not SessaoReproducao.config.aleatorio else ft.ButtonStyle(
+        ) if not ReproductionManager.configuration.shuffle else ft.ButtonStyle(
             bgcolor = {
                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
                 ft.ControlState.HOVERED : color.branco
@@ -151,19 +157,19 @@ class PlayerIcons(ft.Container):
             },
             icon_size = 25
         )
-        self.aleatorio.update()
+        self.shuffle.update()
 
     def toogle_tocar(self, e):
-        SessaoReproducao.toggle_play_pause()
+        ReproductionManager.toggle_play_pause()
     
     def toggle_repetir(self, e):
-        SessaoReproducao.toggle_repetir()
+        ReproductionManager.toggle_repeat()
 
     def toggle_aleatorio(self, e):
-        SessaoReproducao.toggle_aleatorio()
+        ReproductionManager.toggle_shuffle()
     
     def _proximo(self, e):
-        SessaoReproducao.proxima()
+        ReproductionManager.next()
     
     def _anterior(self, e):
-        SessaoReproducao.anterior()
+        ReproductionManager.previous()

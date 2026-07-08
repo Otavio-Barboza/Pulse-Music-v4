@@ -1,6 +1,18 @@
+# import de interface
 from project.ui.others.colors import color
-from ....App.Playlists.Controller.estado_playlist import EstadoPlay
+
+# import de back-end
+from project.core.services.controllers.state_app import StateApp
+from project.core.playlists.controller.playlist_state import PlaylistState
+from project.core.favorite.controller.favoritas_controller import FavoriteState
+from project.core.favorite.enum.favorite_enum import Favorited
+from project.core.song.enum.song_enum import ReproductionMode
+from project.core.song.model.reproduction import Reproduction
+from project.core.song.controller.reproduction_manager import ReproductionManager
+
+# import geral
 import flet as ft
+
 
 class RowContainer(ft.Container):
     def __init__(
@@ -83,18 +95,18 @@ class RowContainer(ft.Container):
         self._callback_artistas = self.atualizar_atistas
         self._callback_capas = self.atualizar_capas
 
-        EstadoPlay.registar_callback(
-            evento = 'att_artista',
-            funcao = self.atualizar_atistas
+        StateApp.register_callback(
+            event = 'actualization_artist',
+            func = self.atualizar_atistas
         )
-        EstadoPlay.registar_callback(
-            evento = 'att_capa',
-            funcao = self.atualizar_capas
+        StateApp.register_callback(
+            event = 'actualization_cover',
+            func = self.atualizar_capas
         )
 
     def will_unmount(self):
-        EstadoPlay._callbacks['att_artista'].remove(self._callback_artistas)
-        EstadoPlay._callbacks['att_capa'].remove(self._callback_capas)
+        StateApp._callbacks['actualization_artist'].remove(self._callback_artistas)
+        StateApp._callbacks['actualization_cover'].remove(self._callback_capas)
 
     def _retornar_nomes(self, nome : str, tamanho : int):
         return ft.Text(
@@ -107,39 +119,29 @@ class RowContainer(ft.Container):
             width = tamanho
         )
     
-    def esta_favoritada(self):  
-        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
-        
-        if self._esta_favoritado == Favoritada.FAVORITADA:
+    def esta_favoritada(self):          
+        if self._esta_favoritado == Favorited.NOT_FAVORITED:
             return ft.Icons.FAVORITE_ROUNDED
         else:
             return ft.Icons.HEART_BROKEN_ROUNDED
 
     def att_icon(self):
-        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
-
-        self._esta_favoritado = Favoritada.NAO_FAVORITADA
+        self._esta_favoritado = Favorited.NOT_FAVORITED
         self.icon.icon = ft.Icons.HEART_BROKEN_ROUNDED
         self.icon.update()
     
     def att_icon_favoritado(self):
-        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
-
-        self._esta_favoritado = Favoritada.FAVORITADA
+        self._esta_favoritado = Favorited.FAVORITED
         self.icon.icon = ft.Icons.FAVORITE_ROUNDED
         self.icon.update()
     
-    def toogle_favoritar(self, e):
-        from ....App.Favoritas.Controller.favoritas_controller import Favoritada
-
-        print(e.control.data)
-        
-        if self._esta_favoritado == Favoritada.FAVORITADA:
-            self._esta_favoritado = Favoritada.NAO_FAVORITADA
+    def toogle_favoritar(self, e):        
+        if self._esta_favoritado == Favorited.FAVORITED:
+            self._esta_favoritado = Favorited.NOT_FAVORITED
             self.icon.icon = ft.Icons.HEART_BROKEN_ROUNDED
             self.desfavoritar(e.control.data)
         else:
-            self._esta_favoritado = Favoritada.FAVORITADA
+            self._esta_favoritado = Favorited.FAVORITED
             self.icon.icon = ft.Icons.FAVORITE
             self.favoritar(e.control.data)
 
@@ -147,48 +149,38 @@ class RowContainer(ft.Container):
             self.icon.update()
         
     def favoritar(self, data):
-        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
-        from ....App.Audio.Controller.sessao import SessaoReproducao
-
-        EstadoFavoritas.alterar_objeto_para_json(data)
-        EstadoFavoritas.adicionar_musica_reproducao(data)
-        SessaoReproducao.atualizar_filas()
+        FavoriteState.convert_object_to_json(data)
+        FavoriteState.add_music_to_playback(data)
+        ReproductionManager.update_queues()
 
     def desfavoritar(self, data):
-        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
-        from ....App.Audio.Controller.sessao import SessaoReproducao
 
-        EstadoFavoritas.remover_favorita_json(data)
-        EstadoFavoritas.remover_musica_reproducao(data)
-        SessaoReproducao.atualizar_filas()
+        FavoriteState.remove_favorite_json(data)
+        FavoriteState.remove_music_to_playback(data)
+        ReproductionManager.update_queues()
 
     def tocar_ou_pausar(self, e):
-        from ....App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
-        from ....App.Audio.Controller.sessao import SessaoReproducao
-
-        if Reprodução._reproducao_atual != e.control.data.modo:
-            if e.control.data.modo == ModoReprodução.FAVORITA.value:
-                Reprodução.definir_modo(ModoReprodução.FAVORITA)
+        if Reproduction.current_reproduction != e.control.data.modo:
+            if e.control.data.modo == ReproductionMode.FAVORITE.value:
+                Reproduction.set_current_reproduction(ReproductionMode.FAVORITE)
             else:
-                Reprodução.definir_modo(e.control.data.modo)
+                Reproduction.set_current_reproduction(e.control.data.modo)
         
-        if SessaoReproducao.fonte_atual != e.control.data.modo:
-            SessaoReproducao.definir_fonte()
+        if ReproductionManager.fonte_atual != e.control.data.modo:
+            ReproductionManager.set_font()
 
-        if SessaoReproducao.fonte_atual is ModoReprodução.SEM_REPRODUCAO:
+        if ReproductionManager.current_font is ReproductionMode.NOT_REPRODUCE:
             print('Sem reprodução definida')
             return
 
-        SessaoReproducao.receber_indice(e.control.data.chave)
-        SessaoReproducao.tocar_indice()
+        ReproductionManager.receber_indice(e.control.data.chave)
+        ReproductionManager.tocar_indice()
 
     def encontrar_artista(self) -> str:
-        from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-        return EstadoPlay.retornar_artista_musica(self.data.chave)
+        return PlaylistState.return_music_artist(self.data.chave)
     
     def encontrar_capa(self) -> str:
-        from ....App.Playlists.Controller.estado_playlist import EstadoPlay
-        return EstadoPlay.retornar_capa_musica(self.data.nome)
+        return PlaylistState.return_cover(self.data.nome)
     
     def atualizar_atistas(self, _):
         nome_artista = self.encontrar_artista()

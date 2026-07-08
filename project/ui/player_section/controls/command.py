@@ -1,6 +1,12 @@
-from ....App.Audio.Controller.sessao import SessaoReproducao
+# import de interface
 from project.ui.others.colors import color
+
+# import de back-end
+from project.core.song.controller.reproduction_manager import ReproductionManager
+
+# import geral
 import flet as ft
+
 
 class PlayerCommands(ft.Container):
     def __init__(self, expandir, player):
@@ -20,7 +26,7 @@ class PlayerCommands(ft.Container):
             value = 100,
             max = 100,
             min = 0,
-            on_change = lambda e: SessaoReproducao.definir_volume(e.control.value / 100)
+            on_change = lambda e: ReproductionManager.set_volume(e.control.value / 100)
         )
         self.slider_volume = ft.Slider(
             thumb_color = color.amarelo,
@@ -30,7 +36,7 @@ class PlayerCommands(ft.Container):
             value = 100,
             max = 100,
             min = 0,
-            on_change = lambda e: SessaoReproducao.definir_volume(e.control.value / 100)
+            on_change = lambda e: ReproductionManager.set_volume(e.control.value / 100)
         )
         
         self.volume_overlay = ft.Container(
@@ -102,7 +108,7 @@ class PlayerCommands(ft.Container):
             ]
         )
 
-        SessaoReproducao.registrar_callback('volume', self.att_volume)
+        ReproductionManager.register_callback('volume', self.att_volume)
 
     def _abrir_volume(self, e):
         if not self.player.expandido.visible:
@@ -136,7 +142,7 @@ class PlayerCommands(ft.Container):
             return ft.Icons.VOLUME_OFF_ROUNDED
     
     def att_volume(self, dados = None):
-        self.slider_volume.value  = SessaoReproducao.estado.volume * 100
-        self.slider_volume_overlay.value  = SessaoReproducao.estado.volume * 100
-        self.icon_volume.icon = self.definir_volume(SessaoReproducao.estado.volume)
+        self.slider_volume.value  = ReproductionManager.state.volume * 100
+        self.slider_volume_overlay.value  = ReproductionManager.state.volume * 100
+        self.icon_volume.icon = self.definir_volume(ReproductionManager.state.volume)
         self.update()

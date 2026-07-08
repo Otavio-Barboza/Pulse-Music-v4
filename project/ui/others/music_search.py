@@ -1,6 +1,10 @@
+# import de interface
 from project.ui.others.colors import color
-import flet as ft
+
+# imports gerais
 import asyncio, pywhatkit
+import flet as ft
+
 
 class MusicSearch(ft.Container):
     def __init__(self):

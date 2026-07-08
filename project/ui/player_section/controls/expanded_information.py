@@ -1,5 +1,9 @@
-from ....App.Audio.Controller.sessao import SessaoReproducao
+# import de back-end
+from project.core.song.controller.reproduction_manager import ReproductionManager
+
+# import geral
 import flet as ft
+
 
 class ExpandedInformation(ft.Container):
     def __init__(self):
@@ -27,7 +31,7 @@ class ExpandedInformation(ft.Container):
             ]
         )
 
-        SessaoReproducao.registrar_callback('musica_atual', self.att_infos_expandido)
+        ReproductionManager.register_callback('current_song', self.att_infos_expandido)
     
     def _criar_textos(self, valor : str = '') -> ft.Text:
         return ft.Text(
@@ -45,7 +49,7 @@ class ExpandedInformation(ft.Container):
         )
     
     def att_infos_expandido(self, dados = None):
-        self.imagem.content.src = SessaoReproducao.buscar_capa()
+        self.imagem.content.src = ReproductionManager.get_cover()
         
         if self.page:
             self.update()

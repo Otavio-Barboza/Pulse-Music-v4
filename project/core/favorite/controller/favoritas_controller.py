@@ -1,7 +1,10 @@
 # imports de back-end
 from project.core.song.model.song import Song
+from project.core.song.model.reproduction import Reproduction
+from project.core.song.enum.song_enum import ReproductionMode
 from project.core.favorite.repository.favorite_repository import FavoriteRepository
 from project.core.favorite.enum.favorite_enum import Favorited
+from project.core.utils.utils import Utils
 
 # import geral
 import inspect, asyncio
@@ -45,8 +48,6 @@ class FavoriteState:
     
     @classmethod
     def convert_object_to_json(cls, data: Song):
-        from ...Audio.Model.modo_reproducao import ModoReprodução
-
         nova_chave, novo_item = FavoriteRepository.format_object_in_json(
             dado = data, 
             status = Favorited.FAVORITED.value
@@ -57,9 +58,9 @@ class FavoriteState:
         if nova_chave not in json_musicas:
             json_musicas[nova_chave] = novo_item
 
-        FavoriteRepository.salvar_json(json_musicas)
+        Utils.sync_update_json(json_musicas)
 
-        data.mode = ModoReprodução.FAVORITA.value
+        data.mode = ReproductionMode.FAVORITA.value
 
         cls.notify(
             evento = 'add_to_favorites',
@@ -92,11 +93,9 @@ class FavoriteState:
         return FavoriteRepository.list_favorite()
     
     @classmethod
-    def add_music_to_playback(cls, musica : Song):
-        from ...Audio.Model.modo_reproducao import Reprodução
-        Reprodução.adicionar_musica(musica)
+    def add_music_to_playback(cls, song : Song):
+        Reproduction.add_song(song)
 
     @classmethod
-    def remove_music_to_playback(cls, musica : Song):
-        from ...Audio.Model.modo_reproducao import Reprodução
-        Reprodução.remover_musica(musica)
+    def remove_music_to_playback(cls, song : Song):
+        Reproduction.remove_song(song)

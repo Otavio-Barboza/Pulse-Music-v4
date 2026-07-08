@@ -3,17 +3,21 @@ from project.ui.others.colors import color
 from project.ui.playlist.containers.music_container import RowContainer
 
 # import de back-end
-from ....App.Audio.Controller.sessao import SessaoReproducao
-from ....App.Audio.Model.modo_reproducao import Reprodução
-from project.core.playlists.controller.estado_playlist import PlaylistState
-from project.core.playlists.enum.playlist_enum import PlaylistLoaded
 from project.core.song.model.song import Song
+from project.core.song.enum.song_enum import ReproductionMode
+from project.core.song.font_reproduction.font_playlist import PlaylistFont
+from project.core.song.controller.reproduction_manager import ReproductionManager
+from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+from project.core.playlists.controller.playlist_state import PlaylistState
+from project.core.favorite.enum.favorite_enum import Favorited
+from project.core.favorite.controller.favoritas_controller import FavoriteState
 
 # import geral
 import flet as ft
 
+
 class ListViewMusic(ft.ListView):
-    def __init__(self, musicas : list[Song], modo_favorita : ModoReprodução | None = None):
+    def __init__(self, musicas : list[Song], modo_favorita : ReproductionMode | None = None):
         super().__init__(
             spacing = 10,
             expand = True
@@ -30,64 +34,58 @@ class ListViewMusic(ft.ListView):
         self._callback_favorita = self.att_favoritas
         self._carregar()
         
-        SessaoReproducao.registrar_callback(
-            evento = 'actualization_container', 
+        ReproductionManager.register_callback(
+            event = 'actualization_container', 
             callback = self.att_container
         )
         PlaylistState.registar_callback(
-            evento = 'update_displayed_musics',
+            event = 'update_displayed_musics',
             funcao = self.recarregar
         )
         PlaylistState.registar_callback(
-            evento = 'actualization_not_favorited',
+            event = 'actualization_not_favorited',
             funcao = self.att_nao_favoritas
         )
         PlaylistState.registar_callback(
-            evento = 'actualization_favorited',
+            event = 'actualization_favorited',
             funcao = self.att_favoritas
         )
 
-        if self.modo_favorita is not None:
-            from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
-            
+        if self.modo_favorita is not None:            
             self._callback_favoritar = self.adicionar_favorita
             self._callback_desfavoritar = self.remover_favorita
 
-            EstadoFavoritas.registrar_callback(
-                evento = 'add_to_favorites',
+            FavoriteState.register_callback(
+                event = 'add_to_favorites',
                 callback = self.adicionar_favorita
             )
-            EstadoFavoritas.registrar_callback(
-                evento = 'unfavorite',
+            FavoriteState.register_callback(
+                event = 'unfavorite',
                 callback = self.remover_favorita
             )
 
-    def will_unmount(self):
-        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas
-        
-        SessaoReproducao._callbacks['actualization_container'].remove(self._callback)
+    def will_unmount(self):        
+        ReproductionManager._callbacks['actualization_container'].remove(self._callback)
         PlaylistState._callbacks['update_displayed_musics'].remove(self._callback_qtde)
         PlaylistState._callbacks['actualization_not_favorited'].remove(self._callback_favoritas)
         PlaylistState._callbacks['actualization_favorited'].remove(self._callback_favorita)
         
         if self.modo_favorita is not None:
-            EstadoFavoritas._callbacks['add_to_favorites'].remove(self._callback_favoritar)
-            EstadoFavoritas._callbacks['unfavorite'].remove(self._callback_desfavoritar)
+            FavoriteState._callbacks['add_to_favorites'].remove(self._callback_favoritar)
+            FavoriteState._callbacks['unfavorite'].remove(self._callback_desfavoritar)
     
-    def _carregar(self):
-        from ....App.Favoritas.Controller.favoritas_controller import EstadoFavoritas, Favoritada
-        
+    def _carregar(self):        
         if self.musicas is None:
             return
         
-        chaves_favoritas = EstadoFavoritas.listar_favoritas()
+        chaves_favoritas = FavoriteState.list_favorite()
 
         for musica in self.musicas:
 
             if musica.chave in chaves_favoritas:
-                status = Favoritada.FAVORITADA
+                status = Favorited.FAVORITED
             else:
-                status = Favoritada.NAO_FAVORITADA
+                status = Favorited.NOT_FAVORITED
             
             container = RowContainer(
                 page = self.page,
@@ -97,26 +95,22 @@ class ListViewMusic(ft.ListView):
             
             self.controls.append(container)
             
-    def recarregar(self, pasta):
-        from ....App.Audio.Fontes.fonte_playlist import FontePlaylist
-        from ....App.Audio.Model.modo_reproducao import ModoReprodução
-        # from ....App.Audio.Controller.sessao import SessaoReproducao
-        
+    def recarregar(self, pasta):        
         if (
             isinstance(PlaylistState._playlist_aberta, dict) and
             PlaylistState._playlist_aberta['open_or_close'] == PlaylistLoaded.OPEN
         ):
             try:                
                 if self.modo_favorita is None:
-                    fonte = FontePlaylist(
-                        pasta = pasta,
-                        modo = ModoReprodução.PLAYLIST
+                    fonte = PlaylistFont(
+                        path = pasta,
+                        mode = ReproductionMode.PLAYLIST
                     )
 
                     self.musicas = fonte.carregar()
                     fonte.carregar_playlist(self.musicas)
 
-                SessaoReproducao.atualizar_filas_scanner()
+                ReproductionManager.atualizar_filas_scanner()
 
                 self.controls.clear()
                 self._carregar()
@@ -169,7 +163,7 @@ class ListViewMusic(ft.ListView):
                 container.att_icon_favoritado()
                 break
 
-    def att_container(self, sessao : SessaoReproducao):
+    def att_container(self, sessao : ReproductionManager):
         if not self.page:
             return
         

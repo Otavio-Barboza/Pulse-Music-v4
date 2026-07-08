@@ -1,12 +1,18 @@
+# imports de interface
 from project.ui.others.colors import color
-from ..content_playlist import PlaylistConteudo
-from ..overlay import ContainerOverlay
+from project.ui.playlist.content_playlist import ContentPlaylist
+from project.ui.playlist.overlay import ContainerOverlay
 from project.ui.playlist.overlay_tip import OverlayTip
-from ....App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist, ModoPlaylist
-from ....App.Services.Config.config_service import ConfigService
-from ....App.Playlists.Repository.playlist_reprositorio import PlaylistRepositorio
-from ....App.Services.Controllers.estado_app import EstadoApp
+
+# imports de back-end
+from project.core.playlists.controller.playlist_manager import PLaylistManager
+from project.core.playlists.enum.playlist_enum import PlaylistMode, PlalistOverlayMode
+from project.core.services.settings.service_settings import ServiceSettings
+from project.core.services.controllers.state_app import StateApp
+
+# import geral
 import flet as ft
+
 
 class ColumnCards(ft.Column):
     def __init__(self):
@@ -14,14 +20,14 @@ class ColumnCards(ft.Column):
             spacing = 0
         )
 
-        self.conteudo = PlaylistConteudo(abrir = self.abrir)
-        self.estado = EstadoPlaylist(grid = self.conteudo.grid)
+        self.conteudo = ContentPlaylist(open = self.abrir)
+        self.estado = PLaylistManager(grid = self.conteudo.grid)
 
         self.button_add_play = ft.TextButton(
             col = 4,
             text = 'Adicionar Nova Playlist',
             icon = ft.Icons.PLAYLIST_ADD,
-            on_click = self._abrir_overlay_dica if ConfigService.ler_overlay() else self._criar_overlay,
+            on_click = self._abrir_overlay_dica if ServiceSettings.load_overlay() else self._criar_overlay,
             visible = True,
             
             style = ft.ButtonStyle(
@@ -87,8 +93,8 @@ class ColumnCards(ft.Column):
             self.conteudo
         ]
 
-        EstadoApp.registrar_ouvinte(evento = 'overlay_dicas', func = ConfigService.salvar_overlay_dicas)
-        EstadoApp.registrar_ouvinte('att_on_click', self.mudar_on_click)
+        StateApp.register_callback(evento = 'overlay_tips', func = ServiceSettings.save_overlay_tips)
+        StateApp.register_callback('actualization_on_click', self.mudar_on_click)
 
     def mudar_on_click(self, valor):
         if valor == True:
@@ -104,7 +110,7 @@ class ColumnCards(ft.Column):
                 page = self.page,
                 estado = self.estado,
                 conteudo = self.conteudo,
-                modo = ModoOverlayPlaylist.CREATE
+                modo = PlalistOverlayMode.CREATE
             )
         )
         self.page.update()
@@ -116,16 +122,16 @@ class ColumnCards(ft.Column):
                 page = self.page,
                 estado = self.estado,
                 conteudo = self.conteudo,
-                modo = ModoOverlayPlaylist.CREATE
+                modo = PlalistOverlayMode.CREATE
             )
         )
         self.page.update()
     
     def _atualizar_botoes(self):
-        if self.estado.modo == ModoPlaylist.GRID:
+        if self.estado.modo == PlaylistMode.GRID:
             self.button_add_play.visible = True
             self.button_retorna_play.visible = False
-        elif self.estado.modo == ModoPlaylist.LISTA:
+        elif self.estado.modo == PlaylistMode.LIST:
             self.button_add_play.visible = False
             self.button_retorna_play.visible = True
 
@@ -133,17 +139,17 @@ class ColumnCards(ft.Column):
 
     def carregar(self):
         """
-            Intermedio ao PlaylistConteudo para o carregamento dos cards ao inicializar o player
+            Intermedio ao ContentPlaylist para o carregamento dos cards ao inicializar o player
         """
         self._atualizar_botoes()
         self.conteudo.carregar()
     
     def abrir(self):
-        self.estado.modo = ModoPlaylist.LISTA
+        self.estado.modo = PlaylistMode.LIST
         self._atualizar_botoes()
 
     def voltar(self, e):
-        self.estado.modo = ModoPlaylist.GRID
+        self.estado.modo = PlaylistMode.GRID
         self._atualizar_botoes()
         self.conteudo.fechar_playlist()
         self.conteudo.carregar()

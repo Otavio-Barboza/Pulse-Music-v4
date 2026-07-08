@@ -1,6 +1,10 @@
+# imports de interface
 from project.ui.others.colors import color
 from project.ui.playlist.containers.container_card import PlaylistCard
+
+# import de ui
 import flet as ft
+
 
 class GridPlaylists(ft.GridView):
     def __init__(self, on_abrir, on_remover, carregar_musicas):

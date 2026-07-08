@@ -2,12 +2,15 @@
 from project.core.utils.utils import Utils
 from project.core.services.account_manager import AccountManager
 from project.core.playlists.enum.playlist_enum import PlaylistMode
-from project.core.playlists.repository.playlist_reprositorio import PlaylistRepository
+from project.core.playlists.repository.playlist_repository import PlaylistRepository
 from project.core.playlists.models.playlist_config import PlaylistConfig
+
+# import geral
+from flet import GridView
 
 
 class PLaylistManager:
-    def __init__(self, grid):
+    def __init__(self, grid: GridView):
         self.grid = grid
         self.list_playlist = None
         self.playlist_config = None

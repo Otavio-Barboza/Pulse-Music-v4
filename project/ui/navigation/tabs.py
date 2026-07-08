@@ -7,7 +7,7 @@ from project.ui.favorite.favoritas import Favorite
 
 # imports de back-end
 from project.core.services.account_manager import AccountManager
-from project.core.services.controllers.estado_grid import GridMode
+from project.core.services.controllers.grid_state import GridMode
 from project.core.services.controllers.resize_manager import ResizeManager
 
 # import geral
@@ -141,17 +141,18 @@ class TabsNavigation(ft.Tabs):
     def carregar_favoritas(self):
         from project.core.song.model.song import Song
         from project.core.favorite.controller.favoritas_controller import FavoriteState
-        from ...App.Audio.Model.modo_reproducao import Reprodução, ModoReprodução
-        
+        from project.core.song.model.reproduction import Reproduction
+        from project.core.song.enum.song_enum import ReproductionMode
+
         list_musics: list[Song] = FavoriteState.list_favorited_objects()
         
         self.tabs[3].content = Favorite(
             list_music_object = list_musics,
-            favorite_mode = ModoReprodução.FAVORITA
+            favorite_mode = ReproductionMode.FAVORITE
         )
         self.tabs[3].update()
 
-        Reprodução.carregar_musicas_do_modo(
-            modo = ModoReprodução.FAVORITA,
-            lista = list_musics
+        Reproduction.load_songs_from_mode(
+            mode = ReproductionMode.FAVORITE,
+            list = list_musics
         )

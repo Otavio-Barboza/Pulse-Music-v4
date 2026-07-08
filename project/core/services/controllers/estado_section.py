@@ -1,5 +1,5 @@
 class EstadoSection:
-    _state = {
+    state = {
         'view' : []
     }
     _callbacks = {
@@ -22,7 +22,7 @@ class EstadoSection:
 
     @classmethod
     def alter_view(cls, key : str, value):
-        cls._state[key] = value
+        cls.state[key] = value
         cls.notify(key = key, value = value)
 
     @classmethod

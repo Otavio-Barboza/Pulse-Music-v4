@@ -1,4 +1,6 @@
+# import geral
 import flet as ft
+
 
 class ContentInformation(ft.Container):
     def __init__(self):

@@ -1,6 +1,12 @@
-from Assets.App.Letras.Controller.letras_services import LetrasServices
+# import de interface
 from project.ui.others.colors import color
+
+# import de back-end
+from ... import LetrasServices
+
+# import geral
 import flet as ft
+
 
 class TranslationContent(ft.Container):
     def __init__(self):

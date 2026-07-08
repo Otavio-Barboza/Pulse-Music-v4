@@ -1,6 +1,12 @@
+# import de interface
 from project.ui.others.colors import color
-from Assets.App.Services.Controllers.estado_section import EstadoSection
+
+# import de back-end
+from project.core.services.controllers.estado_section import EstadoSection
+
+# import geral
 import flet as ft
+
 
 class InformationMenu(ft.Container):
     def __init__(self, trocar_view):
@@ -48,10 +54,10 @@ class InformationMenu(ft.Container):
         return botao
     
     def did_mount(self):
-        EstadoSection.registrar('view', self._quando_view_mudar)
+        EstadoSection.register('view', self._quando_view_mudar)
 
     def will_unmount(self):
-        EstadoSection.remover('view', self._quando_view_mudar)
+        EstadoSection.remove('view', self._quando_view_mudar)
 
     def _quando_view_mudar(self, view : str):
         for chave, botao in self.botoes.items():

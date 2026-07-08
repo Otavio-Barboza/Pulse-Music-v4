@@ -11,15 +11,15 @@ class Reproduction:
         ReproductionMode.ARTIST : [],
         ReproductionMode.ALBUM : []
     }
-    _current_reproduction: ReproductionMode = ReproductionMode.NOT_REPRODUCE
+    current_reproduction: ReproductionMode = ReproductionMode.NOT_REPRODUCE
 
     @classmethod
     def set_current_reproduction(cls, new_mode: ReproductionMode):
-        cls._current_reproduction = new_mode
+        cls.current_reproduction = new_mode
 
     @classmethod
     def return_current_reproduction(cls) -> ReproductionMode:
-        return cls._current_reproduction
+        return cls.current_reproduction
     
     @classmethod
     def load_songs_from_mode(cls, mode: ReproductionMode, list: list[Music]):
@@ -31,8 +31,8 @@ class Reproduction:
 
     @classmethod
     def return_songs_for_mode(cls) -> list[Music]:
-        if cls._current_reproduction != ReproductionMode.NOT_REPRODUCE:
-            return cls._lists_modes_playbacks[cls._current_reproduction]
+        if cls.current_reproduction != ReproductionMode.NOT_REPRODUCE:
+            return cls._lists_modes_playbacks[cls.current_reproduction]
         return None
 
     # FUNÇÕES APENAS PARA AS FAVORITAS

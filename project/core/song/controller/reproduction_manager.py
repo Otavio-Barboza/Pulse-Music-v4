@@ -3,9 +3,9 @@ from project.core.song.model.data_song import PlayerState, ReproductionConfigura
 from project.core.song.model.reproduction import Reproduction
 from project.core.song.model.player import Player
 from project.core.song.enum.song_enum import ReproductionMode
-from ...Letras.Controller.letras_services import LetrasServices
 from project.core.song.model.song import Song
 from project.core.song.repository.song_repository import SongRepository
+from ...Letras.Controller.letras_services import LetrasServices
 
 # import geral
 import random, threading, time
@@ -27,14 +27,14 @@ class ReproductionManager:
 
     _callbacks: dict[str, list] = {
         'volume' : [],
-        'tempo_total' : [],
+        'total_time' : [],
         'slider_position' : [],
-        'musica_atual' : [], # callback para marcar musica que estiver tocando no momento.
+        'current_song' : [], # callback para marcar musica que estiver tocando no momento.
         'slider' : [],
-        'att_container' : [],
+        'actualization_container' : [],
         'play/pause' : [],
         'repeat' : [],
-        'aleatorio' : []
+        'shuffle' : []
     }
 
     LetrasServices.registrar_callback(
@@ -293,13 +293,13 @@ class ReproductionManager:
     
     # OUTROS
     @classmethod
-    def buscar_artista(cls) -> str:
+    def get_artist(cls) -> str:
         return SongRepository.get_artist(cls.state.current_song.key)
     
     @classmethod
-    def buscar_nome(cls) -> str:
+    def get_name(cls) -> str:
         return SongRepository.get_song(cls.state.current_song.key)
 
     @classmethod
-    def buscar_capa(cls) -> str:
+    def get_cover(cls) -> str:
         return SongRepository.get_cover(cls.state.current_song.name)

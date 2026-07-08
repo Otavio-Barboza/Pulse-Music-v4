@@ -1,16 +1,22 @@
+# imports de interface
 from project.ui.others.colors import color
-from project.ui.player_section.controls.information import PlayerInformation
 from project.ui.player_section.controls.icons import PlayerIcons
 from project.ui.player_section.controls.command import PlayerCommands
+from project.ui.player_section.controls.information import PlayerInformation
 from project.ui.player_section.controls.progress_bar import CompactProgressBar
 from project.ui.player_section.controls.expanded_information import ExpandedInformation
 from project.ui.player_section.controls.navigation.expanded_menu import InformationMenu
 from project.ui.player_section.controls.navigation.content import ContentInformation
 from project.ui.player_section.controls.navigation.content_lyrics import LyricsContainer
 from project.ui.player_section.controls.navigation.translation_content import TranslationContent
-from ...App.Services.Controllers.estado_section import EstadoSection
-from ...App.Services.Controllers.estado_redimensionamento import ResizeManager
+
+# imports de back-end
+from project.core.services.controllers.estado_section import EstadoSection
+from project.core.services.controllers.resize_manager import ResizeManager
+
+# import geral
 import flet as ft
+
 
 class PlayerSection:
 
@@ -35,7 +41,7 @@ class PlayerSection:
         self.conteudo_infos = None
         
         self.expandido = ft.Container(
-            bgcolor = cor.preto2,
+            bgcolor = color.preto2,
             visible = False,
 
             content = ft.Column(
@@ -48,12 +54,12 @@ class PlayerSection:
             )
         )
 
-        ResizeManager.registrar(self._redimensionar)
+        ResizeManager.register(self._redimensionar)
 
     def _retornar_compacto(self, expandido : bool) -> ft.Container:
         return ft.Container(
             height = 220,
-            bgcolor = cor.preto7,
+            bgcolor = color.preto7,
             alignment = ft.alignment.center,
             border_radius = ft.border_radius.only(
                 top_left = 10,
@@ -112,7 +118,7 @@ class PlayerSection:
         elif view == 'traducao':
             self.conteudo_infos.trocar(TranslationContent())
         
-        EstadoSection.alterar('view', view)
+        EstadoSection.alter_view('view', view)
         self.page.update()
 
         # print("CONTEUDO INFOS PAGE FINAL", self.conteudo_infos.page)
@@ -176,6 +182,6 @@ class PlayerSection:
         
         self.expandido.content.controls.append(self.compacto_expandido)
         
-        self._trocar_view(EstadoSection._estado['view'])
+        self._trocar_view(EstadoSection.state['view'])
         self.expandido.update()
         

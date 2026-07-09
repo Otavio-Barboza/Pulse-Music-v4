@@ -120,23 +120,19 @@ class CreatePlaylist:
         return name
 
     @classmethod
-    def _retornar_imagens_selecao(cls) -> tuple[list[str], list[str], tuple[str, str]]:
+    def return_selection_images(cls) -> list[str] | list[str] | tuple[str, str]:
         """
             Função para retornar as imagens dos Álbuns e Capas de Músicas para os métodos CREATE e UPDATE das playlists.
         Returns:
             list[str] | tuple[str, str]: duas listas (listagem das imagens) e uma tupla (caminho de cada pasta)
         """
-        return (
-            os.listdir(
-                f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns'
-            ), 
-            os.listdir(
-                f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
-            ), 
-            (
-                f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns', 
-                f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
-            )
+        return os.listdir(
+            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns'
+        ), os.listdir(
+            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
+        ), tuple(
+            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns', 
+            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
         )
     
     @classmethod

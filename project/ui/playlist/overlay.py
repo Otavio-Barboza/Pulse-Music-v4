@@ -12,21 +12,20 @@ import asyncio
 
 
 class ContainerOverlay(ft.Container):
-    def __init__(self, estado, conteudo, modo : PlalistOverlayMode):
+    def __init__(self, state, mode : PlalistOverlayMode):
         super().__init__(
             alignment = ft.alignment.center,
             expand = True
         )
 
-        self.conteudo = conteudo
-        self.estado = estado
-        self.modo = modo
+        self.state = state # PlaylistManager
+        self.mode = mode
 
-        self.albuns, self.capas, self.caminhos = self.estado._retornar_imagens()
+        self.albums, self.covers, self.paths = self.state.return_images()
         self.cards = []
-        self.cores = []
+        self.colors = []
 
-        self.container_cor_opacidade = ft.Container(
+        self.container_color_opacity = ft.Container(
             col = 4,
             height = 150,
             width = 100,
@@ -34,7 +33,7 @@ class ContainerOverlay(ft.Container):
             bgcolor = ft.Colors.BLACK12
         )
 
-        self.slider_opacidade = ft.Slider(
+        self.opacity_slider = ft.Slider(
             on_change = self._change_slider,
             value = 1.0,
             max = 1.0,
@@ -45,24 +44,24 @@ class ContainerOverlay(ft.Container):
             overlay_color = color.amarelo_opaco2
         )
 
-        self.texto_pasta = ft.Text(
+        self.path_text = ft.Text(
             col = 6,
-            value = 'Nenhuma pasta de musicas selecionada',
+            value = 'Nenhuma path de musicas selecionada',
             size = 16,
             max_lines = 1,
             text_align = ft.TextAlign.CENTER
         )
 
-        self.texto_nome = ft.Text(
+        self.text_name = ft.Text(
             col = 6,
-            value = 'Adicione o nome da sua playlist',
+            value = 'Adicione o name da sua playlist',
             size = 18,
             max_lines = 2,
             text_align = ft.TextAlign.CENTER
         )
 
-        self.caixa_texto = ft.TextField(
-            hint_text = 'Digite o nome da sua playlist...',
+        self.text_field = ft.TextField(
+            hint_text = 'Digite o name da sua playlist...',
             hint_style = ft.TextStyle(
                 color = color.cinza1,
                 size = 16
@@ -90,8 +89,8 @@ class ContainerOverlay(ft.Container):
             cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
 
-            on_submit = self._submeter_nome,
-            on_change = self._chage
+            on_submit = self._submit_name,
+            on_change = self._change
         )
 
         self.content = ft.Container(
@@ -114,17 +113,23 @@ class ContainerOverlay(ft.Container):
                         height = 80,
 
                         controls = [
-                            self.caixa_texto,
+                            self.text_field,
                             
-                            self._criar_botoes(click = 'pasta', texto = 'Selecionar Pasta com as Músicas', col = 4, on_cor_fundo = color.laranja2, cor_texto = color.branco)    
+                            self._create_button(
+                                click = 'path', 
+                                text = 'Selecionar Pasta com as Músicas', 
+                                col = 4, 
+                                background_color = color.laranja2, 
+                                text_color = color.branco
+                            )    
                         ]
                     ),
 
                     ft.ResponsiveRow(
                         alignment = ft.MainAxisAlignment.CENTER,
                         controls = [
-                            self.texto_nome,
-                            self.texto_pasta
+                            self.text_name,
+                            self.path_text
                         ]
                     ),
 
@@ -162,7 +167,7 @@ class ContainerOverlay(ft.Container):
                                     content = ft.GridView(
                                         max_extent = 220,
                                         controls = [
-                                            self._criar_cards_img(f'{self.caminhos[0]}/{img}') for img in self.albuns
+                                            self._create_image_card(f'{self.paths[0]}/{img}') for img in self.albums
                                         ]
                                     )
                                 ),
@@ -174,7 +179,7 @@ class ContainerOverlay(ft.Container):
                                         max_extent = 220,
 
                                         controls = [
-                                            self._criar_cards_img(f'{self.caminhos[1]}/{img}') for img in self.capas
+                                            self._create_image_card(f'{self.paths[1]}/{img}') for img in self.covers
                                         ]
                                     )
                                 ),
@@ -192,7 +197,7 @@ class ContainerOverlay(ft.Container):
                                                     content = ft.ResponsiveRow(
                                                         vertical_alignment = ft.CrossAxisAlignment.CENTER,
                                                         controls = [
-                                                            self.container_cor_opacidade,
+                                                            self.container_color_opacity,
 
                                                             ft.Column(
                                                                 alignment = ft.MainAxisAlignment.CENTER,
@@ -201,19 +206,19 @@ class ContainerOverlay(ft.Container):
 
                                                                 controls = [
                                                                     ft.Text(
-                                                                        value = 'Regule a opacidade da color',
+                                                                        value = 'Regule a opacity da color',
                                                                         size = 16,
                                                                         text_align = ft.TextAlign.CENTER
                                                                     ),
 
-                                                                    self.slider_opacidade,
+                                                                    self.opacity_slider,
                                                                     
-                                                                    self._criar_botoes(
-                                                                        click = 'opacidade',
+                                                                    self._create_button(
+                                                                        click = 'opacity',
                                                                         col = None,
-                                                                        texto = 'Salvar Opacidade',
-                                                                        on_cor_fundo = color.azul_medio2,
-                                                                        cor_texto = color.branco
+                                                                        text = 'Salvar Opacidade',
+                                                                        background_color = color.azul_medio2,
+                                                                        text_color = color.branco
                                                                     )
                                                                 ]
                                                             )
@@ -230,7 +235,7 @@ class ContainerOverlay(ft.Container):
                                                         max_extent = 150,
 
                                                         controls = [
-                                                            self._criar_cards_cores(color) for color in color._paleta_de_cores()
+                                                            self._create_color_card(color) for color in color._paleta_de_cores()
                                                         ]
                                                     )
                                                 )
@@ -244,20 +249,20 @@ class ContainerOverlay(ft.Container):
 
                     ft.ResponsiveRow(
                         controls = [
-                            self._criar_botoes(
-                                click = 'cancelar', 
-                                texto = 'Cancelar', 
+                            self._create_button(
+                                click = 'cancel', 
+                                text = 'Cancelar', 
                                 col = 6,
-                                on_cor_fundo = color.vermelho,
-                                cor_texto = color.branco
+                                background_color = color.vermelho,
+                                text_color = color.branco
                             ),
 
-                            self._criar_botoes(
+                            self._create_button(
                                 click = 'concluir', 
-                                texto = 'Concluir', 
+                                text = 'Concluir', 
                                 col = 6,
-                                on_cor_fundo = color.amarelo,
-                                cor_texto = color.preto1
+                                background_color = color.amarelo,
+                                text_color = color.preto1
                             )
                         ]
                     )
@@ -265,32 +270,32 @@ class ContainerOverlay(ft.Container):
             )
         )
 
-        if self.modo == PlalistOverlayMode.UPDATE:
-            self._preencher_campos()
+        if self.mode == PlalistOverlayMode.UPDATE:
+            self._fill_in_fields()
 
-    def _preencher_campos(self):
-        playlist = self.estado.playlist_config  # PlaylistDetalhada
+    def _fill_in_fields(self):
+        playlist = self.state.playlist_config  # PlaylistDetalhada
 
-        self.estado.nome = playlist.nome
-        self.estado.color = playlist.style["color"]
-        self.estado.opacidade = playlist.style["opacidade"]
-        self.estado.imagem = playlist.style["pasta"]
-        self.estado.pasta = playlist.musicas["pasta"]
+        self.state.name = playlist.name
+        self.state.color = playlist.style["color"]
+        self.state.opacity = playlist.style["opacity"]
+        self.state.image = playlist.style["path"]
+        self.state.path = playlist.musicas["path"]
 
-        self.container_cor_opacidade.bgcolor = playlist.style["color"]
-        self.container_cor_opacidade.opacity = playlist.style["opacidade"]
-        self.texto_nome.value = f"Nome da playlist: {playlist.nome}"
-        self.texto_pasta.value = f"Pasta: {playlist.musicas['pasta']}"
+        self.container_color_opacity.bgcolor = playlist.style["color"]
+        self.container_color_opacity.opacity = playlist.style["opacity"]
+        self.text_name.value = f"Nome da playlist: {playlist.name}"
+        self.path_text.value = f"Pasta: {playlist.musicas['path']}"
 
-    def _criar_cards_img(self, imagem):
+    def _create_image_card(self, image):
         card = ft.Container(
             height = 220,
             width = 220,
-            data = imagem,
+            data = image,
             alignment = ft.alignment.top_right,
-            on_click = self._selecionar_imagem,
+            on_click = self._select_image,
             image = ft.DecorationImage(
-                src = imagem,
+                src = image,
                 fit = ft.ImageFit.COVER
             ),
             padding = ft.padding.all(5),
@@ -307,7 +312,7 @@ class ContainerOverlay(ft.Container):
         self.cards.append(card)
         return card
     
-    def _criar_cards_cores(self, color : ft.Colors):
+    def _create_color_card(self, color : ft.Colors):
         cont = ft.Container(
             width = 100,
             height = 100,
@@ -315,7 +320,7 @@ class ContainerOverlay(ft.Container):
             bgcolor = color,
             alignment = ft.alignment.center,
             data = color,
-            on_click = self._selecionar_cor,
+            on_click = self._select_color,
 
             content = ft.Text(
                 value = color.replace('Colors.', '').upper(),
@@ -324,53 +329,60 @@ class ContainerOverlay(ft.Container):
             )
         )
 
-        self.cores.append(cont)
+        self.colors.append(cont)
         return cont
     
-    def _confirmar(self, e):
-        if self.modo == PlalistOverlayMode.CREATE:
-            self.criar_play()
-        elif self.modo == PlalistOverlayMode.UPDATE:
-            self.estado.atualizar_playlist()
-            self._fechar_overlay(e=None)
+    def confirm(self, e):
+        if self.mode == PlalistOverlayMode.CREATE:
+            self.create_playlist()
+        elif self.mode == PlalistOverlayMode.UPDATE:
+            self.state.update_playlist()
+            self.close_overlay(e=None)
 
 
-    def _criar_botoes(self, click, col : int, texto : str, cor_texto : str, on_cor_fundo : str) -> ft.TextButton:
-        if click == 'cancelar':
-            click = self._fechar_overlay
+    def _create_button(
+        self, 
+        click, 
+        col: int, 
+        text: str, 
+        text_color: str, 
+        background_color: str
+    ) -> ft.TextButton:
+        if click == 'cancel':
+            click = self.close_overlay
         elif click == 'concluir':
-            click = self._confirmar
-        elif click == 'pasta':
-            click = self._abrir_seletor_pasta
-        elif click == 'opacidade':
-            click = self._salvar_opacidade
+            click = self.confirm
+        elif click == 'path':
+            click = self.open_selector_path
+        elif click == 'opacity':
+            click = self.save_opacity
         else:
             click =  None
         
         return ft.TextButton(
             col = col,
-            text = texto,
+            text = text,
             on_click = click,
             height = 40,
 
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : on_cor_fundo
+                    ft.ControlState.HOVERED : background_color
                 },
                 side = {
                     ft.ControlState.HOVERED : ft.BorderSide(2, color.branco)
                 },
                 color = {
                     ft.ControlState.DEFAULT : color.branco,
-                    ft.ControlState.HOVERED : cor_texto
+                    ft.ControlState.HOVERED : text_color
                 },
                 padding = ft.padding.all(10)
             )
         )
     
-    def _selecionar_imagem(self, e):
-        self.estado.imagem = e.control.data
+    def _select_image(self, e):
+        self.state.image = e.control.data
 
         for card in self.cards:
             if card.data == e.control.data:
@@ -385,15 +397,15 @@ class ContainerOverlay(ft.Container):
             card.update()
     
     def _change_slider(self, e):
-        self.container_cor_opacidade.opacity = self.slider_opacidade.value
-        self.container_cor_opacidade.update()
+        self.container_color_opacity.opacity = self.opacity_slider.value
+        self.container_color_opacity.update()
 
-    def _selecionar_cor(self, e):
-        self.estado.color = e.control.data
-        self.container_cor_opacidade.bgcolor = e.control.data
-        self.container_cor_opacidade.update()
+    def _select_color(self, e):
+        self.state.color = e.control.data
+        self.container_color_opacity.bgcolor = e.control.data
+        self.container_color_opacity.update()
         
-        for container in self.cores:
+        for container in self.colors:
             color = container.content.value
 
             if container.data == e.control.data:
@@ -405,14 +417,14 @@ class ContainerOverlay(ft.Container):
             
             container.update()
 
-    def _salvar_opacidade(self, e):
+    def save_opacity(self, e):
         cor_opc = ft.Colors.with_opacity(
-            color = self.estado.color, 
-            opacity = self.container_cor_opacidade.opacity
+            color = self.state.color, 
+            opacity = self.container_color_opacity.opacity
         )
 
-        self.estado.color = cor_opc
-        self.estado.opacidade = self.container_cor_opacidade.opacity
+        self.state.color = cor_opc
+        self.state.opacity = self.container_color_opacity.opacity
 
         self.page.open(
             ft.SnackBar(
@@ -420,94 +432,94 @@ class ContainerOverlay(ft.Container):
             )
         )
 
-    def _submeter_nome(self, e):
-        self.estado.nome = self.caixa_texto.value
-        self.texto_nome.value = f'Nome da playlist: {self.caixa_texto.value}'
-        self.caixa_texto.value = ''
+    def _submit_name(self, e):
+        self.state.name = self.text_field.value
+        self.text_name.value = f'Nome da playlist: {self.text_field.value}'
+        self.text_field.value = ''
         self.update()
     
-    def _chage(self, e):
-        self.estado.nome = self.caixa_texto.value
-        self.texto_nome.value = f'Nome da playlist: {self.caixa_texto.value}'
+    def _change(self, e):
+        self.state.name = self.text_field.value
+        self.text_name.value = f'Nome da playlist: {self.text_field.value}'
         self.update()
 
-    def _abrir_seletor_pasta(self, e):
+    def open_selector_path(self, e):
         root = Tk()
         root.withdraw()
-        pasta = filedialog.askdirectory()
+        path = filedialog.askdirectory()
         root.destroy()
         
 
-        if pasta in self.verificar_caminhos_existentes():
+        if path in self.check_existing_paths():
             self.page.open(
                 ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com essa pasta de músicas, escolha outra!')
+                    content = ft.Text('Já existe uma playlist com essa path de músicas, escolha outra!')
                 )
             )
             self.page.update()
         else:
-            self.estado.pasta = pasta
-            self.texto_pasta.value = f'Pasta selecionada: {pasta}'
-            self.texto_pasta.update()
+            self.state.path = path
+            self.path_text.value = f'Pasta selecionada: {path}'
+            self.path_text.update()
     
-    def _fechar_overlay(self, e):
-        self.estado.imagem = r'Assets\Global\Images\Padrao\capa_playlist_padrao.png'
-        self.estado.nome = None
-        self.estado.color = '#3d3d3d'
-        self.estado.opacidade = 1.0
-        self.estado.pasta = None
+    def close_overlay(self, e):
+        self.state.image = r'Assets\Global\Images\Padrao\capa_playlist_padrao.png'
+        self.state.name = None
+        self.state.color = '#3d3d3d'
+        self.state.opacity = 1.0
+        self.state.path = None
         
         self.page.overlay.clear()
         self.page.update()
 
-    async def rodar_pipeline(self, pasta : str, id : str):
+    async def start_pipeline(self, path: str, id: str):
         await asyncio.to_thread(
             Pipeline._processar_wrapper_sync,
-            pasta,
+            path,
             [],
             id
         )
 
-    def verificar_playlists_existentes(self) -> list[str]:
-        return self.estado.retornar_playlists_existentes()
+    def check_existing_playlists(self) -> list[str]:
+        return self.state.return_existngs_playlists()
 
-    def verificar_caminhos_existentes(self) -> list[str]:
-        return self.estado.retornar_pastas_existentes()
+    def check_existing_paths(self) -> list[str]:
+        return self.state.return_existngs_folders()
 
-    def criar_play(self):
-        if self.estado.nome is None:
+    def create_playlist(self):
+        if self.state.name is None:
             self.page.open(
                 ft.SnackBar(
-                    content = ft.Text('Atribua um nome a sua playlist primeiro')
+                    content = ft.Text('Atribua um name a sua playlist primeiro')
                 )
             )
             self.page.update()
-        elif self.estado.nome in self.verificar_playlists_existentes():
+        elif self.state.name in self.check_existing_playlists():
             self.page.open(
                 ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com esse nome, escolha outro!')
+                    content = ft.Text('Já existe uma playlist com esse name, escolha outro!')
                 )
             )
             self.page.update()
-        elif self.estado.pasta is None:
+        elif self.state.path is None:
             self.page.open(
                 ft.SnackBar(
-                    content = ft.Text('Selecione uma pasta para criar')
+                    content = ft.Text('Selecione uma path para criar')
                 )
             )
             self.page.update()
-        elif self.estado.pasta in self.verificar_caminhos_existentes():
+        elif self.state.path in self.check_existing_paths():
             self.page.open(
                 ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com essa pasta de músicas, escolha outra!')
+                    content = ft.Text('Já existe uma playlist com essa path de músicas, escolha outra!')
                 )
             )
             self.page.update()
         else:
-            id = self.estado.criar_playlist()
+            id = self.state.create_playlist()
             self.page.run_task(
-                self.rodar_pipeline,
-                self.estado.pasta,
+                self.start_pipeline,
+                self.state.path,
                 id
             )
-            self._fechar_overlay(e = None)
+            self.close_overlay(e = None)

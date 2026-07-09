@@ -163,7 +163,7 @@ class PlaylistRepository:
         Returns:
             list[str] | tuple[str, str]: Lista das imagens e tupla com os caminhos dos albuns e capas
         """
-        return CreatePlaylist._retornar_imagens_selecao()
+        return CreatePlaylist.return_selection_images()
     
     @classmethod
     def save_config(cls, playlist: PlaylistConfig):

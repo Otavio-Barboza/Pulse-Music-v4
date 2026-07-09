@@ -14,6 +14,7 @@ from project.core.song.enum.song_enum import ReproductionMode
 # import geral
 import flet as ft
 
+
 class ContentPlaylist(ft.Container):
     def __init__(self, abrir):
         super().__init__(
@@ -47,7 +48,6 @@ class ContentPlaylist(ft.Container):
             ContainerOverlay(
                 page = self.page,
                 estado = self.estado,
-                conteudo = self,
                 modo = PlalistOverlayMode.UPDATE
             ) 
         )

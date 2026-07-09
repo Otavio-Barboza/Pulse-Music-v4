@@ -136,5 +136,5 @@ class PlaylistManager:
     def return_existngs_playlists(self) -> list[str]:
         return PlaylistRepository.check_playlist_names()
     
-    def return_existngs_playlists(self) -> list[str]:
+    def return_existngs_folders(self) -> list[str]:
         return PlaylistRepository.check_existing_folders()

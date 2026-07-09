@@ -9,7 +9,7 @@ from project.core.playlists.models.playlist_config import PlaylistConfig
 from flet import GridView
 
 
-class PLaylistManager:
+class PlaylistManager:
     def __init__(self, grid: GridView):
         self.grid = grid
         self.list_playlist = None

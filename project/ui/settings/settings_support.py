@@ -1,5 +1,6 @@
 # import de interface
 from project.ui.others.colors import colors
+from project.ui.utils.utils_ui import UtilsUi
 
 # imports de back-end
 from project.core.services.email_service import send_email
@@ -7,6 +8,7 @@ from project.core.services.account_manager import AccountManager
 
 # import geral
 import flet as ft
+
 
 class SettingsSupport(ft.Container):
     def __init__(self):
@@ -196,23 +198,13 @@ class SettingsSupport(ft.Container):
     
     def send(self, e):
         message = self.text_field.value.strip()
-        print(len(message))
         
         if len(message) > 1500:
-            self.page.open(
-                ft.SnackBar(
-                   ft.Text("A mensagem pode ter no máximo 1000 caracteres.")
-                )
-            )
-            self.page.update()
+            UtilsUi.snack_bar("A mensagem pode ter no máximo 1000 caracteres.")
             return
         
         if not message:
-            self.page.open(ft.SnackBar(
-                ft.Text("Digite uma mensagem antes de enviar 😅")
-            ))
-            # self.page.snack_bar.open = True
-            self.page.update()
+            UtilsUi.snack_bar("Digite uma mensagem antes de enviar 😅")
             return
         
         try:
@@ -226,16 +218,7 @@ class SettingsSupport(ft.Container):
             self.text_field.value = ''
             self.text_field.update()
 
-            self.page.open(ft.SnackBar(
-                ft.Text("Mensagem enviada com sucesso! 📬")
-            ))
-            # self.page.snack_bar.open = True
-            self.page.update()
+            UtilsUi.snack_bar("Mensagem enviada com sucesso! 📬")
         except Exception as err:
-            self.page.open(ft.SnackBar(
-                ft.Text("Erro ao enviar mensagem 😬")
-            ))
-            # self.page.snack_bar.open = True
-            self.page.update()
-
+            UtilsUi.snack_bar("Erro ao enviar mensagem 😬")
             print("Erro ao enviar e-mail:", err)

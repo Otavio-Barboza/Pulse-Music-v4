@@ -1,8 +1,13 @@
+# imports de interface
 from project.ui.others.colors import color
 from project.ui.playlist.overlay import ContainerOverlay
-from ...App.Services.Config.config_service import ConfigService
-from ...App.Services.Controllers.estado_app import EstadoApp
+
+# imports de back-end
+from project.core.services.controllers.state_app import StateApp
+
+# import geral
 import flet as ft
+
 
 class OverlayTip(ft.Container):
     def __init__(self, estado, conteudo, modo):
@@ -144,9 +149,10 @@ class OverlayTip(ft.Container):
             )
         )
         self.page.update()
-        EstadoApp.notificar('overlay_dicas', dados = False)
-        EstadoApp.notificar('att_on_click', dados = False)
-        EstadoApp.notificar('att_switch', dados = False)
+        
+        StateApp.notify(event = 'overlay_tips', data = False)
+        StateApp.notify(event = 'actualization_on_click', data = False)
+        StateApp.notify(event = 'actualization_switch', data = False)
     
     def _fechar(self, e):
         self.page.overlay.clear()

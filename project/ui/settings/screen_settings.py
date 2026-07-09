@@ -11,6 +11,7 @@ from project.core.services.controllers.state_app import StateApp
 # import geral
 import flet as ft
 
+
 class ScreenSettings(ft.Container):
     def __init__(self):
         super().__init__(
@@ -25,7 +26,7 @@ class ScreenSettings(ft.Container):
         # registrar para escutar mudanças de seção
         StateApp.register_callback("configurations_session", self._quando_secao_mudar)
         
-        self.side_menu = self._menu_lateral()
+        self.side_menu = self._side_menu()
 
         self.content_area = ft.Container(
             expand = True,
@@ -47,13 +48,14 @@ class ScreenSettings(ft.Container):
             ]
         )
 
-    def _menu_lateral(self):
+    def _side_menu(self):
         """
             Cria o menú lateral das configurações
 
         Returns:
             ft.Container: Menú lateral das configurações
         """
+
         return ft.Container(
             width = 250,
             bgcolor = colors.preto7,
@@ -80,6 +82,7 @@ class ScreenSettings(ft.Container):
                     self._create_button(text = "Suporte", section_id = "support"),
 
                     ft.Divider(),
+
                     ft.TextButton(
                         text = "Fechar",
                         width = 200,
@@ -151,7 +154,7 @@ class ScreenSettings(ft.Container):
         self.buttons[section_id] = botao
         return botao
 
-    def _selecionar(self, section : str):
+    def _selecionar(self, section: str):
         """
             Quando é clicado em algum botão a ação é registrada no ouvinte do StateApp com o section 
 
@@ -160,7 +163,7 @@ class ScreenSettings(ft.Container):
         """
         StateApp.select_config_section(section)
 
-    def _quando_secao_mudar(self, section_id : str):
+    def _quando_secao_mudar(self, section_id: str):
         """
             1. Altera o Conteúdo da seção principal conforme o botão clicado
             2. Navega nos intens do dict de botões para atualizar a colors, isso caso a seção da chave seja a mesma que o section_id informado
@@ -192,20 +195,23 @@ class ScreenSettings(ft.Container):
             self.content_area.content = SettingsSupport(page = self.page)
 
         self.content_area.update()
-
-        for chave, botao in self.buttons.items():
-            if chave == section_id:
+        
+        key: str
+        button: ft.Icons
+        
+        for key, button in self.buttons.items():
+            if key == section_id:
                 # botão selecionado → colors diferente
-                botao.style.bgcolor = {
+                button.style.bgcolor = {
                     ft.ControlState.DEFAULT: colors.amarelo3,
                     ft.ControlState.HOVERED: colors.amarelo,
                 }
-                botao.style.color = colors.preto1
+                button.style.color = colors.preto1
             else:
-                botao.style.bgcolor = {
+                button.style.bgcolor = {
                     ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
                     ft.ControlState.HOVERED: colors.preto4,
                 }
-                botao.style.color = colors.branco
+                button.style.color = colors.branco
 
-            botao.update()
+            button.update()

@@ -1,15 +1,19 @@
+# imports de back-end
 from project.core.user.models.user import User
 from project.core.services.controllers.state_app import StateApp
 from project.core.utils.utils import Utils
 from project.core.utils.path import AppPaths
+
+# imports gerais
 from typing import Optional
 from pathlib import Path
-import json, os, shutil
+import json, shutil
+
 
 class AccountManager:
     
     _current_user: User | None = None
-    accounts_cache: dict[str, str | list] | None = None
+    accounts_cache: dict[str, list[dict]] | None = None
 
 
     @classmethod

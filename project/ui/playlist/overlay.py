@@ -1,12 +1,18 @@
+# import de interface
 from project.ui.others.colors import color
-from ...App.Playlists.Controller.estado_playlist import ModoOverlayPlaylist
+
+# imports de back-end
+from project.core.playlists.enum.playlist_enum import PlalistOverlayMode
 from ...App.Meta.Pipeline.pipeline import Pipeline
+
+# imports gerais
 from tkinter import filedialog, Tk
 import flet as ft
 import asyncio
 
+
 class ContainerOverlay(ft.Container):
-    def __init__(self, estado, conteudo, modo : ModoOverlayPlaylist):
+    def __init__(self, estado, conteudo, modo : PlalistOverlayMode):
         super().__init__(
             alignment = ft.alignment.center,
             expand = True
@@ -259,7 +265,7 @@ class ContainerOverlay(ft.Container):
             )
         )
 
-        if self.modo == ModoOverlayPlaylist.UPDATE:
+        if self.modo == PlalistOverlayMode.UPDATE:
             self._preencher_campos()
 
     def _preencher_campos(self):
@@ -301,7 +307,7 @@ class ContainerOverlay(ft.Container):
         self.cards.append(card)
         return card
     
-    def _criar_cards_cores(self, color : Colors):
+    def _criar_cards_cores(self, color : ft.Colors):
         cont = ft.Container(
             width = 100,
             height = 100,
@@ -322,9 +328,9 @@ class ContainerOverlay(ft.Container):
         return cont
     
     def _confirmar(self, e):
-        if self.modo == ModoOverlayPlaylist.CREATE:
+        if self.modo == PlalistOverlayMode.CREATE:
             self.criar_play()
-        elif self.modo == ModoOverlayPlaylist.UPDATE:
+        elif self.modo == PlalistOverlayMode.UPDATE:
             self.estado.atualizar_playlist()
             self._fechar_overlay(e=None)
 

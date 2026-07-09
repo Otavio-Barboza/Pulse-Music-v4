@@ -1,9 +1,15 @@
-import flet as ft
+# import de interface
 from project.ui.others.colors import colors
+
+# imports de back-end
 from project.core.services.controllers.state_app import StateApp
 from project.core.services.auth.google_login_auth import login_google
 from project.core.services.account_manager import AccountManager
 from project.core.user.models.user import User
+
+# import geral
+import flet as ft
+
 
 class AccountSettings(ft.Container):
     def __init__(self):
@@ -13,7 +19,7 @@ class AccountSettings(ft.Container):
 
         self.data = None
 
-        self.caixa_texto = ft.TextField(
+        self.text_field = ft.TextField(
             hint_text = 'Digite novo nome...',
             hint_style = ft.TextStyle(
                 color = colors.cinza1,
@@ -38,37 +44,38 @@ class AccountSettings(ft.Container):
 
             cursor_color = colors.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
-            on_submit = self._novo_nome_user
+            on_submit = self.novo_nome_user
         )
 
-        self.nome_user = self._retornar_textos(
-            texto = '',
+        self.user_name = self._create_text(
+            text = '',
             size = 22,
             weight = ft.FontWeight.W_700
         )
-        self.email = self._retornar_textos(
-            texto = '',
+        self.email = self._create_text(
+            text = '',
             size = 16,
             weight = ft.FontWeight.W_500
         )
-        self.imagem = ft.CircleAvatar(
+        self.image = ft.CircleAvatar(
             foreground_image_src = '',
             radius = 35,
             bgcolor = ft.Colors.TRANSPARENT
         )
 
-        StateApp.register_callback('current_account', self._quando_conta_atualizar)
+        StateApp.register_callback('current_account', self.when_account_updates)
 
-        usuario = AccountManager.User()
-        if usuario is not None:
-            usuario.registrar_callback(self._atualizar_campos)
-            self._atualizar_campos(usuario)
+        user = AccountManager.user()
         
-        self.selecao_contas = ft.Column(
+        if user is not None:
+            user.register_callback(self.update_fields)
+            self.update_fields(user)
+        
+        self.account_selection = ft.Column(
             visible = False,
             controls = []
         )
-        self._criar_selecoes()
+        self._create_selections()
 
         self.content = ft.Container(
             alignment = ft.alignment.center,
@@ -97,7 +104,7 @@ class AccountSettings(ft.Container):
                                 ft.Container(
                                     col = {'xs' : 12, 'md' : 3},
                                     alignment = ft.alignment.center,
-                                    content = self.imagem
+                                    content = self.image
                                 ),
                                 
                                 ft.Container(
@@ -114,7 +121,7 @@ class AccountSettings(ft.Container):
                                         horizontal_alignment = ft.CrossAxisAlignment.START,
                                         spacing = 5,                 
                                         controls = [
-                                            self.nome_user,
+                                            self.user_name,
                                             self.email
                                         ]
                                     )
@@ -129,82 +136,89 @@ class AccountSettings(ft.Container):
                             top = 10
                         ),
 
-                        content = self._retornar_textos(
-                            texto = 'Alterar nome de usuário',
+                        content = self._create_text(
+                            text = 'Alterar nome de usuário',
                             size = 22,
                             weight = ft.FontWeight.W_500
                         )
                     ),
-                    self.caixa_texto,
+                    self.text_field,
                     
-                    self._criar_botoes(
-                        texto_botao = 'Adicionar nova conta', 
-                        id = 'nova', 
-                        colors_fundo = colors.amarelo3,
-                        colors_texto = colors.preto7,
-                        funcao = self._acao_itens
+                    self._create_button(
+                        text_button = 'Adicionar new conta', 
+                        id = 'new', 
+                        background_color = colors.amarelo3,
+                        text_color = colors.preto7,
+                        function = self._action_items
                     ),
 
-                    self._criar_botoes(
-                        texto_botao = 'Trocar de conta', 
-                        id = 'trocar', 
-                        colors_fundo = colors.amarelo3,
-                        colors_texto = colors.preto7,
-                        funcao = self._acao_itens
+                    self._create_button(
+                        text_button = 'Trocar de conta', 
+                        id = 'alter', 
+                        background_color = colors.amarelo3,
+                        text_color = colors.preto7,
+                        function = self._action_items
                     ),
-                    self.selecao_contas,
+                    self.account_selection,
                     
-                    self._criar_botoes(
-                        texto_botao = 'Excluir atual conta', 
-                        id = 'excluir',
-                        colors_fundo = colors.preto_puro_3,
-                        colors_texto = colors.branco,
-                        funcao = self._acao_itens
+                    self._create_button(
+                        text_button = 'Excluir atual conta', 
+                        id = 'delete',
+                        background_color = colors.preto_puro_3,
+                        text_color = colors.branco,
+                        function = self._action_items
                     )
                 ]
             )
         )
     
     # conteudos
-    def retornar_contas_disponiveis(self):
+    def return_available_accounts(self) -> list[dict]:
         """
-            Função para retornar as contas disponíveis para a seleção de contas.
+            Função para retornar as accounts disponíveis para a seleção de accounts.
 
         Returns:
-            list : lista das contas disponíveis.
+            list : lista das accounts disponíveis.
         """
-        conta = AccountManager.accounts_cache
-        return conta['contas']
+        return AccountManager.accounts_cache['account']
     
     # widgets
-    def _criar_botoes(self, texto_botao : str, id : str, colors_fundo : str, colors_texto : str | ft.Colors, funcao):
+    def _create_button(
+        self, 
+        text_button: str, 
+        id: str, 
+        background_color: str, 
+        text_color: str | ft.Colors, 
+        function
+    ):
         """
             Função para retornar os botões das principais funcionalides da aba das cofnigurações da conta.
 
         Args:
-            texto_botao (str): texto do botão a ser atribuído
+            text_button (str): text do botão a ser atribuído
             id (str): sessão responsável pelo botão
-            colors_fundo (str): colors do fundo do botão
-            colors_texto (str | ft.Colors): colors do texto do botão
-            funcao (function | def): função a ser atribuída ao clicar no botão
+            background_color (str): colors do fundo do botão
+            text_color (str | ft.Colors): colors do text do botão
+            function (function | def): função a ser atribuída ao clicar no botão
 
         Returns:
-            ft.TextButton : Botão de texto com as características repassadas na função.
+            ft.TextButton : Botão de text com as características repassadas na função.
         """
+    
         return ft.TextButton(
-            text = texto_botao,
-            data = {'acao' : id},
-            on_click = funcao,
+            text = text_button,
+            data = {'action' : id},
+            on_click = function,
             width = 250,
             
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : colors_fundo
+                    ft.ControlState.HOVERED : background_color
                 },
                 color = {
                     ft.ControlState.DEFAULT : colors.branco,
-                    ft.ControlState.HOVERED : colors_texto
+                    ft.ControlState.HOVERED : text_color
                 },
                 side = {
                     ft.ControlState.HOVERED : ft.BorderSide(width = 2, color = colors.branco)
@@ -221,24 +235,25 @@ class AccountSettings(ft.Container):
             )
         )
     
-    def _criar_selecoes(self):
+    def _create_selections(self):
         """
-            Função para criar os botões da seleção de contas.
+            Função para criar os botões da seleção de accounts.
               →  Se houver mais de uma conta dísponivel: Cria a seleção de botões.
-              →  Senão: cria um ft.Text informando que não há outras contas a selecionar. 
+              →  Senão: cria um ft.Text informando que não há outras accounts a select. 
         """
-        lista = self.retornar_contas_disponiveis()
-        id_atual = AccountManager.read_current_account_index()
         
-        self.selecao_contas.controls.clear()
+        _list_accounts: list[dict] = self.return_available_accounts()
+        _current_id: str = AccountManager.read_current_account_index()
+        
+        self.account_selection.controls.clear()
 
-        if len(lista) == 1:
-            self.selecao_contas.controls.append(
+        if len(_list_accounts) == 1:
+            self.account_selection.controls.append(
                 ft.Container(
                     margin = ft.margin.only(left = 30, top = 0, bottom = 0),
 
                     content = ft.Text(
-                        value = 'Não há outras contas salvas. Crie outra para selecioná-la!',
+                        value = 'Não há outras accounts salvas. Crie outra para selecioná-la!',
                         weight = ft.FontWeight.W_500,
                         size = 16,
                         color = colors.branco,
@@ -248,16 +263,18 @@ class AccountSettings(ft.Container):
                 )
             )
         else:
-            for conta in lista:
-                if conta.get('id') != id_atual:
-                    self.selecao_contas.controls.append(
+            account: dict
+
+            for account in _list_accounts:
+                if account.get('id') != _current_id:
+                    self.account_selection.controls.append(
                         ft.Container(
                             margin = ft.margin.only(left = 30, top = 0, bottom = 0),
                             
                             content = ft.TextButton(
-                                data = {'acao' : 'selecionar', 'id' : conta.get('id')},
-                                text = conta.get('nome'),
-                                on_click = self._acao_itens,
+                                data = {'action' : 'select', 'id' : account.get('id')},
+                                text = account.get('nome'),
+                                on_click = self._action_items,
                                 width = 300,
 
                                 style = ft.ButtonStyle(
@@ -282,20 +299,20 @@ class AccountSettings(ft.Container):
 
         self.update()
 
-    def _retornar_textos(self, texto : str, size : int, weight : ft.FontWeight):
+    def _create_text(self, text: str, size: int, weight: ft.FontWeight):
         """
             Função para retornar os textos da tela de configurações da conta.
 
         Args:
-            texto (str): texto a ser colocado.
-            size (int): tamanho do texto.
-            weight (ft.FontWeight): expessura do texto.
+            text (str): text a ser colocado.
+            size (int): tamanho do text.
+            weight (ft.FontWeight): expessura do text.
 
         Returns:
-            ft.Text : texto destinado.
+            ft.Text : text destinado.
         """
         return ft.Text(
-            value = texto,
+            value = text,
             style = ft.TextStyle(
                 size = size,
                 weight = weight,
@@ -304,117 +321,117 @@ class AccountSettings(ft.Container):
         )
     
     # funçionalidades
-    def _novo_nome_user(self, e):
+    def novo_nome_user(self, e):
         """
-            Função para atualizar o nome do usuário atual pela caixa de texto.
+            Função para atualizar o nome do usuário atual pela caixa de text.
 
         Args:
             e (evento): evento disparado da submissão do nome inserido no ft.TextField.
         """
-        novo_nome = self.caixa_texto.value
+        new_name: str = self.text_field.value
 
-        self.nome_user.value = novo_nome
-        self.caixa_texto.value = ''
+        self.user_name.value = new_name
+        self.text_field.value = ''
         self.update()
 
-        AccountManager.User().nome = novo_nome
-        AccountManager.User().salvar()
-        AccountManager.update_name_in_index(account_id = self.data, new_name = novo_nome)
+        AccountManager.user().name = new_name
+        AccountManager.user().save_json()
+        AccountManager.update_name_in_index(account_id = self.data, new_name = new_name)
 
-    def _atualizar_campos(self, usuario : User):
+    def update_fields(self, user: User):
         """
-            Função para atualizar os campos principais chamada em self._quando_conta_atualizar.
+            Função para atualizar os campos principais chamada em self.when_account_updates.
 
         Args:
-            usuario (class User): atributos de User.
+            user (class User): atributos de User.
         """
 
-        self.nome_user.value = usuario.name
-        self.email.value = usuario.email
-        self.imagem.foreground_image_src = usuario.image
-        self.data = usuario.id
+        self.user_name.value = user.name
+        self.email.value = user.email
+        self.image.foreground_image_src = user.image
+        self.data = user.id
         self.update()
 
-    def _quando_conta_atualizar(self, dados : User | dict):
+    def when_account_updates(self, dados : User | dict):
         """
             Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
         """
         # se vier um objeto User, atualiza direto
         if isinstance(dados, User):
-            usuario = dados
+            user = dados
             # registra callback para atualizações futuras
-            usuario.register_callback(self._atualizar_campos)
-            self._atualizar_campos(usuario)
+            user.register_callback(self.update_fields)
+            self.update_fields(user)
             return
 
         # se vier o index (dict), podemos carregar campos a partir dele:
         if isinstance(dados, dict):
             # tenta pegar id atual do index e buscar usuário em memória
             try:
-                id_atual = dados.get("conta_atual")
-                if id_atual:
-                    # tentar selecionar conta (isso chamará carregar_conta() e notificar novamente)
-                    AccountManager.select_account_by_id(id_atual)
+                current_id: str = dados.get("current_account")
+                
+                if current_id:
+                    # tentar select conta (isso chamará carregar_conta() e notificar novamente)
+                    AccountManager.select_account_by_id(current_id)
             except Exception:
                 pass
 
-        self._criar_selecoes()
+        self._create_selections()
 
-    def _trocar_conta_obrigatoria(self, id_new_account : str):
+    def switch_mandatory_account(self, id_new_account: str):
         """
-            Função para realizar a troca obrigatória da conta ao excluir a atual.
+            Função para realizar a troca obrigatória da conta ao delete a atual.
         Args:
-            id_nova_conta (str): ID da nova conta selecionada para carregar.
+            id_nova_conta (str): ID da new conta selecionada para carregar.
         """
 
-        id_a_ser_excluido = AccountManager.read_current_account_index()
+        _id_to_delete: str = AccountManager.read_current_account_index()
 
-        AccountManager.delete_account(id_a_ser_excluido)
+        AccountManager.delete_account(_id_to_delete)
         AccountManager.select_account_by_id(id_new_account)
         
-    def excluir_conta_atual(self):
+    def delete_current_account(self):
         """
-            Função para excluir a atual conta.
-              →  Se o as contas disponíveis forem mais de que 2: Abre overlay na classe SelecionarContaObrigatoria para a seleção de outra conta.
+            Função para delete a atual conta.
+              →  Se o as account disponíveis forem mais de que 2: Abre overlay na classe SelecionarContaObrigatoria para a seleção de outra conta.
               →  Senão: Chama diretamente o AccountManager para a exclusão, caso haja uma única disponível, é alterado automáticamente para essa; senão é notificado o StateApp ('sem_conta') para realizar o novo login.
         """
-        contas = AccountManager.accounts_cache['account']
+        account = AccountManager.accounts_cache['account']
 
-        if len(contas) > 2:
+        if len(account) > 2:
             self.page.overlay.clear()
             self.page.overlay.append(
                 SelecionarContaObrigatória(
-                    page = self.page,
-                    on_selecionar = self._trocar_conta_obrigatoria
+                    on_click = self.switch_mandatory_account
                 )
             )
             self.page.update()
         else:
             AccountManager.delete_account(self.data)
         
-    async def _toggle_trocar_conta(self):
-        self.selecao_contas.visible = not self.selecao_contas.visible
+    async def _toggle_switch_account(self):
+        self.account_selection.visible = not self.account_selection.visible
         self.update()
 
-    async def _acao_itens(self, e):
-        if e.control.data.get('acao') == 'nova':
+    async def _action_items(self, e):
+        if e.control.data.get('action') == 'new':
             await login_google()
-            self._criar_selecoes()
-        elif e.control.data.get('acao') == 'trocar':
-            await self._toggle_trocar_conta()
-        elif e.control.data.get('acao') == 'selecionar':
-            id_conta = e.control.data['id']
-            AccountManager.select_account_by_id(id_conta)
-            self._criar_selecoes()
-        elif e.control.data.get('acao') == 'excluir':
-            self.excluir_conta_atual()
-            self._criar_selecoes()
+            self._create_selections()
+        elif e.control.data.get('action') == 'alter':
+            await self._toggle_switch_account()
+        elif e.control.data.get('action') == 'select':
+            account_id = e.control.data['id']
+            AccountManager.select_account_by_id(account_id)
+            self._create_selections()
+        elif e.control.data.get('action') == 'delete':
+            self.delete_current_account()
+            self._create_selections()
         else:
             print(e.control.data)
 
 
 class SelecionarContaObrigatória(ft.Container):
-    def __init__(self, page, on_selecionar):
+    def __init__(self, on_click):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
@@ -422,11 +439,10 @@ class SelecionarContaObrigatória(ft.Container):
             bgcolor = ft.Colors.with_opacity(0.9, colors.preto1)
         )
 
-        self.page = page
-        self.on_selecionar = on_selecionar
-        self.contas = AccountManager.accounts_cache
-        self.id_atual = AccountManager.read_current_account_index()
-        self.opcoes = ft.Column(controls = [])
+        self.on_click = on_click
+        self.accounts = AccountManager.accounts_cache
+        self.current_id = AccountManager.read_current_account_index()
+        self.options = ft.Column(controls = [])
 
         self.content = ft.Container(
             alignment = ft.alignment.center,
@@ -441,7 +457,7 @@ class SelecionarContaObrigatória(ft.Container):
                 spacing = 20,
                 controls = [
                     ft.Text(
-                        value = 'Selecione uma das contas disponíveis.',
+                        value = 'Selecione uma das accounts disponíveis.',
                         size = 24,
                         color = colors.branco,
                         weight = ft.FontWeight.BOLD,
@@ -449,50 +465,50 @@ class SelecionarContaObrigatória(ft.Container):
                         text_align = ft.TextAlign.CENTER
                     ),
                     ft.Divider(),
-                    self._retornar_opcoes()
+                    self._create_options()
                 ]
             )
         )
         
-        self.on_click = self.fechar_overlay
+        self.on_click = self.close_overlay
 
-    def _selecionar(self, id_conta : str):
+    def _select(self, account_id: str):
         """
             Função que atua como callback para aplicar a abertura e funcionamento da seleção da conta obrigatória.
 
         Args:
-            id_conta (str): ID da conta
+            account_id (str): ID da conta
         """
-        self.on_selecionar(id_conta)
+        self.on_click(account_id)
     
-    def ao_clicar(self, e):
+    def _on_click(self, e):
         """
-            Função para 'chamar' o callback self._selecionar
+            Função para 'chamar' o callback self._select
 
         Args:
             e (evento): evento do clique.
         """
-        self._selecionar(e.control.data)
+        self._select(e.control.data)
         self.page.overlay.clear()
         self.page.update()
     
-    def fechar_overlay(self, e):
+    def close_overlay(self, e):
         self.page.overlay.clear()
         self.page.update()
     
-    def _retornar_opcoes(self):
+    def _create_options(self):
         """
-            Função para retornar a seleção das contas obrigatórias.
+            Função para retornar a seleção das accounts obrigatórias.
 
         Returns:
             ft.Column : Coluna com os botões.
         """
         return ft.Column(
             ft.TextButton(
-                text = conta.get('nome'),
-                data = conta.get('id'),
+                text = account.get('name'),
+                data = account.get('id'),
                 width = 300,
-                on_click = self.ao_clicar,
+                on_click = self._on_click,
 
                 style = ft.ButtonStyle(
                     bgcolor = {
@@ -510,5 +526,5 @@ class SelecionarContaObrigatória(ft.Container):
                     ),
                     shape = ft.RoundedRectangleBorder(radius = 5)
                 )
-            ) for conta in self.contas['contas'] if conta.get('id') != self.id_atual
+            ) for account in self.accounts['accounts'] if account.get('id') != self.current_id
         )

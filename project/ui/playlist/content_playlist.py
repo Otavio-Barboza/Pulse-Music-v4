@@ -1,11 +1,17 @@
+# imports de interface
 from project.ui.playlist.overlay import ContainerOverlay
 from project.ui.playlist.base.grid_playlists import GridPlaylists
 from project.ui.playlist.base.music_list import ListViewMusic
 from project.ui.others.colors import color
-from ...App.Playlists.Controller.estado_playlist import EstadoPlaylist, ModoOverlayPlaylist
-from ...App.Audio.Controller.sessao import SessaoReproducao
-from ...App.Audio.Fontes.fonte_playlist import FontePlaylist
-from ...App.Playlists.Controller.estado_playlist import PlaylistCarregada
+
+# imports de back-end
+from project.core.playlists.enum.playlist_enum import PlalistOverlayMode, PlaylistLoaded
+from project.core.playlists.controller.playlist_manager import PlaylistManager
+from project.core.playlists.controller.playlist_state import PlaylistState
+from project.core.song.font_reproduction.font_playlist import PlaylistFont
+from project.core.song.enum.song_enum import ReproductionMode
+
+# import geral
 import flet as ft
 
 class ContentPlaylist(ft.Container):
@@ -17,13 +23,13 @@ class ContentPlaylist(ft.Container):
 
         self.abrir = abrir
 
-        self.grid = GridPlaylists(
+        self.grid: ft.GridView = GridPlaylists(
             page = self.page,
             on_abrir = self.abrir_config_playlist,
             on_remover = self._remover_playlist,
             carregar_musicas = self.abrir_playlist
         )
-        self.estado = EstadoPlaylist(self.grid)
+        self.estado = PlaylistManager(self.grid)
         
         self.content = self.grid
 
@@ -42,42 +48,39 @@ class ContentPlaylist(ft.Container):
                 page = self.page,
                 estado = self.estado,
                 conteudo = self,
-                modo = ModoOverlayPlaylist.UPDATE
+                modo = PlalistOverlayMode.UPDATE
             ) 
         )
         self.page.update()
     
-    def _remover_playlist(self, playlist_id : str):
-        from ...App.Meta.Scanner.scanner import Scanner
-        from ...App.Playlists.Repository.playlist_reprositorio import PlaylistRepositorio
-        
+    def _remover_playlist(self, playlist_id : str):        
         """
-            Ordem: EstadoPlaylist -> Grid & Repositorio -> CreatePlaylist
+            Ordem: PlaylistManager -> Grid & Repositorio -> CreatePlaylist
         Args:
             playlist_id (str): ID da playlist
         """
+
         self.estado.remover_playlist(playlist_id)
 
     def _criar_play(self):
         """
             Ordem: Estadoplaylist -> Grid & Repositorio -> CreatePlaylist
         """
+        
         self.estado.criar_playlist()
         
     def abrir_playlist(self, id : str, data : str):
         """
-            Ordem: EstadoPlaylist ->
+            Ordem: PlaylistManager ->
         Args:
             id (str): ID da playlist
         """
-        from ...App.Playlists.Controller.estado_playlist import EstadoPlay
-        from ...App.Audio.Model.modo_reproducao import ModoReprodução
 
         card = self.grid.cards[id]
 
-        fonte = FontePlaylist(
-            pasta = card.pasta,
-            modo = ModoReprodução.PLAYLIST
+        fonte = PlaylistFont(
+            path = card.pasta,
+            mode = ReproductionMode.PLAYLIST
         )
         
         lista_de_musicas = fonte.carregar()
@@ -97,15 +100,13 @@ class ContentPlaylist(ft.Container):
         self.content = list_view
         self.update()
 
-        EstadoPlay.abrir_playlist(
-            id_playlist = card.data['id'],
-            status = PlaylistCarregada.ABERTA
+        PlaylistState.open_playlist(
+            id = card.data['id'],
+            status = PlaylistLoaded.OPEN
         )
         
-    def fechar_playlist(self):
-        from ...App.Playlists.Controller.estado_playlist import EstadoPlay
-        
+    def fechar_playlist(self):        
         self.content = self.grid
         self.update()
 
-        EstadoPlay.fechar_playlist()
+        PlaylistState.close_playlist()

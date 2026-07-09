@@ -1,6 +1,10 @@
+# import de interface
 from project.ui.others.colors import colors
-import flet as ft
+
+# imports gerais
 import random, asyncio
+import flet as ft
+
 
 class AboutSettings(ft.Container):
     def __init__(self):

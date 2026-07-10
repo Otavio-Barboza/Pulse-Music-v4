@@ -1,15 +1,15 @@
-class LetrasMemoria:
+class LyricsMemory:
     _letras = {}
-    _cache_letra = None
+    cache_lyrics = None
 
     @classmethod
-    def carregar_memoria(cls):
+    def load_memory(cls):
         from ..Repository.letra_repository import LetraRepository
         cls._letras = LetraRepository.ler_json()
 
     @classmethod
-    def retornar_letra(cls) -> str:
-        from ...Audio.Controller.sessao import SessaoReproducao
+    def return_lyrics(cls) -> str:
+        from ...Audio.Controller.sessao import SessionReproduction
         
         if SessaoReproducao.estado.musica_atual is None:
             return 'Letra não Encontrada'
@@ -26,7 +26,7 @@ class LetrasMemoria:
         return letra
     
     @classmethod
-    def retornar_letra_traduzida(cls, idioma : str) -> str:
+    def return_translated_lyrics(cls, language: str) -> str:
         from ...Audio.Controller.sessao import SessaoReproducao
         
         if SessaoReproducao.estado.musica_atual is None:
@@ -35,19 +35,19 @@ class LetrasMemoria:
         if SessaoReproducao.estado.musica_atual.chave not in cls._letras:
             return None
         
-        letras = cls._letras[
+        lyrics = cls._letras[
             SessaoReproducao.estado.musica_atual.chave
         ].get('traducoes')
 
-        if len(letras) == 0:
+        if len(lyrics) == 0:
             return None
         
-        for traducao in letras:
-            if traducao.get('idioma') == idioma:
+        for traducao in lyrics:
+            if traducao.get('language') == language:
                 return traducao.get('letra')
         else:
             return None
         
     @classmethod
-    def atualizar_cache(cls, idioma):
-        cls._cache_letra = idioma
+    def update_cache(cls, language):
+        cls.cache_lyrics = language

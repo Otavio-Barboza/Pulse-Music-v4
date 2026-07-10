@@ -1,83 +1,87 @@
-from ..Model.genius import Genius
+# imports de back-end
+from project.core.lyrics.model.genius import Genius
 from ..Repository.letra_repository import LetraRepository
 from ..Translate.tradutor import Tradutor
+
+# import geral
 import requests
 
-class LetrasServices:
-    _tela_expandida = False
+
+class LyricsServices:
+    _expanded_screen = False
     GENIUS = Genius()
     TRADUTOR = Tradutor()
 
     _LINGUAGENS_DIPONIVEIS : dict[str, str] = {}    
-    for idioma, uf in TRADUTOR._languages.items():
+    for language, uf in TRADUTOR._languages.items():
         _LINGUAGENS_DIPONIVEIS[
-            idioma.replace(' ', '_')
+            language.replace(' ', '_')
         ] = uf
 
     _callbacks = {}
 
     @classmethod
-    def registrar_callback(cls, evento : str, callback : callable):
-        if evento not in cls._callbacks:
-            cls._callbacks[evento] = []
-        cls._callbacks[evento].append(callback)
+    def register_callback(cls, event: str, callback : callable):
+        if event not in cls._callbacks:
+            cls._callbacks[event] = []
+        cls._callbacks[event].append(callback)
 
     @classmethod
-    def _notificar(cls, dados, evento : str):
-        for callback in cls._callbacks.get(evento, []):
-            callback(dados)
+    def notifify(cls, data, event : str):
+        for callback in cls._callbacks.get(event, []):
+            callback(data)
 
     @classmethod
-    def set_tela_expandida(cls, valor : bool):
-        cls._tela_expandida = valor
+    def set_expanded_screen(cls, valor : bool):
+        cls._expanded_screen = valor
 
     @classmethod
-    def buscar_letra(cls, dados : dict) -> str | None:
+    def get_lyric(cls, data: dict) -> str | None:
         from ..Translate.detector_idioma import detectar_idioma
         from ..Cache.memoria_letras import LetrasMemoria
 
         try:    
-            if dados.get('chave') in LetrasMemoria._letras:
+            if data.get('key') in LetrasMemoria._letras:
                 return
             
             song = cls.GENIUS.search_song(
-                title = dados.get('nome'),
-                artist = dados.get('artista')
+                title = data.get('nome'),
+                artist = data.get('artista')
             )
             
             if not song:
                 return
             
-            cls.salvar_letra(
-                chave_da_musica = dados.get('chave'),
-                letra = song.lyrics,
+            cls.save_lyric(
+                key_song = data.get('chave'),
+                lyric = song.lyrics,
                 idioma_padrao = detectar_idioma(song.lyrics)
             )
 
             LetrasMemoria.carregar_memoria()
 
-            if cls._tela_expandida:
+            if cls._expanded_screen:
                 cls._notificar(
                     evento = 'att_letra',
-                    dados = None
+                    data = None
                 )
 
         except requests.exceptions.Timeout:
-            print("Timeout ao buscar letra.")
+            print("Timeout ao buscar lyric.")
             return
         except Exception as erro:
             print(f"Erro: {erro}")
             return 
     
     @classmethod
-    def _definir_linguagem_saida(cls, saida : str):
+    def set_language_target(cls, saida : str):
         cls.TRADUTOR.target = saida
 
     @classmethod
-    def traduzir(cls, letra : str) -> str | None:
+    def translate(cls, lyric : str) -> str | None:
         from Assets.App.Letras.Translate.detector_idioma import detectar_idioma
 
-        cls.TRADUTOR.source = detectar_idioma(letra)
+        cls.TRADUTOR.source = detectar_idioma(lyric)
         
         if (
             cls.TRADUTOR.source is None
@@ -85,59 +89,59 @@ class LetrasServices:
             cls.TRADUTOR.target is None
         ):
             return
-        return cls.TRADUTOR.translate(letra)
+        return cls.TRADUTOR.translate(lyric)
     
     @classmethod
-    def salvar_letra(cls, letra, chave_da_musica, idioma_padrao):
+    def save_lyric(cls, lyric, key_song, idioma_padrao):
         letras_existentes = LetraRepository.ler_json()
 
-        letras_existentes[chave_da_musica] = {
-            'letra_original' : letra,
+        letras_existentes[key_song] = {
+            'letra_original' : lyric,
             'idioma_original' : idioma_padrao,
-            'traducoes' : []
+            'translations' : []
         }
 
         LetraRepository.salvar_json(letras_existentes)
 
     @classmethod
-    def atualizar_traducoes(cls, chave_da_musica : str, novo_idioma : str, nova_letra : str):
+    def update_translations(cls, key_song : str, new_language : str, new_lyric : str):
         letras_existentes = LetraRepository.ler_json()
 
-        if novo_idioma not in letras_existentes[chave_da_musica]['traducoes']:
-            letras_existentes[chave_da_musica]['traducoes'].append({
-                'idioma' : novo_idioma,
-                'letra' : nova_letra
+        if new_language not in letras_existentes[key_song]['translations']:
+            letras_existentes[key_song]['translations'].append({
+                'language' : new_language,
+                'lyric' : new_lyric
             })
 
         LetraRepository.salvar_json(letras_existentes)
 
     @classmethod
-    def executar_traducao(cls, idioma : str):
+    def start_translation(cls, language : str):
         from ..Cache.memoria_letras import LetrasMemoria
         from ...Audio.Controller.sessao import SessaoReproducao
 
         if SessaoReproducao.estado.musica_atual is None:
-            return 'Nenhuma letra carregada para tradução'
+            return 'Nenhuma lyric carregada para tradução'
         
-        letra_traduzida_existente = LetrasMemoria.retornar_letra_traduzida(idioma)
+        letra_traduzida_existente = LetrasMemoria.retornar_letra_traduzida(language)
         
         if letra_traduzida_existente is not None:
             return letra_traduzida_existente
         
-        letra = LetrasMemoria.retornar_letra()
+        lyric = LetrasMemoria.retornar_letra()
 
-        if not letra:
-            return 'A respectiva letra não foi encontrada. Portanto, não é possível traduzir!'
+        if not lyric:
+            return 'A respectiva lyric não foi encontrada. Portanto, não é possível translate!'
         
-        letra_traduzida = cls.traduzir(letra)
+        letra_traduzida = cls.translate(lyric)
 
         if not letra_traduzida:
             return 'Falha na tradução, tente novamente!'
         
-        cls.atualizar_traducoes(
-            chave_da_musica = SessaoReproducao.estado.musica_atual.chave,
-            novo_idioma = idioma,
-            nova_letra = letra_traduzida
+        cls.update_translations(
+            key_song = SessaoReproducao.estado.musica_atual.chave,
+            new_language = language,
+            new_lyric = letra_traduzida
         )
 
         LetrasMemoria.carregar_memoria()

@@ -1,7 +1,8 @@
-from .detector_idioma import detectar_idioma
+# import geral
 from deep_translator import GoogleTranslator
 
-class Tradutor(GoogleTranslator):
+
+class Translator(GoogleTranslator):
     def __init__(
         self, 
         source = "auto", 

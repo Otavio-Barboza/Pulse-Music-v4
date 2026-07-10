@@ -1,4 +1,6 @@
+# imports gerais
 import lyricsgenius, os, dotenv
+
 
 def ler_env():
     dotenv.load_dotenv(r'Assets\App\Env\.env')
@@ -7,6 +9,7 @@ def ler_env():
     except Exception as e:
         print(e)
         return None
+
 
 class Genius(lyricsgenius.Genius):
     def __init__(

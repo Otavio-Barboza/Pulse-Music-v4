@@ -4,7 +4,7 @@ from project.core.meta.enum.status import SongStatus
 # import geral
 from pathlib import Path
 
-
+teste = None
 class SongMetadata:
     
     def __init__(
@@ -43,22 +43,22 @@ class SongMetadata:
 
         # Dados artist
         artist_metadata: dict[str, str | Path] = {
-            'id_deezer' : None,
-            'medium' : None, # str do path da img medium salva
-            'big' : {
-                'link' : None,
-                'path' : None # str da musica sendo salva.
+            "id_deezer" : None,
+            "medium" : None, # str do path da img medium salva
+            "big" : {
+                "link" : None,
+                "path" : None # str da musica sendo salva.
             } 
         },
 
         # Dados álbum
         album_metadata: dict[str, str | Path] = {
-            'id_deezer' : None, 
-            'name' : None, 
-            'medium' : None, 
-            'big' : {
-                'link' : None,
-                'path' : None
+            "id_deezer" : None, 
+            "name" : None, 
+            "medium" : None, 
+            "big" : {
+                "link" : None,
+                "path" : None
             }
         }
     ):
@@ -139,11 +139,11 @@ class SongMetadata:
         img_b_link: str | None
     ):
         self.artist_metadata = {
-            'id' : id,
-            'medium' : img_m,
-            'big' : {
-                'link' : img_b_link,
-                'path' : img_b
+            "id" : id,
+            "medium" : img_m,
+            "big" : {
+                "link" : img_b_link,
+                "path" : img_b
             }
         }
 
@@ -156,12 +156,12 @@ class SongMetadata:
         img_b_link: str | None
     ):
         self.album_metadata = {
-            'id_deezer' : id_deezer,
-            'name' : name,
-            'medium' : img_m,
-            'big' : {
-                'link' : img_b_link,
-                'path' : img_b
+            "id_deezer" : id_deezer,
+            "name" : name,
+            "medium" : img_m,
+            "big" : {
+                "link" : img_b_link,
+                "path" : img_b
             }
         }
         

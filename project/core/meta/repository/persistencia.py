@@ -28,7 +28,7 @@ class Persistencia:
     @classmethod
     async def gerenciar_dados_json_musicas(cls, grupos : dict):
         from ..Controller.status import Status
-        from .tarefas import GerenciaMetadados
+        from .tasks import GerenciaMetadados
         
         json_musicas_atual = await cls.ler_json(
             f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json'

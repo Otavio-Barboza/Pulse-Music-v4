@@ -1,5 +1,5 @@
 from pathlib import Path
-import json
+import json, aiofiles
 
 class Utils:
 
@@ -21,13 +21,21 @@ class Utils:
             return json.load(js)
 
     @classmethod
-    def async_load_json(cls, path, data: dict):
-        ...
-
-    @classmethod
     def sync_update_json(cls, path, data: dict):
-        ...
+        with open(path, 'w', encoding = 'utf-8') as js:
+            json.dump(data or {}, js, indent = 4, ensure_ascii = False)
 
     @classmethod
-    def async_update_json(cls, path, data: dict):
-        ...
+    async def async_load_json(cls, path: Path):
+        async with aiofiles.open(path, 'r', encoding = 'utf-8') as j:
+            return json.loads(await j.read())
+
+    @classmethod
+    async def async_update_json(cls, path: Path, data: dict):
+        async with aiofiles.open(path, 'w', encoding = 'utf-8') as j:
+            content = json.dumps(
+                data,
+                ensure_ascii = False,
+                indent = 4
+            )
+            await j.write(content)

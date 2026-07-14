@@ -59,7 +59,7 @@ class PipelineFase3:
 
         # 🔹 CASO 2: APENAS TÍTULO
         else:
-            from .pipeline_fase_2 import PipelineFase2
+            from .phase_2 import PipelineFase2
             
             itens_processados = []
 
@@ -237,7 +237,7 @@ class PipelineFase3:
                     )
                 # 🔹 CASO COM ARTISTA
                 else:
-                    from .pipeline_fase_2 import PipelineFase2
+                    from .phase_2 import PipelineFase2
 
                     artista_final = await PipelineFase2._escolher_artista(
                         score = melhor_score,

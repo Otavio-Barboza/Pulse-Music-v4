@@ -3,6 +3,7 @@ from project.core.meta.models.song import SongMetadata
 
 # imports gerais
 from pathlib import Path
+from difflib import SequenceMatcher
 import aiofiles, hashlib, aiohttp, os
 
 
@@ -70,3 +71,7 @@ class Task:
                 hasher.update(chunk)
         
         return hasher.hexdigest()
+    
+    @classmethod
+    def similarity(cls, a: str, b: str) -> float:
+        return SequenceMatcher(None, a, b).ratio()

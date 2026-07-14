@@ -8,7 +8,7 @@ import aiohttp, asyncio
 BASE_URL = 'https://api.deezer.com'
 
 
-class GerenciadorFontes:
+class FontManager:
     def __init__(self, session):
         self.deezer = DeezerFont(session)
 

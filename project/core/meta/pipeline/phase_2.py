@@ -1,76 +1,83 @@
-from ..Repository.normalizacao import Filtragem
-from ..Repository.validacao import Validacao
-from Assets.App.Meta.Controller.status import Status
-from Assets.App.Meta.Providers.deezer import GerenciadorFontes
-from ..Models.musica_meta import MusicaMetadados
-from ..Repository.persistencia import Persistencia
-from ....App.Services.gerenciador_contas import GerenciadorContas       
-from ..Repository.extrai_metadados import ExtracaoMetadados
-from ..Memoria.memoria_artistas import MemoriaArtistas
+# imports de back-end
+from project.core.meta.repository.filtering import Filtering
+from project.core.meta.repository.tasks import Task
+from project.core.meta.enum.status import SongStatus
+from project.core.meta.provider.deezer import FontManager
+from project.core.meta.models.song import SongMetadata
+from project.core.meta.repository.extract_metadata import ExtractMetadata
+from project.core.meta.cache.cache_artists import CacheArtists
+from project.core.services.account_manager import AccountManager       
+
+# imports gerais
 import aiohttp, os
 
-class PipelineFase2:
+
+class Phase2:
     @classmethod
-    async def _async_fase_2(cls, lista : list[MusicaMetadados], caminho : str):
-        grupos = {
-            Status.AMBOS : [],
-            Status.MEDIO : [],
-            Status.INCONSISTENTE : [],
-            Status.INCOMPLETO : [],
-            Status.APENAS_TITULO : [],
-            Status.SEM_ART_FILTRADO : [],
-            Status.SEM_ART_NATIVO : []
+    async def phase_2(cls, list_object: list[SongMetadata], path : str):
+        groups = {
+            SongStatus.BOTH : [],
+            SongStatus.MEDIUM : [],
+            SongStatus.INCONSISTENT : [],
+            SongStatus.INCOMPLETE : [],
+            SongStatus.TITLE_ONLY : [],
+            SongStatus.NO_ARTIST_FILTERED : [],
+            SongStatus.NO_ARTIST_ID3 : []
         }
         
-        if lista is None:
-            raise(f'ERRO: {type(lista)}')
+        if list_object is None:
+            raise(f'ERRO: {type(list_object)}')
         
         # organização dos dados
-        for dado in lista:
-            grupos[dado.status].append(dado)
+        for data in list_object:
+            groups[data.status].append(data)
 
-        await cls.ajustar_ambos(lista_ambos = grupos[Status.AMBOS], caminho = caminho)
-        await cls.resolver_medios_e_inconsistentes(
-            lista_inconsistentes = grupos[Status.INCONSISTENTE],
-            lista_medios = grupos[Status.MEDIO],
-            caminho = caminho
+        await cls.resolve_both(
+            lista_ambos = groups[SongStatus.BOTH], 
+            path = path
         )
-        await cls.resolver_sem_artista_filtrado_ou_nativo(
-            lista_so_filtrados = grupos[Status.SEM_ART_NATIVO],
-            lista_so_nativos = grupos[Status.SEM_ART_FILTRADO],
-            caminho = caminho
+        await cls.resolve_medium_and_inconsistent(
+            inconsitent_list = groups[SongStatus.INCONSISTENT],
+            medium_list = groups[SongStatus.MEDIUM],
+            path = path
         )
-        await cls.resolver_apenas_titulos(
-            lista_apenas_titulo = grupos[Status.APENAS_TITULO],
-            caminho = caminho
+        await cls.resolve_no_artist_filtered_or_no_id3(
+            filtered_only_list = groups[SongStatus.NO_ARTIST_ID3],
+            id3_only_list = groups[SongStatus.NO_ARTIST_FILTERED],
+            path = path
+        )
+        await cls.resolve_title_only(
+            title_only_list = groups[SongStatus.TITLE_ONLY],
+            path = path
         )
 
-        return grupos
+        return groups
     
     @classmethod
-    async def ajustar_ambos(cls, lista_ambos : list[MusicaMetadados], caminho : str):
+    async def resolve_both(cls, lista_ambos : list[SongMetadata], path : str):
         from .pipeline import Pipeline
 
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
-            fontes = GerenciadorFontes(session)
+            fonts = FontManager(session)
+
             for musica in lista_ambos:
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(musica.artista_titulo_filtrado)
+                    Filtering._limpar_feat(musica.artista_titulo_filtrado)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 )
                 musica.set_possiveis_artistas([musica.artista_meta_nativo])
-                musica.set_status(Status.ALTA)
+                musica.set_status(SongStatus.ALTA)
                 musica.set_score(1.5)
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
                 
-                dados_deezer = await fontes.deezer.buscar_musica(titulo = musica.titulo_musica_filtrado, artista = musica.artista_final)
+                dados_deezer = await fonts.deezer.buscar_musica(titulo = musica.titulo_musica_filtrado, artista = musica.artista_final)
                 
                 caminho_img_medium_art = Persistencia.baixar_imagem(
                     url = dados_deezer['track'][0]['artist']['picture_medium'],
@@ -86,7 +93,7 @@ class PipelineFase2:
                     img_m = caminho_img_medium_art,
                     img_b = os.path.normpath(
                         os.path.join(
-                            musica.caminho, 
+                            musica.path, 
                             musica.arquivo_mp3_original
                         )
                     ),
@@ -108,17 +115,17 @@ class PipelineFase2:
                     img_m = caminho_img_medium_alb or None,
                     img_b = os.path.normpath(
                         os.path.join(
-                            musica.caminho, 
+                            musica.path, 
                             musica.arquivo_mp3_original
                         )
                     ),
                     img_b_link = dados_deezer['track'][0]['album']['cover_big'] or None
                 )
 
-                ExtracaoMetadados.registrar_metadados_player(
+                ExtractMetadata.registrar_metadados_player(
                     caminho_arquivo = os.path.normpath(
                         os.path.join(
-                            musica.caminho, 
+                            musica.path, 
                             musica.arquivo_mp3_original
                         )
                     ),
@@ -134,15 +141,15 @@ class PipelineFase2:
                 )
 
         await Pipeline.salvar_dados(
-            {Status.AMBOS : lista_ambos}
+            {SongStatus.AMBOS : lista_ambos}
         )
-        Pipeline.executar_callbacks(caminho)
+        Pipeline.executar_callbacks(path)
     
     @classmethod
-    async def _resolver_musica(cls, fontes : GerenciadorFontes, musica : MusicaMetadados, estrategia : dict):
+    async def _resolver_musica(cls, fonts : FontManager, musica : SongMetadata, estrategia : dict):
         artista_para_busca = estrategia['artista_para_busca'](musica)
 
-        resultado = await fontes.deezer.buscar_musica(
+        resultado = await fonts.deezer.buscar_musica(
             titulo = musica.titulo_musica_filtrado,
             artista = artista_para_busca
         )
@@ -163,7 +170,7 @@ class PipelineFase2:
         return melhor_item, melhor_score
     
     @classmethod
-    async def _escolher_artista(cls, score : float, melhor_item : dict, musica : MusicaMetadados):
+    async def _escolher_artista(cls, score : float, melhor_item : dict, musica : SongMetadata):
         if score >= 0.85:
             return melhor_item['artist']['name']
         elif 0.85 > score > 0.65:
@@ -174,17 +181,17 @@ class PipelineFase2:
     @classmethod
     def _estrategia_medios(cls):
         return {
-            'artista_para_busca' : lambda musica: Filtragem._limpar_feat(musica.artista_titulo_filtrado),
+            'artista_para_busca' : lambda musica: Filtering._limpar_feat(musica.artista_titulo_filtrado),
             'calcular_score' : lambda musica, item: (
-                0.6 * Validacao.similaridade(
+                0.6 * Task.similaridade(
                     musica.titulo_musica_filtrado,
                     item['title']
                 ) + 0.4 * max(
-                    Validacao.similaridade(
-                        Filtragem._limpar_feat(musica.artista_titulo_filtrado),
+                    Task.similaridade(
+                        Filtering._limpar_feat(musica.artista_titulo_filtrado),
                         item['artist']['name']
                     ),
-                    Validacao.similaridade(
+                    Task.similaridade(
                         musica.artista_meta_nativo,
                         item['artist']['name']
                     )
@@ -193,19 +200,19 @@ class PipelineFase2:
         }
     
     @classmethod
-    async def resolver_medios_e_inconsistentes(cls, lista_medios : list[MusicaMetadados], lista_inconsistentes : list[MusicaMetadados], caminho : str):
+    async def resolve_medium_and_inconsistent(cls, medium_list : list[SongMetadata], inconsitent_list : list[SongMetadata], path : str):
         from .pipeline import Pipeline
 
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
-            fontes = GerenciadorFontes(session)
+            fonts = FontManager(session)
 
-            for musica in lista_medios:
+            for musica in medium_list:
                 melhor_item, melhor_score = await cls._resolver_musica(
                     musica = musica,
-                    fontes = fontes,
+                    fonts = fonts,
                     estrategia = cls._estrategia_medios()
                 )
                 artista_final = await cls._escolher_artista(
@@ -215,24 +222,24 @@ class PipelineFase2:
                 )
 
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(artista_final)
+                    Filtering._limpar_feat(artista_final)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado, musica.artista_meta_nativo])  
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
                 
                 if melhor_score >= 0.85:
-                    musica.set_status(Status.ALTA)
+                    musica.set_status(SongStatus.ALTA)
                 elif 0.85 > melhor_score > 0.65:
-                    musica.set_status(Status.MEDIA)
+                    musica.set_status(SongStatus.MEDIA)
                 else:
-                    musica.set_status(Status.BAIXA)
+                    musica.set_status(SongStatus.BAIXA)
 
                 if melhor_item is not None:
 
@@ -250,7 +257,7 @@ class PipelineFase2:
                         img_m = caminho_img_medium_art,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -272,17 +279,17 @@ class PipelineFase2:
                         img_m = caminho_img_medium_alb or None,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
                         img_b_link = melhor_item['album']['cover_big'] or None
                     )
 
-                    ExtracaoMetadados.registrar_metadados_player(
+                    ExtractMetadata.registrar_metadados_player(
                         caminho_arquivo = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -297,10 +304,10 @@ class PipelineFase2:
                         id_art = musica.img_album.get('id')
                     )
 
-            for musica in lista_inconsistentes:
+            for musica in inconsitent_list:
                 melhor_item, melhor_score = await cls._resolver_musica(
                     musica = musica,
-                    fontes = fontes,
+                    fonts = fonts,
                     estrategia = cls._estrategia_medios()
                 )
                 artista_final = await cls._escolher_artista(
@@ -310,24 +317,24 @@ class PipelineFase2:
                 )
 
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(artista_final)
+                    Filtering._limpar_feat(artista_final)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado, musica.artista_meta_nativo])
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
 
                 if melhor_score >= 0.85:
-                    musica.set_status(Status.ALTA)
+                    musica.set_status(SongStatus.ALTA)
                 elif 0.85 > melhor_score > 0.65:
-                    musica.set_status(Status.MEDIA)
+                    musica.set_status(SongStatus.MEDIA)
                 else:
-                    musica.set_status(Status.BAIXA)
+                    musica.set_status(SongStatus.BAIXA)
 
                 if melhor_item is not None:
 
@@ -345,7 +352,7 @@ class PipelineFase2:
                         img_m = caminho_img_medium_art,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -367,17 +374,17 @@ class PipelineFase2:
                         img_m = caminho_img_medium_alb or None,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
                         img_b_link = melhor_item['album']['cover_big'] or None
                     )
 
-                    ExtracaoMetadados.registrar_metadados_player(
+                    ExtractMetadata.registrar_metadados_player(
                         caminho_arquivo = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -394,21 +401,21 @@ class PipelineFase2:
         
         await Pipeline.salvar_dados(
             {
-                Status.MEDIO : lista_medios,
-                Status.INCONSISTENTE : lista_inconsistentes
+                SongStatus.MEDIO : medium_list,
+                SongStatus.INCONSISTENTE : inconsitent_list
             }
         )
-        Pipeline.executar_callbacks(caminho)
+        Pipeline.executar_callbacks(path)
 
     @classmethod
     def _estrategia_artista_filtrado(cls):
         return {
-            'artista_para_busca' : lambda musica: Filtragem._limpar_feat(musica.artista_titulo_filtrado),
+            'artista_para_busca' : lambda musica: Filtering._limpar_feat(musica.artista_titulo_filtrado),
             'calcular_score' : lambda musica, item: (
-                0.6 * Validacao.similaridade(
+                0.6 * Task.similaridade(
                     musica.titulo_musica_filtrado,
                     item['title']
-                ) + 0.4 * Validacao.similaridade(
+                ) + 0.4 * Task.similaridade(
                     musica.artista_titulo_filtrado,
                     item['artist']['name']
                 )
@@ -420,10 +427,10 @@ class PipelineFase2:
         return {
             'artista_para_busca' : lambda musica: musica.artista_meta_nativo,
             'calcular_score' : lambda musica, item: (
-                0.6 * Validacao.similaridade(
+                0.6 * Task.similaridade(
                     musica.titulo_musica_filtrado,
                     item['title']
-                ) + 0.4 * Validacao.similaridade(
+                ) + 0.4 * Task.similaridade(
                     musica.artista_meta_nativo,
                     item['artist']['name']
                 )
@@ -431,18 +438,18 @@ class PipelineFase2:
         }
     
     @classmethod
-    async def resolver_sem_artista_filtrado_ou_nativo(cls, lista_so_nativos : list[MusicaMetadados], lista_so_filtrados : list[MusicaMetadados], caminho : str):
+    async def resolve_no_artist_filtered_or_no_id3(cls, id3_only_list : list[SongMetadata], filtered_only_list : list[SongMetadata], path : str):
         from .pipeline import Pipeline
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
-            fontes = GerenciadorFontes(session)
+            fonts = FontManager(session)
             lista = []
 
-            for musica in lista_so_filtrados:
+            for musica in filtered_only_list:
                 melhor_item, melhor_score = await cls._resolver_musica(
-                    fontes = fontes,
+                    fonts = fonts,
                     musica = musica,
                     estrategia = cls._estrategia_artista_filtrado()
                 )
@@ -453,24 +460,24 @@ class PipelineFase2:
                 )
 
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(artista_final)
+                    Filtering._limpar_feat(artista_final)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_meta_nativo])  
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
                 
                 if melhor_score >= 0.85:
-                    musica.set_status(Status.ALTA)
+                    musica.set_status(SongStatus.ALTA)
                 elif 0.85 > melhor_score > 0.65:
-                    musica.set_status(Status.MEDIA)
+                    musica.set_status(SongStatus.MEDIA)
                 else:
-                    musica.set_status(Status.BAIXA)
+                    musica.set_status(SongStatus.BAIXA)
 
                 if melhor_item is not None:
 
@@ -488,7 +495,7 @@ class PipelineFase2:
                         img_m = caminho_img_medium_art,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -510,17 +517,17 @@ class PipelineFase2:
                         img_m = caminho_img_medium_alb or None,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
                         img_b_link = melhor_item['album']['cover_big'] or None
                     )
 
-                    ExtracaoMetadados.registrar_metadados_player(
+                    ExtractMetadata.registrar_metadados_player(
                         caminho_arquivo = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -535,9 +542,9 @@ class PipelineFase2:
                         id_art = musica.img_album.get('id')
                     )
 
-            for musica in lista_so_nativos:
+            for musica in id3_only_list:
                 melhor_item, melhor_score = await cls._resolver_musica(
-                    fontes = fontes,
+                    fonts = fonts,
                     musica = musica,
                     estrategia = cls._estrategia_artista_nativo()
                 )
@@ -548,24 +555,24 @@ class PipelineFase2:
                 )
 
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(artista_final)
+                    Filtering._limpar_feat(artista_final)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 )
 
                 musica.set_score(melhor_score)
                 musica.set_possiveis_artistas([melhor_item['artist']['name'] if melhor_item is not None else 'Desconhecido', musica.artista_titulo_filtrado])  
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
                 
                 if melhor_score >= 0.85:
-                    musica.set_status(Status.ALTA)
+                    musica.set_status(SongStatus.ALTA)
                 elif 0.85 > melhor_score > 0.65:
-                    musica.set_status(Status.MEDIA)
+                    musica.set_status(SongStatus.MEDIA)
                 else:
-                    musica.set_status(Status.BAIXA)
+                    musica.set_status(SongStatus.BAIXA)
 
                 if melhor_item is not None:
 
@@ -583,7 +590,7 @@ class PipelineFase2:
                         img_m = caminho_img_medium_art,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -605,17 +612,17 @@ class PipelineFase2:
                         img_m = caminho_img_medium_alb or None,
                         img_b = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
                         img_b_link = melhor_item['album']['cover_big'] or None
                     )
 
-                    ExtracaoMetadados.registrar_metadados_player(
+                    ExtractMetadata.registrar_metadados_player(
                         caminho_arquivo = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -632,15 +639,15 @@ class PipelineFase2:
 
         await Pipeline.salvar_dados(
             {
-                Status.SEM_ART_FILTRADO : lista_so_nativos,
-                Status.SEM_ART_NATIVO : lista_so_filtrados
+                SongStatus.SEM_ART_FILTRADO : id3_only_list,
+                SongStatus.SEM_ART_NATIVO : filtered_only_list
             }
         )
-        Pipeline.executar_callbacks(caminho)
+        Pipeline.executar_callbacks(path)
 
     @classmethod
-    def _calcular_score_apenas_titulo(cls, musica : MusicaMetadados, item : dict):
-        similaridade_titulo = Validacao.similaridade(
+    def _calcular_score_apenas_titulo(cls, musica : SongMetadata, item : dict):
+        similaridade_titulo = Task.similaridade(
             musica.titulo_musica_filtrado.lower().strip(),
             item['title'].lower().strip()
         )            
@@ -665,35 +672,35 @@ class PipelineFase2:
         }
     
     @classmethod
-    async def _classificar_artistas_apenas_titulo(cls, gap, sim_1, consenso, top5) -> str | Status:
+    async def _classificar_artistas_apenas_titulo(cls, gap, sim_1, consenso, top5) -> str | SongStatus:
         artista = top5[0]["artist"]["name"]
 
         if sim_1 >= 0.85 and gap >= 0.05:
-            return artista, Status.ALTA
+            return artista, SongStatus.ALTA
         elif sim_1 >= 0.80 and gap >= 0.02:
-            return artista, Status.MEDIA
+            return artista, SongStatus.MEDIA
         else:
-            return artista, Status.BAIXA
+            return artista, SongStatus.BAIXA
         
     @classmethod
-    async def resolver_apenas_titulos(cls,  lista_apenas_titulo : list[MusicaMetadados], caminho : str):
+    async def resolve_title_only(cls,  title_only_list : list[SongMetadata], path : str):
         from .pipeline import Pipeline
 
         CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
         CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
-            fontes = GerenciadorFontes(session)
+            fonts = FontManager(session)
             resultados_pipeline = []
 
-            for musica in lista_apenas_titulo:
-                resultado = await fontes.deezer.buscar_musica(
+            for musica in title_only_list:
+                resultado = await fonts.deezer.buscar_musica(
                     titulo = musica.titulo_musica_filtrado,
                     artista = None
                 )
 
                 if not resultado or not resultado.get('track'):
-                    musica.set_status(Status.BAIXA)
+                    musica.set_status(SongStatus.BAIXA)
                     musica.set_artista_final(None)
                     musica.set_artista_id(None)
                     musica.set_score(0)
@@ -733,10 +740,10 @@ class PipelineFase2:
                 )
 
                 musica.set_artista_final(
-                    Filtragem._limpar_feat(artista_final)
+                    Filtering._limpar_feat(artista_final)
                 )
                 musica.set_artista_id(
-                    MemoriaArtistas.resolver_id(
+                    CacheArtists.resolver_id(
                         musica.artista_final
                     ) if musica.artista_final is not None else None
                 ) 
@@ -746,7 +753,7 @@ class PipelineFase2:
                 musica.set_sim_1(sim_1)
                 musica.set_sim_2(sim_2)
                 musica.set_status(status_artista_final)
-                musica.set_caminho(caminho)
+                musica.set_caminho(path)
 
                 caminho_img_medium_art = Persistencia.baixar_imagem(
                     url = top5[0]['artist']['picture_medium'],
@@ -762,7 +769,7 @@ class PipelineFase2:
                     img_m = caminho_img_medium_art,
                     img_b = os.path.normpath(
                         os.path.join(
-                            musica.caminho, 
+                            musica.path, 
                             musica.arquivo_mp3_original
                         )
                     ),
@@ -784,17 +791,17 @@ class PipelineFase2:
                     img_m = caminho_img_medium_alb or None,
                     img_b = os.path.normpath(
                         os.path.join(
-                            musica.caminho, 
+                            musica.path, 
                             musica.arquivo_mp3_original
                         )
                     ),
                     img_b_link = top5[0]['album']['cover_big'] or None
                 )
 
-                ExtracaoMetadados.registrar_metadados_player(
+                ExtractMetadata.registrar_metadados_player(
                         caminho_arquivo = os.path.normpath(
                             os.path.join(
-                                musica.caminho, 
+                                musica.path, 
                                 musica.arquivo_mp3_original
                             )
                         ),
@@ -810,6 +817,6 @@ class PipelineFase2:
                     )
                 
         await Pipeline.salvar_dados(
-            {Status.APENAS_TITULO : lista_apenas_titulo}
+            {SongStatus.APENAS_TITULO : title_only_list}
         )
-        Pipeline.executar_callbacks(caminho)
+        Pipeline.executar_callbacks(path)

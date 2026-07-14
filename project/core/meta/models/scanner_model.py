@@ -1,27 +1,31 @@
-from ..Controller.status import StatusScanner
-from ..Repository.persistencia import Persistencia
-from ...Services.gerenciador_contas import GerenciadorContas
-from ..Scanner.scanner import Scanner
+# import de back-end
+from project.core.meta.enum.status import ScannerStatus
+from project.core.meta.scanner.scanner import Scanner
+
+# imports gerais
 import asyncio, os
 
+
 class ScannerModel:
-    _tupla_status = (
-        StatusScanner.ON, StatusScanner.PAUSE, StatusScanner.BREAK, 
-        StatusScanner.ON_SCANNER, StatusScanner.ON_PIPELINE_PLAYLIST
+
+    status: ScannerStatus | None = None
+    _status: tuple[ScannerStatus] = (
+        ScannerStatus.ON, ScannerStatus.PAUSE, ScannerStatus.BREAK, 
+        ScannerStatus.ON_SCANNER, ScannerStatus.ON_PIPELINE_PLAYLIST
     )
-    _status_operacao = StatusScanner.ON
-    _status_processos = None
-    _tarefas_ativas = 0
+    _status_operation: ScannerStatus = ScannerStatus.ON
+    _status_procesesses: ScannerStatus | None = None
+    _number_of_active_taks: int = 0
     
     @classmethod
-    async def _async_iniciar_scanner(cls):
-        cls.alterar_status(
+    async def async_start_scanner(cls):
+        cls.set_status(
             None
         )
         Scanner.gerenciar_status()
         
-        while cls._status_operacao != StatusScanner.BREAK:
-            if cls._status_operacao == StatusScanner.PAUSE:
+        while cls._status_operation != ScannerStatus.BREAK:
+            if cls._status_operation == ScannerStatus.PAUSE:
                 await asyncio.sleep(1)
             else:
                 await Scanner._async_verificar_json()
@@ -30,24 +34,24 @@ class ScannerModel:
             raise('Scanner parou inesperadamente!')
 
     @classmethod
-    def alterar_status(cls, status : StatusScanner):
-        for stt in cls._tupla_status:
+    def set_status(cls, status: ScannerStatus):
+        for stt in cls._status:
             if stt == status:
                 cls.status = stt
                 break
             
     @classmethod
-    def definir_status_processo(cls, status : StatusScanner | None = None):
-        cls._status_processos = status
+    def set_status_prosesses(cls, status: ScannerStatus | None = None):
+        cls._status_procesesses = status
     
     @classmethod
-    def iniciar_tarefa(cls):
-        cls._tarefas_ativas += 1
+    def start_task(cls):
+        cls._number_of_active_taks += 1
 
     @classmethod
-    def finalizar_tarefa(cls):
-        cls._tarefas_ativas -= 1
+    def finaly_task(cls):
+        cls._number_of_active_taks -= 1
 
     @classmethod
-    def esta_ocupado(cls):
-        return cls._tarefas_ativas > 0
+    def return_is_busy(cls):
+        return cls._number_of_active_taks > 0

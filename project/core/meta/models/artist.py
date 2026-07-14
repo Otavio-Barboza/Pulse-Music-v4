@@ -20,25 +20,25 @@ class Artist:
                 'songs': []
             }
 
-        self.artist[artist_id]["musicas"].append({
+        self.artist[artist_id]["songs"].append({
             'key' : key_song, 
             'artist_path' : path_of_song_key
         })
 
-    # def remover(self, track_id: str, artist_id: str | None):
-    #     if not artist_id:
-    #         return
+    def remove(self, track_id: str, artist_id: str | None):
+        if not artist_id:
+            return
 
-    #     if artist_id not in self.artist:
-    #         return
+        if artist_id not in self.artist:
+            return
 
-    #     lista = self.artist[artist_id]["musicas"]
+        lista = self.artist[artist_id]["songs"]
 
-    #     if track_id in lista:
-    #         lista.remove(track_id)
+        if track_id in lista:
+            lista.remove(track_id)
 
-    #     if not lista:
-    #         del self.artist[artist_id]
+        if not lista:
+            del self.artist[artist_id]
 
     def to_dict(self):
         return self.artist

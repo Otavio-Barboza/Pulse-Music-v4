@@ -7,7 +7,7 @@ import inspect, asyncio
 
 
 class PlaylistState:
-    _playlist_loaded = PlaylistLoaded.CLOSE
+    playlist_loaded = PlaylistLoaded.CLOSE
     _callbacks = {}
 
     @classmethod
@@ -36,14 +36,14 @@ class PlaylistState:
 
     @classmethod
     def open_playlist(cls, id: str, status: PlaylistLoaded):
-        cls._playlist_loaded = {
+        cls.playlist_loaded = {
             'id' : id,
             'open_or_close' : status
         }
 
     @classmethod
     def close_playlist(cls):
-        cls._playlist_loaded = PlaylistLoaded.CLOSE
+        cls.playlist_loaded = PlaylistLoaded.CLOSE
 
     @classmethod
     def return_music_artist(cls, id: str) -> str:

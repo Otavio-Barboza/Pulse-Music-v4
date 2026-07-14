@@ -1,105 +1,107 @@
-from ..Repository.normalizacao import Filtragem
-from Assets.App.Meta.Repository.extrai_metadados import ExtracaoMetadados
-from Assets.App.Meta.Controller.status import Status
-from ..Models.musica_meta import MusicaMetadados
-from .pipeline_fase_1 import PipelineFase1
-from .pipeline_fase_2 import PipelineFase2
-from .pipeline_fase_3 import PipelineFase3
-from ..Repository.tarefas import GerenciaMetadados
-from ..Repository.persistencia import Persistencia
-from ...Playlists.Controller.estado_playlist import EstadoPlay
+# imports de back-end
+from project.core.meta.enum.status import SongStatus, ScannerStatus
+from project.core.meta.models.song import SongMetadata
+from project.core.meta.pipeline.phase_1 import Phase1
+from project.core.meta.pipeline.phase_2 import PipelineFase2
+from project.core.meta.pipeline.phase_3 import PipelineFase3
+from project.core.meta.repository.filtering import Filtering
+from project.core.meta.repository.extract_metadata import ExtractMetadata
+from project.core.meta.repository.metadata_repository import MetadataRepository
+from project.core.meta.cache.cache_artists import CacheArtists
+from project.core.meta.models.scanner_model import ScannerModel
+from project.core.meta.scanner.scanner import Scanner
+from project.core.meta.controller.scanner_controller import ScannerController
+from project.core.playlists.controller.playlist_state import PlaylistState
+from project.core.services.controllers.grid_state import GridState, GridMode
+from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+
+# imports gerais
+from pathlib import Path
 import os, asyncio
 
+
 class Pipeline:
-    @classmethod
-    async def _async_classificar_presenca(cls, titulo_filtrado : dict[str | None], artista_filtrado : str | None):
-        if titulo_filtrado is None:
-            return Status.INCOMPLETO
-
-        if titulo_filtrado['artista'] is not None and artista_filtrado is None:
-            return Status.SEM_ART_NATIVO
-
-        if titulo_filtrado['artista'] is None and artista_filtrado is not None:
-            return Status.SEM_ART_FILTRADO
-
-        if titulo_filtrado['titulo_filtrado'] is not None:
-            return Status.APENAS_TITULO
-
-        return Status.INCOMPLETO
 
     @classmethod
-    def normalizar_musica(cls, musica):
-        if isinstance(musica, MusicaMetadados):
-            return musica.arquivo_mp3_original
-        return musica
+    async def _async_classificar_presenca(cls, filtered_title : dict[str | None], filtered_artist : str | None):
+        if filtered_title is None:
+            return SongStatus.INCOMPLETE
+
+        if filtered_title['artist'] is not None and filtered_artist is None:
+            return SongStatus.NO_ARTIST_ID3
+
+        if filtered_title['artist'] is None and filtered_artist is not None:
+            return SongStatus.NO_ARTIST_FILTERED
+
+        if filtered_title['filtered_title'] is not None:
+            return SongStatus.TITLE_ONLY
+
+        return SongStatus.INCOMPLETE
+
+    @classmethod
+    def normalize_song(cls, song):
+        if isinstance(song, SongMetadata):
+            return song.mp3_file
+        return song
     
     @classmethod
-    async def salvar_dados(cls, grupos : dict):
-        from ..Memoria.memoria_artistas import MemoriaArtistas
-
-        await Persistencia.gerenciar_dados_json_musicas(grupos = grupos)
-        await MemoriaArtistas.salvar()
-        await Persistencia.atribuir_memoria()
+    async def save_data(cls, groups: dict):
+        await MetadataRepository.data_manager_songs_json(groups = groups)
+        await CacheArtists.save()
+        await MetadataRepository.load_cache()
     
     @classmethod
-    def executar_callbacks(cls, caminho : str):
-        from ...Services.Controllers.estado_grid import EstadoGrid, GridMode
-        from ...Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
-
-        EstadoGrid._notificar(
-            evento = 'att_grid', 
-            dados = GridMode.ARTISTA
+    def to_execute_callbacks(cls, path: Path):
+        GridState.notify(
+            event = 'actualization_grid', 
+            data = GridMode.ARTIST
         )
-        EstadoGrid._notificar(
-            evento = 'att_grid',
-            dados = GridMode.ALBUM
+        GridState.notify(
+            event = 'actualization_grid',
+            data = GridMode.ALBUM
         )
         
-        EstadoPlay.notificar(
-            evento = 'att_qtde_play',
-            dados = {
+        PlaylistState.notify(
+            event = 'actualization_number_songs_of_playlist',
+            data = {
                 'id' : id,
                 'qtde' : len(
-                    os.listdir(caminho)
+                    os.listdir(path)
                 )
             }
         )
 
         if (
-            isinstance(EstadoPlay._playlist_aberta, dict) and 
-            EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+            isinstance(PlaylistState.playlist_loaded, dict) and 
+            PlaylistState.playlist_loaded['open'] == PlaylistLoaded.OPEN
         ):
-            EstadoPlay.notificar(
-                evento = 'att_artista',
-                dados = None
+            PlaylistState.notify(
+                event = 'actualization_artist',
+                data = None
             )
-            EstadoPlay.notificar(
-                evento = 'att_capa',
-                dados = None
+            PlaylistState.notify(
+                event = 'actualization_cover',
+                data = None
             )
 
     @classmethod
-    def _processar_wrapper_sync(cls, caminho : str, lista_objetos : list = [], id_playlist : str | None = None) -> list[MusicaMetadados]:
-        from ..Models.scanner_model import ScannerModel
-        from ..Controller.scanner_controller import ScannerController
-        from ..Scanner.scanner import Scanner
-        from ..Controller.status import StatusScanner
+    def processar_wrapper_sync(cls, path: str, object_list: list = [], id_playlist: str | None = None) -> list[SongMetadata]:
         
-        ScannerModel.iniciar_tarefa()
-        ScannerModel.definir_status_processo(
-            StatusScanner.ON_PIPELINE_PLAYLIST
+        ScannerModel.start_task()
+        ScannerModel.set_status_prosesses(
+            ScannerStatus.ON_PIPELINE_PLAYLIST
         )
         Scanner.gerenciar_status()
-        ScannerController.notificar(
-            'icone_status_scanner',
+        ScannerController.notify(
+            'icon_status_scanner',
             None
         )
 
         try:
             asyncio.run(
                 cls._async_processar_musica(
-                    caminho = caminho, 
-                    lista_objetos = lista_objetos,
+                    path = path, 
+                    object_list = object_list,
                     id = id_playlist
                 )
             )
@@ -111,132 +113,134 @@ class Pipeline:
         finally:
             ScannerModel.finalizar_tarefa()
             
-            if not ScannerModel.esta_ocupado():
-                ScannerModel.definir_status_processo(
+            if not ScannerModel.return_is_busy():
+                ScannerModel.set_status_prosesses(
                     None
                 )
-                ScannerController.notificar(
+                ScannerController.notify(
                     'progress_status_scanner',
                     None
                 )
                 Scanner.gerenciar_status()
                 
     @classmethod
-    async def _async_processar_musica(cls, caminho : str, lista_objetos : list = [], id : str | None = None) -> list[MusicaMetadados]:
-        from ...Services.Controllers.estado_grid import GridMode, EstadoGrid
-        from ..Memoria.memoria_artistas import MemoriaArtistas
+    async def _async_processar_musica(
+        cls, 
+        path: Path, 
+        object_list: list[SongMetadata] = [], 
+        id: str | None = None
+    ) -> list[SongMetadata]:
 
-        lista_já_processadas = []
+        list_already_processed: list[SongMetadata] = []
         lista = []
+        
+        music: SongMetadata | str
+        for music in os.listdir(path) if len(object_list) == 0 else object_list:
+            filtered_title = None
+            filtered_artist = None
 
-        for musica in os.listdir(caminho) if len(lista_objetos) == 0 else lista_objetos:
-            titulo_filtrado = None
-            artista_filtrado = None
+            music = cls.normalize_song(music)
+            music = os.path.basename(music)
 
-            musica = cls.normalizar_musica(musica)
-            musica = os.path.basename(musica)
-
-            caminho_arquivo = os.path.normpath(
-                os.path.join(caminho, musica)
+            destination_file = os.path.normpath(
+                os.path.join(path, music)
             )
 
-            # FASE 0 - verificação da existencia de dados já alterados pelo próprio player, assim carregamento dos dados já imbutidos.
-            if ExtracaoMetadados.musica_ja_processada(caminho_arquivo):
-                mus = ExtracaoMetadados.extrair_metadados_player(caminho_arquivo)
+            # FASE 0 - verificação da existencia de data já alterados pelo próprio player, assim carregamento dos data já imbutidos.
+            if ExtractMetadata.music_already_processed(destination_file):
+                mus = ExtractMetadata.extract_metadata_playter(destination_file)
                 
-                artista_id = MemoriaArtistas.resolver_id(
-                    mus.get('artista')
-                )
+                artista_id = CacheArtists.resolve_id(mus.get('artist'))
                 
                 dic = await asyncio.to_thread(
-                    ExtracaoMetadados.extrair_imagens_mp3,
-                    caminho_arquivo, 
+                    ExtractMetadata.extact_images_mp3,
+                    destination_file, 
                     mus, 
-                    musica.replace('.mp3', ''),
+                    music.replace('.mp3', ''),
                     artista_id
                 )
                 
-                lista_já_processadas.append(
-                    MusicaMetadados(
-                        id_playlist = id,
-                        artista_id = artista_id,
-                        titulo_musica_filtrado = mus.get('titulo'),
-                        artista_final = mus.get('artista'),
-                        arquivo_mp3_original = musica,
-                        caminho_musica = caminho,
-                        arquivo_mp3_filtrado = None,
-                        artista_arquivo_filtrado = None,
-                        artista_meta_nativo = mus.get('artista'),
-                        artista_titulo_filtrado = None,
-                        consenso = None,
+                list_already_processed.append(
+                    SongMetadata(
+                        playlist_id = id,
+                        artist_id = artista_id,
+                        song_title_id3_filtered = mus.get('title'),
+                        defined_artist = mus.get('artist'),
+                        mp3_file = music,
+                        song_path = path,
+                        mp3_file_title = None,
+                        mp3_file_artist = None,
+                        artist_metadata = mus.get('artist'),
+                        song_artist_id3_filtered = None,
+                        consensus = None,
                         gap = None,
                         score = None,
                         sim_1 = None,
                         sim_2 = None,
-                        lista_artistas_possiveis = [],
-                        status = Status.ALTA,
-                        titulo_musica_original = musica,
-                        img_album = {
-                            'id' : mus.get('id_album'), 
+                        list_of_potential_artists = [],
+                        status = SongStatus.HIGH,
+                        original_song_title = music,
+                        album_metadata = {
+                            'id_deezer' : mus.get('id_album'), 
                             'nome' : mus.get('album'), 
                             'medium' : dic.get('alb'), 
                             'big' : {
                                 'link' : mus.get('imagem_album_player_big'),
-                                'caminho' : caminho_arquivo
+                                'path' : destination_file
                             }
                         },
-                        img_artista = {
-                            'id' : mus.get('id_artista'), 
+                        artist_metadata = {
+                            'id_deezer' : mus.get('id_artista'), 
                             'medium' : dic.get('art'), 
                             'big' : {
                                 'link' : mus.get('imagem_album_player_medium'),
-                                'caminho' : caminho_arquivo
+                                'path' : destination_file
                             }
                         }
                     )
                 )
             else:
                 # FASE 1 - extração de metadados e classificação + filtragem tradicional
-                dados = await ExtracaoMetadados._async_extrair(caminho_arquivo)
+                data = await ExtractMetadata.async_extrair(destination_file)
                 
-                if dados is not None:
-                    if dados['titulo'] is not None:
-                        titulo_filtrado = await Filtragem._async_filtrar_titulo(nome = dados['titulo'])
+                if data is not None:
+                    if data['title'] is not None:
+                        filtered_title = await Filtering.async_filter_title(nome = data['title'])
 
-                    if dados['artista'] is not None:
-                        artista_filtrado = await Filtragem._async_filtrar_artista(artista = dados['artista'])
+                    if data['artist'] is not None:
+                        filtered_artist = await Filtering.async_filter_artist(artist = data['artist'])
                 
-                    if artista_filtrado is not None and titulo_filtrado['artista'] is not None:
-                        lista.append(await PipelineFase1._async_fase_1(
-                            nome_arquivo_original = musica,
-                            titulo_filtrado = titulo_filtrado,
-                            artista_meta_nativo = artista_filtrado
+                    if filtered_artist is not None and filtered_title['artist'] is not None:
+                        lista.append(await Phase1.phase_1(
+                            nome_arquivo_original = music,
+                            filtered_title = filtered_title,
+                            artista_meta_nativo = filtered_artist
                         ))
                     else:
-                        lista.append(await ExtracaoMetadados._async_organiza_dados(
-                            nome_arquivo_original = musica,
-                            titulo_filtrado = titulo_filtrado,
-                            artista_meta_nativo = artista_filtrado,
+                        lista.append(await ExtractMetadata.async_organiza_dados(
+                            nome_arquivo_original = music,
+                            filtered_title = filtered_title,
+                            artista_meta_nativo = filtered_artist,
                             id_artista = '',
                             status = await cls._async_classificar_presenca(
-                                titulo_filtrado = titulo_filtrado, 
-                                artista_filtrado = artista_filtrado    
+                                filtered_title = filtered_title, 
+                                filtered_artist = filtered_artist    
                             ),
                             id_playlist = id
                         ))
         
-        grupo_fase_0 = {Status.METADADOS_FASE_0 : lista_já_processadas}
-        await cls.salvar_dados(grupos = grupo_fase_0)
-        cls.executar_callbacks(caminho)
+        group_phase_0 = {SongStatus.PHASE_0 : list_already_processed}
+        await cls.save_data(groups = group_phase_0)
+        cls.to_execute_callbacks(path)
 
-        grupos = await PipelineFase2._async_fase_2(
+        groups = await PipelineFase2.phase_2(
             lista = lista, 
-            caminho = caminho
+            path = path
         )
         
-        await PipelineFase3._async_fase_3(
-            lista_incompletas = grupos[Status.INCOMPLETO], 
-            caminho = caminho
+        await PipelineFase3.phase_3(
+            lista_incompletas = groups[SongStatus.INCOMPLETE], 
+            path = path
         )
 
-        cls.executar_callbacks(caminho)
+        cls.to_execute_callbacks(path)

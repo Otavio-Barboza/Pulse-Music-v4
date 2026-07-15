@@ -1,8 +1,8 @@
 # imports de back-end
-from project.core.services.account_manager import AccountManager
-from project.core.utils.utils import Utils
-from project.core.song.model.song import Song
-from project.core.favorite.enum.favorite_enum import Favorited
+from core.services.account_manager import AccountManager
+from core.utils.utils import Utils
+from core.song.model.song import Song
+from core.favorite.enum.favorite_enum import Favorited
 
 # imports gerais
 import json, os
@@ -10,11 +10,11 @@ import json, os
 
 class FavoriteRepository:
 
-    CAMINHO_FAVORITAS = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Song/favoritas.json'
+    CAMINHO_FAVORITAS = f"Assets/Data/Contas/{'AccountManager.accounts_cache[current_account]'}/Song/favoritas.json"
 
     @classmethod
     def format_object_in_json(cls, data: Song, status: Favorited) -> str | dict[str, dict[str, str]]:
-        from project.core.song.enum.song_enum import ReproductionMode
+        from core.song.enum.song_enum import ReproductionMode
         return data.chave, {
             'status' : status,
             'nome' : data.nome,

@@ -1,8 +1,8 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.services.controllers.estado_section import EstadoSection
+from core.services.controllers.estado_section import EstadoSection
 
 # import geral
 import flet as ft

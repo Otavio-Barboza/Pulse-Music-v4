@@ -1,3 +1,5 @@
+# import de back-end
+# from core.services.account_manager import AccountManager
 # imports gerais
 from pathlib import Path
 import os
@@ -6,10 +8,10 @@ import os
 class AppPaths:
 
     # assets local
-    LOCAL_ASSETS: Path = "project"
+    BASE_DIR = Path(__file__).resolve().parents[2]  # ajuste conforme a localização deste arquivo
 
     # assets
-    ASSETS: Path = LOCAL_ASSETS / "assets" / "auth"
+    ASSETS_JSON: Path = BASE_DIR / "assets" / "auth" / "client_secret_google.json"
 
 
     # local app data do windows
@@ -24,7 +26,4 @@ class AppPaths:
     ACCOUNT_JSON: Path = LOCAL_APP_DATA / "accounts.json"
 
 
-print(AppPaths.LOCAL_APP_DATA)
-print(AppPaths.ACCOUNT)
-print(AppPaths.CONFIG)
-print(AppPaths.CACHE)
+print(AppPaths.ACCOUNT_JSON)

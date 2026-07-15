@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.meta.repository.tasks import Task
+from core.meta.repository.tasks import Task
 
 # import geral
 import re

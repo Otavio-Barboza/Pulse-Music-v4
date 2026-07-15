@@ -1,8 +1,8 @@
 # import do colors
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.services.account_manager import AccountManager
+from core.services.account_manager import AccountManager
 
 # imports gerais
 from pathlib import Path

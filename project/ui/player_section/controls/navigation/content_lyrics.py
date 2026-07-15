@@ -1,8 +1,8 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.lyrics.controller.lyrics_services import LyricsServices 
+from core.lyrics.controller.lyrics_services import LyricsServices 
 
 # import geral
 import flet as ft
@@ -20,17 +20,17 @@ class LyricsContainer(ft.Container):
         self.content = ft.Column(
             controls = [
                 ft.Text(
-                    value = self.carregar_letra(),
+                    value = self.load_lyric(),
                     size = 18,
                     weight = ft.FontWeight.W_500
                 )
             ]
         )
 
-        self.callback = self.atualizar_letra
+        self.callback = self.update_lyric
         LyricsServices.register_callback(
             event = "actualization_lyric",
-            callback = self.atualizar_letra
+            callback = self.update_lyric
         )
 
     def did_mount(self):
@@ -42,10 +42,10 @@ class LyricsContainer(ft.Container):
         if self.callback in LyricsServices.callbacks["actualization_lyric"]:
             LyricsServices.callbacks["actualization_lyric"].remove(self.callback)
         
-    def carregar_letra(self) -> str:
-        from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
-        return LetrasMemoria.retornar_letra()
+    def load_lyric(self) -> str:
+        from core.lyrics.cache.cache_lyrics import CacheLyrics
+        return CacheLyrics.return_lyric()
     
-    def atualizar_letra(self, *_):
-        self.content.controls[0].value = self.carregar_letra()
+    def update_lyric(self, *_):
+        self.content.controls[0].value = self.load_lyric()
         self.update()

@@ -1,6 +1,6 @@
 # mport de back-end
-from project.core.meta.models.song import SongMetadata
-from project.core.services.account_manager import AccountManager
+from core.meta.models.song import SongMetadata
+from core.services.account_manager import AccountManager
 
 # imports gerais
 from mutagen import File

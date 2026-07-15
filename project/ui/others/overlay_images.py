@@ -1,9 +1,9 @@
 # import de interface
-from project.ui.others.colors import color
-from project.ui.playlist.base.music_list import ListViewMusic
+from ui.others.colors import color
+from ui.playlist.base.music_list import ListViewMusic
 
 # import de back-end
-from project.core.services.controllers.grid_state import GridMode
+from core.services.controllers.grid_state import GridMode
 
 # import geral
 import flet as ft

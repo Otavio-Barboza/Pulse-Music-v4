@@ -1,9 +1,9 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # imports de back-end
-from project.core.playlists.enum.playlist_enum import PlalistOverlayMode
-from project.core.meta.pipeline.pipeline import Pipeline
+from core.playlists.enum.playlist_enum import PlalistOverlayMode
+from core.meta.pipeline.pipeline import Pipeline
 
 # imports gerais
 from tkinter import filedialog, Tk

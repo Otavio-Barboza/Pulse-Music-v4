@@ -15,7 +15,7 @@ class Utils:
             return
         
         with open(path, 'w', encoding = 'utf-8') as js:
-            json.dump(data or {}, js, indent = 4, ensure_ascii = False)
+            json.dump(data, js, indent = 4, ensure_ascii = False)
 
     @classmethod
     def sync_load_json(cls, path: Path) -> dict:
@@ -23,7 +23,7 @@ class Utils:
             return json.load(js)
 
     @classmethod
-    def sync_update_json(cls, path, data: dict):
+    def sync_update_json(cls, path: Path, data: dict):
         with open(path, 'w', encoding = 'utf-8') as js:
             json.dump(data or {}, js, indent = 4, ensure_ascii = False)
 

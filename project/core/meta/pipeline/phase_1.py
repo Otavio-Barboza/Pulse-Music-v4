@@ -1,8 +1,8 @@
 # imports de back-end
-from project.core.meta.repository.tasks import Task
-from project.core.meta.enum.status import SongStatus
-from project.core.meta.models.song import SongMetadata
-from project.core.meta.repository.extract_metadata import ExtractMetadata
+from core.meta.repository.tasks import Task
+from core.meta.enum.status import SongStatus
+from core.meta.models.song import SongMetadata
+from core.meta.repository.extract_metadata import ExtractMetadata
 
 
 class Phase1:

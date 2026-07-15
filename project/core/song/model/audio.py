@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.song.model.monitoring import Monitoring
+from core.song.model.monitoring import Monitoring
 
 # import geral
 import threading

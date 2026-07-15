@@ -1,13 +1,13 @@
 # imports de back-end
-from project.core.meta.repository.filtering import Filtering
-from project.core.meta.repository.tasks import Task
-from project.core.meta.enum.status import SongStatus
-from project.core.meta.provider.deezer import FontManager
-from project.core.meta.models.song import SongMetadata
-from project.core.meta.repository.extract_metadata import ExtractMetadata
-from project.core.meta.cache.cache_artists import CacheArtists
-from project.core.meta.repository.metadata_repository import MetadataRepository
-from project.core.services.account_manager import AccountManager       
+from core.meta.repository.filtering import Filtering
+from core.meta.repository.tasks import Task
+from core.meta.enum.status import SongStatus
+from core.meta.provider.deezer import FontManager
+from core.meta.models.song import SongMetadata
+from core.meta.repository.extract_metadata import ExtractMetadata
+from core.meta.cache.cache_artists import CacheArtists
+from core.meta.repository.metadata_repository import MetadataRepository
+from core.services.account_manager import AccountManager       
 
 # imports gerais
 from pathlib import Path

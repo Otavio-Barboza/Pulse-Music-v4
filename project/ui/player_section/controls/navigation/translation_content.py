@@ -1,8 +1,8 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.lyrics.controller.lyrics_services import LyricsServices
+from core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
 import flet as ft

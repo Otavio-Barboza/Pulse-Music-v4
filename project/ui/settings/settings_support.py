@@ -1,10 +1,10 @@
 # import de interface
-from project.ui.others.colors import colors
-from project.ui.utils.utils_ui import UtilsUi
+from ui.others.colors import color
+from ui.utils.utils_ui import UtilsUi
 
 # imports de back-end
-from project.core.services.email_service import send_email
-from project.core.services.account_manager import AccountManager
+from core.services.email_service import send_email
+from core.services.account_manager import AccountManager
 
 # import geral
 import flet as ft
@@ -19,7 +19,7 @@ class SettingsSupport(ft.Container):
         self.text_field = ft.TextField(
             hint_text = 'Digite a mensagem...',
             hint_style = ft.TextStyle(
-                color = colors.cinza1,
+                color = color.cinza1,
                 size = 16
             ),
 
@@ -30,20 +30,20 @@ class SettingsSupport(ft.Container):
             multiline = True,
             height = 150,
             filled = True,
-            fill_color = colors.preto4,
+            fill_color = color.preto4,
             border_color = ft.Colors.TRANSPARENT,
             width = 700,
             
             label_style = ft.TextStyle(
-                color = colors.branco
+                color = color.branco
             ),
             
             text_style = ft.TextStyle(
-                color = colors.branco,
+                color = color.branco,
                 size = 16
             ),
 
-            cursor_color = colors.amarelo,
+            cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10)
         )
 
@@ -68,7 +68,7 @@ class SettingsSupport(ft.Container):
                             controls = [
                                 ft.CircleAvatar(
                                     radius = 40,
-                                    bgcolor = colors.branco,
+                                    bgcolor = color.branco,
                                     content = ft.Image(
                                         src = r'Assets\Global\Images\Logo\logo_v2.png',
                                         border_radius = ft.border_radius.all(100),
@@ -78,7 +78,7 @@ class SettingsSupport(ft.Container):
                                 ),
                                 self._create_texts(
                                     text = 'Suporte Pulse Music',
-                                    text_color = colors.branco_puro,
+                                    text_color = color.branco_puro,
                                     weight = ft.FontWeight.BOLD,
                                     size = 48,
                                     max_lines = 2
@@ -94,7 +94,7 @@ class SettingsSupport(ft.Container):
                     
                             content = self._create_texts(
                                 text = '→  Aqui você possui o suporte do que necessitar referente ao app. Envie dúvidas, problemas ou feedbacks. \n→   Basta digitar a mensagem na caixa de text e para confirmar, clique em salvar.',
-                                text_color = colors.branco_puro,
+                                text_color = color.branco_puro,
                                 weight = ft.FontWeight.W_400,
                                 size = 20,
                                 max_lines = 7,
@@ -114,7 +114,7 @@ class SettingsSupport(ft.Container):
                                 controls = [
                                     self._create_texts(
                                         text = ' E-mail do suporte: barbozaotavio17@gmail.com',
-                                        text_color = colors.branco_puro,
+                                        text_color = color.branco_puro,
                                         weight = ft.FontWeight.W_400,
                                         size = 18,
                                         max_lines = 5,
@@ -137,12 +137,12 @@ class SettingsSupport(ft.Container):
 
                                     style = ft.ButtonStyle(
                                         bgcolor = {
-                                            ft.ControlState.DEFAULT : colors.amarelo,
-                                            ft.ControlState.HOVERED : colors.amarelo2
+                                            ft.ControlState.DEFAULT : color.amarelo,
+                                            ft.ControlState.HOVERED : color.amarelo2
                                         },
 
                                         padding = ft.padding.all(10),
-                                        color = colors.preto_puro_5,
+                                        color = color.preto_puro_5,
                                         shape = ft.RoundedRectangleBorder(radius = 20),
                                         alignment = ft.alignment.center,
                                         text_style = ft.TextStyle(
@@ -174,7 +174,7 @@ class SettingsSupport(ft.Container):
 
         Args:
             text (str): text desejado colocar
-            text_color (str): colors a definir para o text
+            text_color (str): color a definir para o text
             weight (ft.FontWeight): expessura da fonte
             size (int): size da fonte
             overflow (ft.TextOverflow, optional): Encolhimento do text conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }

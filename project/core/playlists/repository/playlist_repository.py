@@ -1,10 +1,10 @@
 # imports de back-end
-from project.core.utils.utils import Utils
-from project.core.services.account_manager import AccountManager
-from project.core.playlists.models.playlist import Playlist
-from project.core.playlists.models.playlist_config import PlaylistConfig
-from project.core.playlists.models.playlist_card import PlaylistCard
-from project.core.playlists.repository.path import CreatePlaylist
+from core.utils.utils import Utils
+from core.services.account_manager import AccountManager
+from core.playlists.models.playlist import Playlist
+from core.playlists.models.playlist_config import PlaylistConfig
+from core.playlists.models.playlist_card import PlaylistCard
+from core.playlists.repository.path import CreatePlaylist
 
 # imports gerais
 from pathlib import Path

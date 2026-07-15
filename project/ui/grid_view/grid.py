@@ -1,12 +1,12 @@
 # import de interface
-from project.ui.others.overlay_images import OverlayImages
+from ui.others.overlay_images import OverlayImages
 
 # imports de back-end
-from project.core.services.controllers.grid_state import GridMode, GridState
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.meta.cache.global_cache import cache_metadata
-from project.core.meta.repository.extract_metadata import ExtractMetadata
-from project.core.services.account_manager import AccountManager
+from core.services.controllers.grid_state import GridMode, GridState
+from core.song.enum.song_enum import ReproductionMode
+from core.meta.cache.global_cache import cache_metadata
+from core.meta.repository.extract_metadata import ExtractMetadata
+from core.services.account_manager import AccountManager
 
 # imports gerais
 import flet as ft
@@ -34,8 +34,8 @@ class GridImages(ft.GridView):
         )
     
     def click(self, e):
-        from project.core.song.model.song import Song
-        from project.core.song.model.reproduction import Reproduction
+        from core.song.model.song import Song
+        from core.song.model.reproduction import Reproduction
         
         song_list = []
         

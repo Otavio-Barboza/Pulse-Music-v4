@@ -1,19 +1,19 @@
 # imports de back-end
-from project.core.meta.enum.status import SongStatus, ScannerStatus
-from project.core.meta.models.song import SongMetadata
-from project.core.meta.pipeline.phase_1 import Phase1
-from project.core.meta.pipeline.phase_2 import Phase2
-from project.core.meta.pipeline.phase_3 import Phase3
-from project.core.meta.repository.filtering import Filtering
-from project.core.meta.repository.extract_metadata import ExtractMetadata
-from project.core.meta.repository.metadata_repository import MetadataRepository
-from project.core.meta.cache.cache_artists import CacheArtists
-from project.core.meta.models.scanner_model import ScannerModel
-from project.core.meta.scanner.scanner import Scanner
-from project.core.meta.controller.scanner_controller import ScannerController
-from project.core.playlists.controller.playlist_state import PlaylistState
-from project.core.services.controllers.grid_state import GridState, GridMode
-from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+from core.meta.enum.status import SongStatus, ScannerStatus
+from core.meta.models.song import SongMetadata
+from core.meta.pipeline.phase_1 import Phase1
+from core.meta.pipeline.phase_2 import Phase2
+from core.meta.pipeline.phase_3 import Phase3
+from core.meta.repository.filtering import Filtering
+from core.meta.repository.extract_metadata import ExtractMetadata
+from core.meta.repository.metadata_repository import MetadataRepository
+from core.meta.cache.cache_artists import CacheArtists
+from core.meta.models.scanner_model import ScannerModel
+from core.meta.scanner.scanner import Scanner
+from core.meta.controller.scanner_controller import ScannerController
+from core.playlists.controller.playlist_state import PlaylistState
+from core.services.controllers.grid_state import GridState, GridMode
+from core.playlists.enum.playlist_enum import PlaylistLoaded
 
 # imports gerais
 from pathlib import Path
@@ -170,7 +170,6 @@ class Pipeline:
                         song_path = path,
                         mp3_file_title = None,
                         mp3_file_artist = None,
-                        artist_metadata = mus.get('artist'),
                         song_artist_id3_filtered = None,
                         consensus = None,
                         gap = None,

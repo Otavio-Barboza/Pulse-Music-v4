@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.meta.enum.status import SongStatus
+from core.meta.enum.status import SongStatus
 
 # import geral
 from pathlib import Path

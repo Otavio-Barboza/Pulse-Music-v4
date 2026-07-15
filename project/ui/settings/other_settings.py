@@ -1,9 +1,9 @@
 # import de interface
-from project.ui.others.colors import colors
+from ui.others.colors import color
 
 # imports de back-end
-from project.core.services.account_manager import StateApp
-from project.core.services.settings.service_settings import ServiceSettings
+from core.services.account_manager import StateApp
+from core.services.settings.service_settings import ServiceSettings
 
 # import geral
 import flet as ft
@@ -19,10 +19,10 @@ class OtherSettings(ft.Container):
             label = 'Ativar dicas',
             value = ServiceSettings.load_overlay(),
             on_change = self._switch_value_changed,
-            active_track_color = colors.preto_puro_5,
-            inactive_track_color = colors.branco,
-            active_color = colors.amarelo4,
-            inactive_thumb_color = colors.preto1,
+            active_track_color = color.preto_puro_5,
+            inactive_track_color = color.branco,
+            active_color = color.amarelo4,
+            inactive_thumb_color = color.preto1,
             label_position = ft.LabelPosition.RIGHT,
             
             label_style = ft.TextStyle(

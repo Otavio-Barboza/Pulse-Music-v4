@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.song.controller.reproduction_manager import ReproductionManager
+from core.song.controller.reproduction_manager import ReproductionManager
 
 # import geral
 import flet as ft

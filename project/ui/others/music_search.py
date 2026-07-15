@@ -1,5 +1,5 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # imports gerais
 import asyncio, pywhatkit

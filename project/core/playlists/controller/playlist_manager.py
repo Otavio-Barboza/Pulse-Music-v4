@@ -1,9 +1,9 @@
 # imports de back-end
-from project.core.utils.utils import Utils
-from project.core.services.account_manager import AccountManager
-from project.core.playlists.enum.playlist_enum import PlaylistMode
-from project.core.playlists.repository.playlist_repository import PlaylistRepository
-from project.core.playlists.models.playlist_config import PlaylistConfig
+from core.utils.utils import Utils
+from core.services.account_manager import AccountManager
+from core.playlists.enum.playlist_enum import PlaylistMode
+from core.playlists.repository.playlist_repository import PlaylistRepository
+from core.playlists.models.playlist_config import PlaylistConfig
 
 # import geral
 from flet import GridView

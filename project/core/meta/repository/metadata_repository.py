@@ -1,8 +1,8 @@
 # import de back-end
-from project.core.services.account_manager import AccountManager
-from project.core.meta.repository.tasks import Task
-from project.core.utils.utils import Utils
-from project.core.meta.models.song import SongMetadata
+from core.services.account_manager import AccountManager
+from core.meta.repository.tasks import Task
+from core.utils.utils import Utils
+from core.meta.models.song import SongMetadata
 
 # imports gerais
 from pathlib import Path
@@ -47,8 +47,8 @@ class MetadataRepository:
     
     @classmethod
     async def load_cache(cls):
-        from project.core.meta.cache.cache_artists import CacheArtists
-        from project.core.meta.cache.global_cache import cache_metadata
+        from core.meta.cache.cache_artists import CacheArtists
+        from core.meta.cache.global_cache import cache_metadata
 
         dados = await cls.ler_json(f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json')
         cache_metadata.load(dados)

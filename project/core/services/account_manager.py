@@ -1,8 +1,8 @@
 # imports de back-end
-from project.core.user.models.user import User
-from project.core.services.controllers.state_app import StateApp
-from project.core.utils.utils import Utils
-from project.core.utils.path import AppPaths
+from core.user.models.user import User
+from core.services.controllers.state_app import StateApp
+from core.utils.utils import Utils
+from core.utils.path import AppPaths
 
 # imports gerais
 from typing import Optional
@@ -28,49 +28,58 @@ class AccountManager:
         _summary_: Função para criar toda a estrutura base de pastas e arquivos JSON necessários para operação do aplicativo.
 
         Args:
-            base_path (Path): caminho base para criação de cada pasta ou arquivo.
+            base_path (Path): path base para criação de cada pasta ou arquivo.
             data_profile (dict[str, str]): dados do perfil do usuário.
             data_playlist (dict[str, str  |  int  |  dict]): dados das playlist.
             data_settings (dict[str, dict[str, bool]]): dados de configurações (overlays)
         """
+        Utils.create_path(path = base_path)
 
         # geral da conta
-        Utils.create_json(caminho = base_path / "profile.json", conteudo = data_profile)
-        Utils.create_json(caminho = base_path / "settings.json", conteudo = data_settings)
-        Utils.create_json(caminho = base_path / "playlists.json", conteudo = data_playlist)
+        Utils.create_json(path = base_path / "profile.json", data = data_profile)
+        Utils.create_json(path = base_path / "settings.json", data = data_settings)
+        Utils.create_json(path = base_path / "playlists.json", data = data_playlist)
 
         # playlist
-        Utils.create_path(caminho = base_path / "playlists")
+        Utils.create_path(path = base_path / "playlists")
 
         # Music e metas
-        Utils.create_path(caminho = base_path / "music")
-        Utils.create_json(caminho = base_path / "lyrics.json", conteudo = {})
-        Utils.create_json(caminho = base_path / "artists.json", conteudo = {})
-        Utils.create_json(caminho = base_path / "favorite.json", conteudo = {})
-        Utils.create_json(caminho = base_path / "music.json", conteudo = {})
+        Utils.create_path(path = base_path / "music")
+        Utils.create_json(path = base_path / "music" / "lyrics.json", data = {})
+        Utils.create_json(path = base_path / "music" / "artists.json", data = {})
+        Utils.create_json(path = base_path / "music" / "favorites.json", data = {})
+        Utils.create_json(path = base_path / "music" / "songs.json", data = {})
 
         # imagens
-        Utils.create_path(caminho = base_path / "images")
-        Utils.create_path(caminho = base_path / "images" / "covers")
-        Utils.create_path(caminho = base_path / "images" / "albums")
-        Utils.create_path(caminho = base_path / "images" / "artists")
+        Utils.create_path(path = base_path / "images")
+        Utils.create_path(path = base_path / "images" / "covers")
+        Utils.create_path(path = base_path / "images" / "albums")
+        Utils.create_path(path = base_path / "images" / "artists")
 
 
     # leitura e inserção dos dados em contas.json
     @classmethod
-    def load_json_accounts(cls):
+    def load_json_accounts(cls) -> bool:
         """
-            Função para carregar o contas.json armazenando os cados em cache (cls.accounts_cache).
+            Função para carregar o accounts.json armazenando os cados em cache (cls.accounts_cache).
         """
-        cls.accounts_cache = Utils.sync_load_json(AppPaths.ACCOUNT_JSON)
+        print(f"EXISTE: {AppPaths.ACCOUNT_JSON.exists()}")
+
+        if AppPaths.ACCOUNT_JSON.exists():
+            print(cls.accounts_cache)
+            cls.accounts_cache = Utils.sync_load_json(AppPaths.ACCOUNT_JSON)
+            print(cls.accounts_cache)
+            return True
+        else:
+            return False
 
     @classmethod
     def save_accounts_json(cls):
         """
-            Salva os dados novos no contas.json (cls.accounts_cache).
+            Salva os dados novos no accounts.json (cls.accounts_cache).
         """
         if cls.accounts_cache is None:
-            cls.accounts_cache = {'current_acount' : None, 'account' : []}
+            cls.accounts_cache = {"current_account" : None, "accounts" : []}
 
         Utils.sync_update_json(
             path = AppPaths.ACCOUNT_JSON,
@@ -91,7 +100,7 @@ class AccountManager:
 
         if cls.accounts_cache is None:
             cls.load_json_accounts()
-        for account in cls.accounts_cache.get("account", []):
+        for account in cls.accounts_cache.get("accounts", []):
             if account.get("id") == account_id:
                 return account
         return None
@@ -99,7 +108,7 @@ class AccountManager:
 
     # carregar/instanciar Usuario
     @classmethod
-    def load_account(cls, account_id : str, base_path : str, data : dict | None = None):
+    def load_account(cls, account_id: str, base_path: Path, data: dict | None = None):
         """
             Cria Usuario e coloca em memoria. Se 'data' for None ou estiver incompleto, tenta ler perfil.json da base_path.
 
@@ -171,11 +180,16 @@ class AccountManager:
         if cls.search_account_index(account_id) is not None:
             return False
         
-        novo = {"id" : account_id, "name" : name, "email" : email, "base_path" : base_path}
+        novo = {
+            "id" : account_id, 
+            "name" : name, 
+            "email" : email, 
+            "base_path" : str(base_path) #transformando em string para salvar no JSON
+        }
 
         # adicionando uma nova conta a lista de contas do cache
-        cls.accounts_cache['account'].append(novo)
-        cls.accounts_cache['current_acount'] = account_id
+        cls.accounts_cache["accounts"].append(novo)
+        cls.accounts_cache["current_account"] = account_id
         cls.save_accounts_json()
         
         return True
@@ -194,12 +208,12 @@ class AccountManager:
         """
         cls.load_json_accounts()
         
-        account: dict = cls.search_account_index(account_id)
+        accounts: dict = cls.search_account_index(account_id)
 
-        if not account:
+        if not accounts:
             return False
         
-        account["name"] = new_name
+        accounts["name"] = new_name
         cls.save_accounts_json()
 
         return True
@@ -217,31 +231,33 @@ class AccountManager:
         """
         cls.load_json_accounts()
         
-        account: dict = cls.search_account_index(account_id)
+        accounts: dict = cls.search_account_index(account_id)
 
-        if not account:
+        if not accounts:
             return False
         
-        path: str = account.get("pasta_base")
+        path: str = accounts.get("pasta_base")
 
         # carrega Usuario a partir do perfil.json
-        cls.load_account(account_id = account_id, pasta_base = path, dados = account)
+        cls.load_account(account_id = account_id, pasta_base = path, dados = accounts)
         cls.accounts_cache["current_acount"] = account_id
         cls.save_accounts_json()
 
         return True
     
     @classmethod
-    def read_current_account_index(cls) -> str:
+    def read_current_account_index(cls) -> str | None:
         """
             Função para ler a conta atual logada.
 
         Returns:
             str : ID da conta atual logada
         """
-        cls.load_json_accounts()
-        return cls.accounts_cache.get("current_acount")
-    
+        if cls.load_json_accounts():
+            return cls.accounts_cache.get("current_account")
+        else:
+            return None
+        
     @classmethod
     def delete_account(cls, account_id : str):
         """
@@ -259,14 +275,14 @@ class AccountManager:
         if path.exists():
             shutil.rmtree(path)
 
-        cls.accounts_cache["account"] = [
-            conta for conta in cls.accounts_cache["account"]
+        cls.accounts_cache["accounts"] = [
+            conta for conta in cls.accounts_cache["accounts"]
             if conta.get("id") != account_id
         ]
 
         if account_id:
-            if cls.accounts_cache.get("account"):
-                other_account = cls.accounts_cache.get("account")[0]
+            if cls.accounts_cache.get("accounts"):
+                other_account = cls.accounts_cache.get("accounts")[0]
                 
                 cls.accounts_cache["current_acount"] = other_account.get("id")
                 cls.save_accounts_json()

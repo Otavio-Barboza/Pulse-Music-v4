@@ -1,10 +1,9 @@
 # imports de back-end
-from project.core.lyrics.model.genius import Genius
-from project.core.lyrics.translate.translator import Translator
-from project.core.lyrics.cache.cache_lyrics import CacheLyrics
-from project.core.lyrics.translate.language_detect import language_detect
-from project.core.song.controller.reproduction_manager import ReproductionManager
-from project.core.utils.utils import Utils
+from core.lyrics.model.genius import Genius
+from core.lyrics.translate.translator import Translator
+from core.lyrics.cache.cache_lyrics import CacheLyrics
+from core.lyrics.translate.language_detect import language_detect
+from core.utils.utils import Utils
 
 # import geral
 import requests
@@ -116,6 +115,8 @@ class LyricsServices:
 
     @classmethod
     def start_translation(cls, language: str):
+        from core.song.controller.reproduction_manager import ReproductionManager
+
         if ReproductionManager.state.current_song is None:
             return "Nenhuma lyric carregada para tradução"
         

@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.song.model.song import Song
+from core.song.model.song import Song
 
 # import geral
 from dataclasses import dataclass

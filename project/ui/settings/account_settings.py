@@ -1,11 +1,11 @@
 # import de interface
-from project.ui.others.colors import colors
+from ui.others.colors import color
 
 # imports de back-end
-from project.core.services.controllers.state_app import StateApp
-from project.core.services.auth.google_login_auth import login_google
-from project.core.services.account_manager import AccountManager
-from project.core.user.models.user import User
+from core.services.controllers.state_app import StateApp
+from core.services.auth.google_login_auth import login_google
+from core.services.account_manager import AccountManager
+from core.user.models.user import User
 
 # import geral
 import flet as ft
@@ -22,27 +22,27 @@ class AccountSettings(ft.Container):
         self.text_field = ft.TextField(
             hint_text = 'Digite novo nome...',
             hint_style = ft.TextStyle(
-                color = colors.cinza1,
+                color = color.cinza1,
                 size = 16
             ),
 
             border_radius = ft.border_radius.all(12),
             height = 50,
             filled = True,
-            fill_color = colors.preto4,
+            fill_color = color.preto4,
             border_color = ft.Colors.TRANSPARENT,
             width = 700,
             
             label_style = ft.TextStyle(
-                color = colors.branco
+                color = color.branco
             ),
             
             text_style = ft.TextStyle(
-                color = colors.branco,
+                color = color.branco,
                 size = 16
             ),
 
-            cursor_color = colors.amarelo,
+            cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
             on_submit = self.novo_nome_user
         )
@@ -88,7 +88,7 @@ class AccountSettings(ft.Container):
             
                 controls = [
                     ft.Container(
-                        bgcolor = colors.preto8,
+                        bgcolor = color.preto8,
                         border_radius = ft.border_radius.all(10),
                         alignment = ft.alignment.center,
                         padding = ft.padding.symmetric(
@@ -147,16 +147,16 @@ class AccountSettings(ft.Container):
                     self._create_button(
                         text_button = 'Adicionar new conta', 
                         id = 'new', 
-                        background_color = colors.amarelo3,
-                        text_color = colors.preto7,
+                        background_color = color.amarelo3,
+                        text_color = color.preto7,
                         function = self._action_items
                     ),
 
                     self._create_button(
                         text_button = 'Trocar de conta', 
                         id = 'alter', 
-                        background_color = colors.amarelo3,
-                        text_color = colors.preto7,
+                        background_color = color.amarelo3,
+                        text_color = color.preto7,
                         function = self._action_items
                     ),
                     self.account_selection,
@@ -164,8 +164,8 @@ class AccountSettings(ft.Container):
                     self._create_button(
                         text_button = 'Excluir atual conta', 
                         id = 'delete',
-                        background_color = colors.preto_puro_3,
-                        text_color = colors.branco,
+                        background_color = color.preto_puro_3,
+                        text_color = color.branco,
                         function = self._action_items
                     )
                 ]
@@ -197,8 +197,8 @@ class AccountSettings(ft.Container):
         Args:
             text_button (str): text do botão a ser atribuído
             id (str): sessão responsável pelo botão
-            background_color (str): colors do fundo do botão
-            text_color (str | ft.Colors): colors do text do botão
+            background_color (str): color do fundo do botão
+            text_color (str | ft.Colors): color do text do botão
             function (function | def): função a ser atribuída ao clicar no botão
 
         Returns:
@@ -217,11 +217,11 @@ class AccountSettings(ft.Container):
                     ft.ControlState.HOVERED : background_color
                 },
                 color = {
-                    ft.ControlState.DEFAULT : colors.branco,
+                    ft.ControlState.DEFAULT : color.branco,
                     ft.ControlState.HOVERED : text_color
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(width = 2, color = colors.branco)
+                    ft.ControlState.HOVERED : ft.BorderSide(width = 2, color = color.branco)
                 },
                 padding = ft.padding.symmetric(
                     vertical = 17.5,
@@ -256,7 +256,7 @@ class AccountSettings(ft.Container):
                         value = 'Não há outras accounts salvas. Crie outra para selecioná-la!',
                         weight = ft.FontWeight.W_500,
                         size = 16,
-                        color = colors.branco,
+                        color = color.branco,
                         max_lines = 2,
                         overflow = ft.TextOverflow.FADE
                     )
@@ -280,9 +280,9 @@ class AccountSettings(ft.Container):
                                 style = ft.ButtonStyle(
                                     bgcolor = {
                                         ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                                        ft.ControlState.HOVERED : colors.preto8
+                                        ft.ControlState.HOVERED : color.preto8
                                     },
-                                    color = colors.branco,
+                                    color = color.branco,
                                     padding = ft.padding.symmetric(
                                         vertical = 15,
                                         horizontal = 15
@@ -436,7 +436,7 @@ class SelecionarContaObrigatória(ft.Container):
             expand = True,
             alignment = ft.alignment.center,
             blur = 5,
-            bgcolor = ft.Colors.with_opacity(0.9, colors.preto1)
+            bgcolor = ft.Colors.with_opacity(0.9, color.preto1)
         )
 
         self.on_click = on_click
@@ -446,7 +446,7 @@ class SelecionarContaObrigatória(ft.Container):
 
         self.content = ft.Container(
             alignment = ft.alignment.center,
-            bgcolor = colors.preto7,
+            bgcolor = color.preto7,
             height = 600,
             width = 400,
             padding = ft.padding.all(25),
@@ -459,7 +459,7 @@ class SelecionarContaObrigatória(ft.Container):
                     ft.Text(
                         value = 'Selecione uma das accounts disponíveis.',
                         size = 24,
-                        color = colors.branco,
+                        color = color.branco,
                         weight = ft.FontWeight.BOLD,
                         max_lines = 2,
                         text_align = ft.TextAlign.CENTER
@@ -512,11 +512,11 @@ class SelecionarContaObrigatória(ft.Container):
 
                 style = ft.ButtonStyle(
                     bgcolor = {
-                        ft.ControlState.DEFAULT : colors.preto8,
-                        ft.ControlState.HOVERED : colors.amarelo3
+                        ft.ControlState.DEFAULT : color.preto8,
+                        ft.ControlState.HOVERED : color.amarelo3
                     },
                     alignment = ft.alignment.center,
-                    color = colors.branco,
+                    color = color.branco,
                     padding = ft.padding.symmetric(
                         vertical = 15,
                         horizontal = 15

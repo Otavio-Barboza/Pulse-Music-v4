@@ -1,8 +1,8 @@
 # imports de back-end
-from project.core.song.font_reproduction.font_reproduction import ReproductionFont
-from project.core.song.repository.song_repository import SongRepository
-from project.core.song.model.reproduction import Reproduction
-from project.core.song.enum.song_enum import ReproductionMode
+from core.song.font_reproduction.font_reproduction import ReproductionFont
+from core.song.repository.song_repository import SongRepository
+from core.song.model.reproduction import Reproduction
+from core.song.enum.song_enum import ReproductionMode
 
 # import geral
 from pathlib import Path

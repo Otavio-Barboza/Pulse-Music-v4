@@ -1,10 +1,10 @@
 # imports de back-end
-from project.core.song.model.song import Song
-from project.core.song.model.reproduction import Reproduction
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.favorite.repository.favorite_repository import FavoriteRepository
-from project.core.favorite.enum.favorite_enum import Favorited
-from project.core.utils.utils import Utils
+from core.song.model.song import Song
+from core.song.model.reproduction import Reproduction
+from core.song.enum.song_enum import ReproductionMode
+from core.favorite.repository.favorite_repository import FavoriteRepository
+from core.favorite.enum.favorite_enum import Favorited
+from core.utils.utils import Utils
 
 # import geral
 import inspect, asyncio

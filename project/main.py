@@ -1,23 +1,23 @@
 # imports de arquivos de interface
-from project.ui.app_bar.app_bar import AppBar
-from project.ui.player_section.section_player import PlayerSection
-from project.ui.settings.screen_settings import ScreenSettings
-from project.ui.navigation.tabs import TabsNavigation
-from project.ui.others.colors import color
+from ui.app_bar.app_bar import AppBar
+from ui.player_section.section_player import PlayerSection
+from ui.settings.screen_settings import ScreenSettings
+from ui.navigation.tabs import TabsNavigation
+from ui.others.colors import color
 
 # imports de arquivos back-end
-from project.core.services.controllers.state_app import StateApp
-from project.core.services.auth.google_login_auth import login_google
-from project.core.utils.utils import Utils
-from project.core.utils.path import AppPaths
-from project.core.services.account_manager import AccountManager
-from project.core.services.controllers.resize_manager import ResizeManager
-from project.core.song.model.audio import AudioLoop
-from project.core.song.controller.reproduction_manager import ReproductionManager
-from project.core.meta.models.scanner_model import ScannerModel
-from project.core.meta.cache.global_cache import cache_metadata
-from project.core.meta.cache.cache_artists import CacheArtists
-from project.core.lyrics.cache.cache_lyrics import CacheLyrics
+from core.services.controllers.state_app import StateApp
+from core.services.auth.google_login_auth import login_google
+from core.utils.utils import Utils
+from core.utils.path import AppPaths
+from core.services.account_manager import AccountManager
+from core.services.controllers.resize_manager import ResizeManager
+from core.song.model.audio import AudioLoop
+from core.song.controller.reproduction_manager import ReproductionManager
+from core.meta.models.scanner_model import ScannerModel
+from core.meta.cache.global_cache import cache_metadata
+from core.meta.cache.cache_artists import CacheArtists
+from core.lyrics.cache.cache_lyrics import CacheLyrics
 
 # imports de bibliotecas  gerais
 from pathlib import Path
@@ -75,8 +75,10 @@ async def main(page: ft.Page):
               →  Se tiver conta logada: notifica o StateApp ("conta_atual") para realizar o carregamento do usuario e informações ao player. 
               →  Senão: notifica o StateApp ("no_account") para realizar o login pelas contas Google.
         """
+        print()
         current_id = AccountManager.read_current_account_index()
-
+        print(current_id)
+        print()
         if current_id is not None:
             data = AccountManager.search_account_index(current_id)
             profile = open_profile(current_id)
@@ -110,7 +112,7 @@ async def main(page: ft.Page):
         page.update()
 
     await validate_login()
-    await load_cache()
+    # await load_cache()
 
     tabs = TabsNavigation()
 

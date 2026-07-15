@@ -1,9 +1,9 @@
 # imports de back-end
-from project.core.song.model.song import Song
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.meta.repository.tasks import Task
-from project.core.utils.utils import Utils
-from project.core.services.account_manager import AccountManager
+from core.song.model.song import Song
+from core.song.enum.song_enum import ReproductionMode
+from core.meta.repository.tasks import Task
+from core.utils.utils import Utils
+from core.services.account_manager import AccountManager
 
 # imports gerais
 from pathlib import Path

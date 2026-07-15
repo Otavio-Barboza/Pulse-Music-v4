@@ -3,7 +3,7 @@ import lyricsgenius, os, dotenv
 
 
 def ler_env():
-    dotenv.load_dotenv(r'Assets\App\Env\.env')
+    dotenv.load_dotenv(r'core\env\.env')
     try:
         return os.getenv('CLIENT_ACCESS_TOKEN')
     except Exception as e:

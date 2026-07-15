@@ -1,6 +1,6 @@
 # imports de interface
-from project.ui.others.colors import color
-from project.ui.playlist.containers.container_card import PlaylistCard
+from ui.others.colors import color
+from ui.playlist.containers.container_card import PlaylistCard
 
 # import de ui
 import flet as ft

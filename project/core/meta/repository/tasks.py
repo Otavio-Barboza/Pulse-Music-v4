@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.meta.models.song import SongMetadata
+from core.meta.models.song import SongMetadata
 
 # imports gerais
 from pathlib import Path

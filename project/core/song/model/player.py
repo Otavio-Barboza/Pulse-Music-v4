@@ -1,5 +1,5 @@
-from project.core.song.model.monitoring import Monitoring
-from project.core.song.model.audio import AudioLoop
+from core.song.model.monitoring import Monitoring
+from core.song.model.audio import AudioLoop
 
 # imports gerais
 from pathlib import Path

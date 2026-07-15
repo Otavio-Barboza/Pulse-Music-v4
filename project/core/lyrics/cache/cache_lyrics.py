@@ -1,6 +1,5 @@
 # import de back-end
-from project.core.utils.utils import Utils
-from project.core.song.controller.reproduction_manager import ReproductionManager
+from core.utils.utils import Utils
 
 
 class CacheLyrics:
@@ -14,6 +13,8 @@ class CacheLyrics:
 
     @classmethod
     def return_lyric(cls) -> str:        
+        from core.song.controller.reproduction_manager import ReproductionManager
+
         if ReproductionManager.state.current_song is None:
             return 'Letra não Encontrada'
         
@@ -30,6 +31,8 @@ class CacheLyrics:
     
     @classmethod
     def return_translated_lyric(cls, language: str) -> str:        
+        from core.song.controller.reproduction_manager import ReproductionManager
+        
         if ReproductionManager.state.current_song is None:
             return None
         

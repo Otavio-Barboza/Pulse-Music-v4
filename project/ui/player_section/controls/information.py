@@ -1,8 +1,8 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.song.controller.reproduction_manager import ReproductionManager
+from core.song.controller.reproduction_manager import ReproductionManager
 
 # import geral
 import flet as ft

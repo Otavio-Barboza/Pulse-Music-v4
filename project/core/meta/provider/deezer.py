@@ -1,5 +1,5 @@
 # import de back-end
-from project.core.meta.models.base import MetadataSource
+from core.meta.models.base import MetadataSource
 
 # imports gerais
 import aiohttp, asyncio

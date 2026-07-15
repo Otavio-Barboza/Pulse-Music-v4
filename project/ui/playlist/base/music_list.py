@@ -1,16 +1,16 @@
 # import de interface
-from project.ui.others.colors import color
-from project.ui.playlist.containers.music_container import RowContainer
+from ui.others.colors import color
+from ui.playlist.containers.music_container import RowContainer
 
 # import de back-end
-from project.core.song.model.song import Song
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.song.font_reproduction.font_playlist import PlaylistFont
-from project.core.song.controller.reproduction_manager import ReproductionManager
-from project.core.playlists.enum.playlist_enum import PlaylistLoaded
-from project.core.playlists.controller.playlist_state import PlaylistState
-from project.core.favorite.enum.favorite_enum import Favorited
-from project.core.favorite.controller.favoritas_controller import FavoriteState
+from core.song.model.song import Song
+from core.song.enum.song_enum import ReproductionMode
+from core.song.font_reproduction.font_playlist import PlaylistFont
+from core.song.controller.reproduction_manager import ReproductionManager
+from core.playlists.enum.playlist_enum import PlaylistLoaded
+from core.playlists.controller.playlist_state import PlaylistState
+from core.favorite.enum.favorite_enum import Favorited
+from core.favorite.controller.favoritas_controller import FavoriteState
 
 # import geral
 import flet as ft

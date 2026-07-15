@@ -1,31 +1,30 @@
 # imports de interface
-from project.ui.playlist.overlay import ContainerOverlay
-from project.ui.playlist.base.grid_playlists import GridPlaylists
-from project.ui.playlist.base.music_list import ListViewMusic
-from project.ui.others.colors import color
+from ui.playlist.overlay import ContainerOverlay
+from ui.playlist.base.grid_playlists import GridPlaylists
+from ui.playlist.base.music_list import ListViewMusic
+from ui.others.colors import color
 
 # imports de back-end
-from project.core.playlists.enum.playlist_enum import PlalistOverlayMode, PlaylistLoaded
-from project.core.playlists.controller.playlist_manager import PlaylistManager
-from project.core.playlists.controller.playlist_state import PlaylistState
-from project.core.song.font_reproduction.font_playlist import PlaylistFont
-from project.core.song.enum.song_enum import ReproductionMode
+from core.playlists.enum.playlist_enum import PlalistOverlayMode, PlaylistLoaded
+from core.playlists.controller.playlist_manager import PlaylistManager
+from core.playlists.controller.playlist_state import PlaylistState
+from core.song.font_reproduction.font_playlist import PlaylistFont
+from core.song.enum.song_enum import ReproductionMode
 
 # import geral
 import flet as ft
 
 
 class ContentPlaylist(ft.Container):
-    def __init__(self, abrir):
+    def __init__(self, open_function):
         super().__init__(
             padding = ft.padding.all(10),
             expand = True
         )
 
-        self.abrir = abrir
+        self.open_function = open_function
 
         self.grid: ft.GridView = GridPlaylists(
-            page = self.page,
             on_abrir = self.abrir_config_playlist,
             on_remover = self._remover_playlist,
             carregar_musicas = self.abrir_playlist
@@ -89,7 +88,7 @@ class ContentPlaylist(ft.Container):
             lista_musicas = lista_de_musicas
         )
 
-        self.abrir()
+        self.open_function()
 
         list_view = ListViewMusic(
             page = self.page,

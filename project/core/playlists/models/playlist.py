@@ -1,4 +1,4 @@
-from project.core.playlists.models.playlist_config import PlaylistConfig
+from core.playlists.models.playlist_config import PlaylistConfig
 
 
 class Playlist:

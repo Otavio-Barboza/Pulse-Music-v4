@@ -1,6 +1,6 @@
 # imports do back-end
-from project.core.playlists.repository.playlist_repository import PlaylistRepository
-from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+from core.playlists.repository.playlist_repository import PlaylistRepository
+from core.playlists.enum.playlist_enum import PlaylistLoaded
 
 # imports gerais
 import inspect, asyncio

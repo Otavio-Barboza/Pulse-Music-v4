@@ -1,13 +1,13 @@
 # imports de back-end
-from project.core.meta.repository.filtering import Filtering
-from project.core.meta.repository.tasks import Task
-from project.core.meta.enum.status import SongStatus
-from project.core.meta.provider.deezer import FontManager
-from project.core.meta.models.song import SongMetadata
-from project.core.meta.repository.metadata_repository import MetadataRepository
-from project.core.services.account_manager import AccountManager
-from project.core.meta.cache.cache_artists import CacheArtists
-from project.core.meta.repository.extract_metadata import ExtractMetadata
+from core.meta.repository.filtering import Filtering
+from core.meta.repository.tasks import Task
+from core.meta.enum.status import SongStatus
+from core.meta.provider.deezer import FontManager
+from core.meta.models.song import SongMetadata
+from core.meta.repository.metadata_repository import MetadataRepository
+from core.services.account_manager import AccountManager
+from core.meta.cache.cache_artists import CacheArtists
+from core.meta.repository.extract_metadata import ExtractMetadata
 
 # imports gerais
 import aiohttp, os
@@ -76,7 +76,7 @@ class Phase3:
 
         # 🔹 CASO 2: APENAS TÍTULO
         else:
-            from project.core.meta.pipeline.phase_2 import Phase2
+            from core.meta.pipeline.phase_2 import Phase2
             
             processed_items = []
 
@@ -116,10 +116,10 @@ class Phase3:
     
     @classmethod
     async def phase_3(cls, incomplete_list: list[SongMetadata], path: str):
-        from project.core.meta.pipeline.pipeline import Pipeline
+        from core.meta.pipeline.pipeline import Pipeline
 
-        CAMINHO_ARTISTAS = f"Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Artistas"
-        CAMINHO_ALBUNS = f"Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Albuns"
+        CAMINHO_ARTISTAS = f"Assets/Data/Contas/{AccountManager.accounts_cache['current_account']}/Imagens/Artistas"
+        CAMINHO_ALBUNS = f"Assets/Data/Contas/{AccountManager.accounts_cache['current_account']}/Imagens/Albuns"
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -253,7 +253,7 @@ class Phase3:
                     )
                 # 🔹 CASO COM ARTISTA
                 else:
-                    from project.core.meta.pipeline.phase_2 import Phase2
+                    from core.meta.pipeline.phase_2 import Phase2
 
                     defined_artist = await Phase2.choose_artist(
                         score = best_score,

@@ -1,12 +1,12 @@
 # imports de interface
-from project.ui.others.colors import colors
-from project.ui.settings.account_settings import AccountSettings
-from project.ui.settings.about_settings import AboutSettings
-from project.ui.settings.settings_support import SettingsSupport
-from project.ui.settings.other_settings import OtherSettings
+from ui.others.colors import color
+from ui.settings.account_settings import AccountSettings
+from ui.settings.about_settings import AboutSettings
+from ui.settings.settings_support import SettingsSupport
+from ui.settings.other_settings import OtherSettings
 
 # imports de back-end
-from project.core.services.controllers.state_app import StateApp
+from core.services.controllers.state_app import StateApp
 
 # import geral
 import flet as ft
@@ -16,7 +16,7 @@ class ScreenSettings(ft.Container):
     def __init__(self):
         super().__init__(
             expand = True,
-            bgcolor = colors.preto6,
+            bgcolor = color.preto6,
             padding = 0
         )
 
@@ -31,7 +31,7 @@ class ScreenSettings(ft.Container):
         self.content_area = ft.Container(
             expand = True,
             padding = 20,
-            bgcolor = colors.preto2,
+            bgcolor = color.preto2,
             border_radius = ft.border_radius.only(
                 top_left = 10,
                 bottom_left = 10
@@ -58,7 +58,7 @@ class ScreenSettings(ft.Container):
 
         return ft.Container(
             width = 250,
-            bgcolor = colors.preto7,
+            bgcolor = color.preto7,
             padding = ft.padding.all(20),
             border_radius = ft.border_radius.only(
                 top_right = 10, 
@@ -91,7 +91,7 @@ class ScreenSettings(ft.Container):
                         style = ft.ButtonStyle(
                             bgcolor = {
                                 ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                                ft.ControlState.HOVERED : colors.amarelo4
+                                ft.ControlState.HOVERED : color.amarelo4
                             },
                             text_style = ft.TextStyle(
                                 size = 16,
@@ -102,8 +102,8 @@ class ScreenSettings(ft.Container):
                                 horizontal = 15
                             ),
                             color = {
-                                ft.ft.ControlState.DEFAULT : colors.branco,
-                                ft.ft.ControlState.HOVERED : colors.preto_puro
+                                ft.ft.ControlState.DEFAULT : color.branco,
+                                ft.ft.ControlState.HOVERED : color.preto_puro
                             },
                             alignment = ft.alignment.center,
                             icon_size = 20
@@ -134,7 +134,7 @@ class ScreenSettings(ft.Container):
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : colors.preto4
+                    ft.ControlState.HOVERED : color.preto4
                 },
                 padding = ft.padding.symmetric(
                     vertical = 20,
@@ -145,7 +145,7 @@ class ScreenSettings(ft.Container):
                     weight = ft.FontWeight.W_500
                 ),
 
-                color = colors.branco,
+                color = color.branco,
                 shape = ft.RoundedRectangleBorder(radius = 5),
                 alignment = ft.alignment.center_left
             )
@@ -166,7 +166,7 @@ class ScreenSettings(ft.Container):
     def _quando_secao_mudar(self, section_id: str):
         """
             1. Altera o Conteúdo da seção principal conforme o botão clicado
-            2. Navega nos intens do dict de botões para atualizar a colors, isso caso a seção da chave seja a mesma que o section_id informado
+            2. Navega nos intens do dict de botões para atualizar a color, isso caso a seção da chave seja a mesma que o section_id informado
 
         Args:
             section_id (str): Seção responsável
@@ -201,17 +201,17 @@ class ScreenSettings(ft.Container):
         
         for key, button in self.buttons.items():
             if key == section_id:
-                # botão selecionado → colors diferente
+                # botão selecionado → color diferente
                 button.style.bgcolor = {
-                    ft.ControlState.DEFAULT: colors.amarelo3,
-                    ft.ControlState.HOVERED: colors.amarelo,
+                    ft.ControlState.DEFAULT: color.amarelo3,
+                    ft.ControlState.HOVERED: color.amarelo,
                 }
-                button.style.color = colors.preto1
+                button.style.color = color.preto1
             else:
                 button.style.bgcolor = {
                     ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED: colors.preto4,
+                    ft.ControlState.HOVERED: color.preto4,
                 }
-                button.style.color = colors.branco
+                button.style.color = color.branco
 
             button.update()

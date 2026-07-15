@@ -1,9 +1,9 @@
 # import de interface
-from project.ui.playlist.base.music_list import ListViewMusic
+from ui.playlist.base.music_list import ListViewMusic
 
 # import de back-end
-from project.core.song.model.song import Song
-from project.core.song.enum.song_enum import ReproductionMode
+from core.song.model.song import Song
+from core.song.enum.song_enum import ReproductionMode
 
 # import geral
 import flet as ft

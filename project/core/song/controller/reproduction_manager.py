@@ -1,11 +1,11 @@
 # imports de back-end
-from project.core.song.model.data_song import PlayerState, ReproductionConfiguration
-from project.core.song.model.reproduction import Reproduction
-from project.core.song.model.player import Player
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.song.model.song import Song
-from project.core.song.repository.song_repository import SongRepository
-from project.core.lyrics.controller.lyrics_services import LyricsServices
+from core.song.model.data_song import PlayerState, ReproductionConfiguration
+from core.song.model.reproduction import Reproduction
+from core.song.model.player import Player
+from core.song.enum.song_enum import ReproductionMode
+from core.song.model.song import Song
+from core.song.repository.song_repository import SongRepository
+from core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
 import random, threading, time
@@ -16,7 +16,7 @@ class ReproductionManager:
     state = PlayerState()
     configuration = ReproductionConfiguration()
 
-    current_font: ReproductionMode = Reproduction._current_reproduction
+    current_font: ReproductionMode = Reproduction.current_reproduction
 
     _queue: list[Song] = []
     _random_queue: list[Song] = []

@@ -1,13 +1,13 @@
 # imports de back-end
-from project.core.services.account_manager import AccountManager
-from project.core.services.controllers.grid_state import GridState
-from project.core.meta.repository.metadata_repository import MetadataRepository
-from project.core.meta.enum.status import ScannerStatus
-from project.core.playlists.controller.playlist_state import PlaylistState
-from project.core.playlists.enum.playlist_enum import PlaylistLoaded
-from project.core.meta.controller.scanner_controller import ScannerController
-from project.core.services.controllers.grid_state import GridMode
-from project.core.meta.repository.filtering import Filtering
+from core.services.account_manager import AccountManager
+from core.services.controllers.grid_state import GridState
+from core.meta.repository.metadata_repository import MetadataRepository
+from core.meta.enum.status import ScannerStatus
+from core.playlists.controller.playlist_state import PlaylistState
+from core.playlists.enum.playlist_enum import PlaylistLoaded
+from core.meta.controller.scanner_controller import ScannerController
+from core.services.controllers.grid_state import GridMode
+from core.meta.repository.filtering import Filtering
 
 # imports gerais
 from collections import defaultdict
@@ -20,7 +20,7 @@ class Scanner:
 
     @classmethod
     async def validar_dados_json(cls, data : dict):
-        from project.core.meta.models.scanner_model import ScannerModel
+        from core.meta.models.scanner_model import ScannerModel
 
         path = data.get('songs').get('path')
         len_path = len(os.listdir(path))
@@ -255,7 +255,7 @@ class Scanner:
         
     @classmethod
     async def new_song(cls, path: str, list: list):
-        from project.core.meta.pipeline.pipeline import Pipeline
+        from core.meta.pipeline.pipeline import Pipeline
 
         base_path_playlists = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists'
 
@@ -281,7 +281,7 @@ class Scanner:
 
     @classmethod
     async def delete_music(cls, keys : set[str]):       
-        from project.core.meta.models.scanner_model import ScannerModel
+        from core.meta.models.scanner_model import ScannerModel
 
         ScannerModel.start_task()
         ScannerModel.set_status_prosesses(ScannerStatus.ON_SCANNER)
@@ -315,7 +315,7 @@ class Scanner:
 
     @classmethod
     def manager_status(cls):
-        from project.core.meta.models.scanner_model import ScannerModel
+        from core.meta.models.scanner_model import ScannerModel
 
         if ScannerModel.status_procesesses == ScannerStatus.ON_SCANNER:
             ScannerController.notify(

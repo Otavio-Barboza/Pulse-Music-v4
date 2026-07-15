@@ -1,14 +1,14 @@
 # imports da ui (interface)
-from project.ui.others.colors import color
-from project.ui.others.music_search import MusicSearch
-from project.ui.playlist.base.base_playlists import ColumnCards
-from project.ui.grid_view.grid import GridImages
-from project.ui.favorite.favoritas import Favorite
+from ui.others.colors import color
+from ui.others.music_search import MusicSearch
+from ui.playlist.base.base_playlists import ColumnCards
+from ui.grid_view.grid import GridImages
+from ui.favorite.favoritas import Favorite
 
 # imports de back-end
-from project.core.services.account_manager import AccountManager
-from project.core.services.controllers.grid_state import GridMode
-from project.core.services.controllers.resize_manager import ResizeManager
+from core.services.account_manager import AccountManager
+from core.services.controllers.grid_state import GridMode
+from core.services.controllers.resize_manager import ResizeManager
 
 # import geral
 import flet as ft
@@ -139,10 +139,10 @@ class TabsNavigation(ft.Tabs):
         self.tabs[1].update()
     
     def carregar_favoritas(self):
-        from project.core.song.model.song import Song
-        from project.core.favorite.controller.favoritas_controller import FavoriteState
-        from project.core.song.model.reproduction import Reproduction
-        from project.core.song.enum.song_enum import ReproductionMode
+        from core.song.model.song import Song
+        from core.favorite.controller.favoritas_controller import FavoriteState
+        from core.song.model.reproduction import Reproduction
+        from core.song.enum.song_enum import ReproductionMode
 
         list_musics: list[Song] = FavoriteState.list_favorited_objects()
         

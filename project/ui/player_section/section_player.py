@@ -1,18 +1,18 @@
 # imports de interface
-from project.ui.others.colors import color
-from project.ui.player_section.controls.icons import PlayerIcons
-from project.ui.player_section.controls.command import PlayerCommands
-from project.ui.player_section.controls.information import PlayerInformation
-from project.ui.player_section.controls.progress_bar import CompactProgressBar
-from project.ui.player_section.controls.expanded_information import ExpandedInformation
-from project.ui.player_section.controls.navigation.expanded_menu import InformationMenu
-from project.ui.player_section.controls.navigation.content import ContentInformation
-from project.ui.player_section.controls.navigation.content_lyrics import LyricsContainer
-from project.ui.player_section.controls.navigation.translation_content import TranslationContent
+from ui.others.colors import color
+from ui.player_section.controls.icons import PlayerIcons
+from ui.player_section.controls.command import PlayerCommands
+from ui.player_section.controls.information import PlayerInformation
+from ui.player_section.controls.progress_bar import CompactProgressBar
+from ui.player_section.controls.expanded_information import ExpandedInformation
+from ui.player_section.controls.navigation.expanded_menu import InformationMenu
+from ui.player_section.controls.navigation.content import ContentInformation
+from ui.player_section.controls.navigation.content_lyrics import LyricsContainer
+from ui.player_section.controls.navigation.translation_content import TranslationContent
 
 # imports de back-end
-from project.core.services.controllers.estado_section import EstadoSection
-from project.core.services.controllers.resize_manager import ResizeManager
+from core.services.controllers.estado_section import EstadoSection
+from core.services.controllers.resize_manager import ResizeManager
 
 # import geral
 import flet as ft

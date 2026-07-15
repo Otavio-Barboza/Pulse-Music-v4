@@ -1,14 +1,14 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.services.controllers.state_app import StateApp
-from project.core.playlists.controller.playlist_state import PlaylistState
-from project.core.favorite.controller.favoritas_controller import FavoriteState
-from project.core.favorite.enum.favorite_enum import Favorited
-from project.core.song.enum.song_enum import ReproductionMode
-from project.core.song.model.reproduction import Reproduction
-from project.core.song.controller.reproduction_manager import ReproductionManager
+from core.services.controllers.state_app import StateApp
+from core.playlists.controller.playlist_state import PlaylistState
+from core.favorite.controller.favoritas_controller import FavoriteState
+from core.favorite.enum.favorite_enum import Favorited
+from core.song.enum.song_enum import ReproductionMode
+from core.song.model.reproduction import Reproduction
+from core.song.controller.reproduction_manager import ReproductionManager
 
 # import geral
 import flet as ft

@@ -1,6 +1,6 @@
 # import de back-end
-from project.core.meta.enum.status import ScannerStatus
-from project.core.meta.scanner.scanner import Scanner
+from core.meta.enum.status import ScannerStatus
+from core.meta.scanner.scanner import Scanner
 
 # imports gerais
 import asyncio, os

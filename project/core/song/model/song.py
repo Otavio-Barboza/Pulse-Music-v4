@@ -1,4 +1,4 @@
-from project.core.song.enum.song_enum import ReproductionMode
+from core.song.enum.song_enum import ReproductionMode
 
 class Song:
     def __init__(self, mode: ReproductionMode, name: str, path: str, key: str):

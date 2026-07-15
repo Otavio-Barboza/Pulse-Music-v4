@@ -1,6 +1,6 @@
 # imports de back-end
-from project.core.meta.models.artist import Artist
-from project.core.meta.models.album import Album
+from core.meta.models.artist import Artist
+from core.meta.models.album import Album
 
 # import geral
 import os

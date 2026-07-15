@@ -1,6 +1,6 @@
 # imports de back-end
-from project.core.meta.repository.filtering import Filtering
-from project.core.meta.repository.metadata_repository import MetadataRepository
+from core.meta.repository.filtering import Filtering
+from core.meta.repository.metadata_repository import MetadataRepository
 
 # imports gerais
 from uuid import uuid4

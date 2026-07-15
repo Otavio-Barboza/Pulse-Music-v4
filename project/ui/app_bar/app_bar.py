@@ -1,8 +1,8 @@
 # import de interface
-from project.ui.others.colors import color
+from ui.others.colors import color
 
 # import de back-end
-from project.core.meta.controller.scanner_controller import ScannerController
+from core.meta.controller.scanner_controller import ScannerController
 
 # imports geral
 import flet as ft

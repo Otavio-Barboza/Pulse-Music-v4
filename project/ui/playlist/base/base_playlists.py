@@ -1,14 +1,14 @@
 # imports de interface
-from project.ui.others.colors import color
-from project.ui.playlist.content_playlist import ContentPlaylist
-from project.ui.playlist.overlay import ContainerOverlay
-from project.ui.playlist.overlay_tip import OverlayTip
+from ui.others.colors import color
+from ui.playlist.content_playlist import ContentPlaylist
+from ui.playlist.overlay import ContainerOverlay
+from ui.playlist.overlay_tip import OverlayTip
 
 # imports de back-end
-from project.core.playlists.controller.playlist_manager import PLaylistManager
-from project.core.playlists.enum.playlist_enum import PlaylistMode, PlalistOverlayMode
-from project.core.services.settings.service_settings import ServiceSettings
-from project.core.services.controllers.state_app import StateApp
+from core.playlists.controller.playlist_manager import PlaylistManager
+from core.playlists.enum.playlist_enum import PlaylistMode, PlalistOverlayMode
+from core.services.settings.service_settings import ServiceSettings
+from core.services.controllers.state_app import StateApp
 
 # import geral
 import flet as ft
@@ -20,8 +20,8 @@ class ColumnCards(ft.Column):
             spacing = 0
         )
 
-        self.conteudo = ContentPlaylist(open = self.abrir)
-        self.estado = PLaylistManager(grid = self.conteudo.grid)
+        self.conteudo = ContentPlaylist(open_function = self.open_function)
+        self.estado = PlaylistManager(grid = self.conteudo.grid)
 
         self.button_add_play = ft.TextButton(
             col = 4,
@@ -144,7 +144,7 @@ class ColumnCards(ft.Column):
         self._atualizar_botoes()
         self.conteudo.carregar()
     
-    def abrir(self):
+    def open_function(self):
         self.estado.modo = PlaylistMode.LIST
         self._atualizar_botoes()
 

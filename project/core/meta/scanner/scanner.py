@@ -1,104 +1,95 @@
-from ...Services.gerenciador_contas import GerenciadorContas
-from ...Services.Controllers.estado_grid import EstadoGrid
-from ..Repository.persistencia import Persistencia
-from ..Controller.status import StatusScanner
-from ...Playlists.Controller.estado_playlist import EstadoPlay
-from ...Audio.Controller.sessao import SessaoReproducao
+# imports de back-end
+from project.core.services.account_manager import AccountManager
+from project.core.services.controllers.grid_state import GridState
+from project.core.meta.repository.metadata_repository import MetadataRepository
+from project.core.meta.enum.status import ScannerStatus
+from project.core.playlists.controller.playlist_state import PlaylistState
+from project.core.playlists.enum.playlist_enum import PlaylistLoaded
+from project.core.meta.controller.scanner_controller import ScannerController
+from project.core.services.controllers.grid_state import GridMode
+from project.core.meta.repository.filtering import Filtering
+
+# imports gerais
+from collections import defaultdict
 import os, asyncio
 
+
 class Scanner:
-    _scanner_rodando = False
+
+    _is_running = False
 
     @classmethod
-    async def validar_dados_json(cls, dados : dict):
-        from ..Models.scanner_model import ScannerModel
-        from ...Playlists.Controller.estado_playlist import EstadoPlay, PlaylistCarregada
-        from ...Audio.Repository.musica_repositorio import RepositorioMusica
+    async def validar_dados_json(cls, data : dict):
+        from project.core.meta.models.scanner_model import ScannerModel
 
-        pasta = dados.get('musicas').get('pasta')
-        len_pasta = len(
-            os.listdir(pasta)
-        )
+        path = data.get('musicas').get('path')
+        len_path = len(os.listdir(path))
 
-        dados['musicas']['quantidade_de_musicas'] = len_pasta
+        data['musicas']['quantidade_de_musicas'] = len_path
        
-        musicas_novas = await cls.reconhecer_musicas(
-            pasta = pasta, validador = True
+        new_songs = await cls.reconhecer_musicas(
+            path = path, validador = True
         )
-        musicas_removidas = await cls.reconhecer_musicas(
-            pasta = pasta, validador = False
+        removed_songs = await cls.reconhecer_musicas(
+            path = path, validador = False
         )
        
-        if musicas_removidas is not None:
-            chaves = await cls.obter_chaves_por_caminho(musicas_removidas)
+        if removed_songs is not None:
+            keys = await cls.obter_chaves_por_caminho(removed_songs)
             
-            if ScannerModel.esta_ocupado():
+            if ScannerModel.return_is_busy():
                 return
             
             await cls.exclusao_musica(
-                chaves = chaves
+                keys = keys
             )
-            await Persistencia.atribuir_memoria()
+            await MetadataRepository.load_cache()
             
             await asyncio.sleep(1)
 
             if (
-                isinstance(EstadoPlay._playlist_aberta, dict) and
-                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+                isinstance(PlaylistState.playlist_loaded, dict) and
+                PlaylistState.playlist_loaded['open'] == PlaylistLoaded.ABERTA
             ):
-                EstadoPlay.notificar(
-                    evento = 'att_musicas_exibidas',
-                    dados = pasta
+                PlaylistState.notify(
+                    event = 'update_displayed_musics',
+                    data = path
                 )
 
-            # if (
-            #     len_pasta is not None
-            #      or
-            #     dados.get('id') is not None
-            # ):
-            #     EstadoPlay.notificar(
-            #         evento = 'att_qtde_play',
-            #         dados = {
-            #             "id": dados.get('id'), 
-            #             "qtde": len_pasta
-            #         }
-            #     )
-        
-        if musicas_novas is not None:   
+        if new_songs is not None:   
             if ScannerModel.esta_ocupado():
                 return
             
             await cls.nova_musica(
-                pasta = pasta,
-                lista = musicas_novas
+                path = path,
+                list = new_songs
             )
-            await Persistencia.salvar_json(
-                caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Playlists/{dados.get("id")}/config_play.json',
-                dados = dados
+            await MetadataRepository.save_artists_json(
+                # caminho = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{data.get("id")}/config_play.json',
+                data = data
             )
-            await Persistencia.atribuir_memoria()
+            await MetadataRepository.load_cache()
             
             await asyncio.sleep(1)
 
             if (
-                isinstance(EstadoPlay._playlist_aberta, dict) and
-                EstadoPlay._playlist_aberta['aberta'] == PlaylistCarregada.ABERTA
+                isinstance(PlaylistState.playlist_loaded, dict) and
+                PlaylistState.playlist_loaded['open'] == PlaylistLoaded.OPEN 
             ):
-                EstadoPlay.notificar(
-                    evento = 'att_musicas_exibidas',
-                    dados = pasta
+                PlaylistState.notify(
+                    event = 'update_displayed_musics',
+                    data = path
                 )
             
         if (
-            len_pasta is not None
-            or
-            dados.get('id') is not None
+            len_path is not None
+            or data.get('id') is not None
         ):
-            EstadoPlay.notificar(
-                evento = 'att_qtde_play',
-                dados = {
-                    "id": dados.get('id'), 
-                    "qtde": len_pasta
+            PlaylistState.notify(
+                event = 'att_qtde_play',
+                data = {
+                    "id": data.get('id'), 
+                    "qtde": len_path
                 }
             )            
 
@@ -106,37 +97,33 @@ class Scanner:
 
     @classmethod
     async def _async_verificar_json(cls):
-        from ..Controller.scanner_controller import ScannerController
-        from ..Models.scanner_model import ScannerModel
-        
-        if cls._scanner_rodando:
+        if cls._is_running:
             return
         
-        cls._scanner_rodando = True
+        cls._is_running = True
         
         try:
             playlists_disponiveis = os.listdir(
-                f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Playlists'
+                f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists'
             )
                 
             for playlist in playlists_disponiveis:
-                dados_playlist = await Persistencia.ler_json(
-                    f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
-                )
-                await cls.validar_dados_json(dados = dados_playlist)
+                dados_playlist = await MetadataRepository.return_artists_json()
+                    # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
+
+                await cls.validar_dados_json(data = dados_playlist)
         finally:
-            cls._scanner_rodando = False
+            cls._is_running = False
 
     @classmethod
-    async def reconhecer_musicas(cls, pasta : str, validador : bool) -> list | None:
+    async def reconhecer_musicas(cls, path : str, validador : bool) -> list | None:
         caminhos_json = set()
 
-        musicas_json = await Persistencia.ler_json(
-            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json'
-        )
+        musicas_json = await MetadataRepository.return_artists_json()
+            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json'
        
         for _, valor in musicas_json.items():
-            if valor.get('caminho') == pasta:
+            if valor.get('caminho') == path:
                 caminho = os.path.join(
                     valor.get('caminho'),
                     valor.get('arquivo_original')
@@ -147,9 +134,9 @@ class Scanner:
        
         arquivos_pasta = set()
 
-        for arquivo in os.listdir(pasta):
+        for arquivo in os.listdir(path):
             caminho = os.path.join(
-                pasta, 
+                path, 
                 arquivo
             )
 
@@ -164,9 +151,8 @@ class Scanner:
     
     @classmethod
     async def obter_chaves_por_caminho(cls, caminhos : list[str]) -> set[str]:
-        musica_json = await Persistencia.ler_json(
-            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json'
-        )
+        musica_json = await MetadataRepository.return_artists_json()
+            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json'
 
         caminhos = set(os.path.normpath(c) for c in caminhos)
 
@@ -182,10 +168,6 @@ class Scanner:
     
     @classmethod
     async def reconhecer_artistas_albuns_inexistentes(cls, chaves_remover : set[str]):
-        from collections import defaultdict
-        from ...Meta.Repository.normalizacao import Filtragem
-        from ...Services.Controllers.estado_grid import GridMode
-
         """
             1 - Acessar o JSON musicas.
             2 - Pegar as Imagens das músicas em referência e atribuir em list() ou set().
@@ -195,9 +177,8 @@ class Scanner:
             4 - Excluir a música em si do músicas.json            
         """
         
-        musicas_json = await Persistencia.ler_json(
-            f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json'
-        )
+        musicas_json = await MetadataRepository.return_artists_json()
+            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json'
        
         artistas = defaultdict(set)        
         albuns = defaultdict(set)
@@ -206,7 +187,7 @@ class Scanner:
         # pegar as imagens
         for chave, valor in musicas_json.items():
             # artista
-            artista = Filtragem._limpar_feat(
+            artista = Filtering.clean_feat(
                 valor.get("artista_final")
             )
             artistas[artista].add(chave)           
@@ -216,7 +197,7 @@ class Scanner:
             albuns[album].add(chave)
                             
         for chave, valor in musicas_json.items():
-            artista = Filtragem._limpar_feat(
+            artista = Filtering.clean_feat(
                 valor.get("artista_final")
             )
             album = valor.get('album').get('nome_album')
@@ -233,94 +214,90 @@ class Scanner:
                     valor.get('arquivo_original')
                 )
                 caminho_capa = os.path.normpath(
-                    f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Capa Musica/{nome_capa_base}.jpg'
+                    f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Capa Musica/{nome_capa_base}.jpg'
                 )
                 
                 if len(restantes_alb) == 0:
-                    Persistencia.excluir_imagem(caminho_alb)
+                    MetadataRepository.delete_image(caminho_alb)
                 
                 if len(restantes_art) == 0:
-                    Persistencia.excluir_imagem(caminho_art)
+                    MetadataRepository.delete_image(caminho_art)
                     
                 if os.path.isfile(caminho_capa):
-                    Persistencia.excluir_imagem(
+                    MetadataRepository.delete_image(
                         caminho_capa
                     )
                     
                 chaves_para_remover.add(chave)
             
-        letras_json = await Persistencia.ler_json(
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/letras.json'
-        )
+        letras_json = await MetadataRepository.return_artists_json()
+            # caminho = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/letras.json'
 
         for chave in chaves_para_remover:
             del musicas_json[chave]
             del letras_json[chave]
         
-        await Persistencia.salvar_json(
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/musicas.json',
-            dados = musicas_json
+        await MetadataRepository.save_artists_json(
+            # caminho = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json',
+            data = musicas_json
         )            
-        await Persistencia.salvar_json(
-            caminho = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Music/letras.json',
-            dados = letras_json
+        await MetadataRepository.save_artists_json(
+            caminho = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/letras.json',
+            data = letras_json
         )            
 
-        EstadoGrid._notificar(
-            evento = 'att_grid', 
-            dados = GridMode.ARTISTA
+        GridState.notify(
+            event = 'att_grid', 
+            data = GridMode.ARTIST
         )
-        EstadoGrid._notificar(
-            evento = 'att_grid',
-            dados = GridMode.ALBUM
+        GridState.notify(
+            event = 'att_grid',
+            data = GridMode.ALBUM
         )
         
     @classmethod
-    async def nova_musica(cls, pasta : str, lista : list):
-        from ..Pipeline.pipeline import Pipeline
+    async def nova_musica(cls, path : str, list: list):
+        from project.core.meta.pipeline.pipeline import Pipeline
 
-        caminho_base_playlists = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Playlists'
+        caminho_base_playlists = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists'
 
         for playlist in os.listdir(
             caminho_base_playlists
         ):
-            json_config_play = await Persistencia.ler_json(
-                f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
+            json_config_play = await MetadataRepository.return_artists_json(
+                f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
             )
 
-            if json_config_play['musicas'].get('pasta') == pasta:
+            if json_config_play['musicas'].get('path') == path:
                 playlist_id = playlist
                 break
         
         asyncio.create_task(
             asyncio.to_thread(
-                Pipeline._processar_wrapper_sync,
-                pasta,
-                lista,
+                Pipeline.processar_wrapper_sync,
+                path,
+                list,
                 playlist_id
             )
         )
 
     @classmethod
-    async def exclusao_musica(cls, chaves : set[str]):       
-        from ..Models.scanner_model import ScannerModel
-        from ..Controller.scanner_controller import ScannerController
-        
-        ScannerModel.iniciar_tarefa()
-        ScannerModel.definir_status_processo(
-            StatusScanner.ON_SCANNER
-        )
+    async def exclusao_musica(cls, keys : set[str]):       
+        from project.core.meta.models.scanner_model import ScannerModel
+
+        ScannerModel.start_task()
+        ScannerModel.set_status_prosesses(ScannerStatus.ON_SCANNER)
         cls.gerenciar_status()
-        ScannerController.notificar(
-            evento = 'icone_status_scanner',
-            dados = None
+        ScannerController.notify(
+            event = 'icon_status_scanner',
+            data = None
         )
         
         await asyncio.sleep(1)
 
         try:
             await cls.reconhecer_artistas_albuns_inexistentes(
-                chaves_remover = chaves
+                chaves_remover = keys
             )
         finally:
             ScannerModel.finalizar_tarefa()
@@ -331,29 +308,28 @@ class Scanner:
                 ScannerModel.definir_status_processo(
                     None
                 )
-                ScannerController.notificar(
-                    evento = 'progress_status_scanner',
-                    dados = None
+                ScannerController.notify(
+                    event = 'progress_status_scanner',
+                    data = None
                 )
                 cls.gerenciar_status()
 
     @classmethod
     def gerenciar_status(cls):
-        from ..Models.scanner_model import ScannerModel
-        from ..Controller.scanner_controller import ScannerController
+        from project.core.meta.models.scanner_model import ScannerModel
 
-        if ScannerModel._status_processos == StatusScanner.ON_SCANNER:
-            ScannerController.notificar(
-                evento = 'informacao_processo_scanner',
-                dados = 'Monitoramento está rodando...\n\n    Poder estar havendo remoção dos conteúdos desnecessários ou alguma atualização das informações exibidas.'
+        if ScannerModel.status_procesesses == ScannerStatus.ON_SCANNER:
+            ScannerController.notify(
+                event = 'processes_information_scanner',
+                data = 'Monitoramento está rodando...\n\n    Poder estar havendo remoção dos conteúdos desnecessários ou alguma atualização das informações exibidas.'
             )
-        elif ScannerModel._status_processos == StatusScanner.ON_PIPELINE_PLAYLIST:
-            ScannerController.notificar(
-                evento = 'informacao_processo_scanner',
-                dados = 'Buscando dados...\n\n    O player está buscando os dados de artistas, álbuns, capas e todos com suas imagens, aguarde o processo acontecer para visualizá-los.'
+        elif ScannerModel.status_procesesses == ScannerStatus.ON_PIPELINE_PLAYLIST:
+            ScannerController.notify(
+                event = 'processes_information_scanner',
+                data = 'Buscando data...\n\n    O player está buscando os data de artistas, álbuns, capas e todos com suas imagens, aguarde o processo acontecer para visualizá-los.'
             )
-        elif ScannerModel._status_processos == None:
-            ScannerController.notificar(
-                evento = 'informacao_processo_scanner',
-                dados = 'Monitor das Playlists aguardando alterações...\n\n    Aqui será indicado as alterações de informações que estiverem acontecendo, sejam:\n\n• Adição de músicas em alguma playlist.\n• Remoção de músicas em alguma playlist.\n\n    O monitor gerencia automaticamente o conteúdo, adicionando novos itens e removendo os desnecessários.'
+        elif ScannerModel.status_procesesses == None:
+            ScannerController.notify(
+                event = 'processes_information_scanner',
+                data = 'Monitor das Playlists aguardando alterações...\n\n    Aqui será indicado as alterações de informações que estiverem acontecendo, sejam:\n\n• Adição de músicas em alguma playlist.\n• Remoção de músicas em alguma playlist.\n\n    O monitor gerencia automaticamente o conteúdo, adicionando novos itens e removendo os desnecessários.'
             )

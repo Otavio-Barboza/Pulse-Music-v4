@@ -39,7 +39,7 @@ def open_profile(current_id: str) -> dict:
     return Utils.sync_load_json(AppPaths.ACCOUNT / current_id / "profile.json")
    
 
-async def main(page : ft.Page):
+async def main(page: ft.Page):
 
     # configurações gerais do app
     page.title = "Pulse Music"

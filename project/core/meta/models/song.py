@@ -119,7 +119,7 @@ class SongMetadata:
     def set_gap(self, gap: None | float):
         self.gap = gap
 
-    def set_consenso(self, consensus: None | float):
+    def set_consensus(self, consensus: None | float):
         self.consensus = consensus
     
     def set_potential_artists(self, artistas: list):

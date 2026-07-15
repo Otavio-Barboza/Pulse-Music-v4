@@ -2,8 +2,8 @@
 from project.core.meta.enum.status import SongStatus, ScannerStatus
 from project.core.meta.models.song import SongMetadata
 from project.core.meta.pipeline.phase_1 import Phase1
-from project.core.meta.pipeline.phase_2 import PipelineFase2
-from project.core.meta.pipeline.phase_3 import PipelineFase3
+from project.core.meta.pipeline.phase_2 import Phase2
+from project.core.meta.pipeline.phase_3 import Phase3
 from project.core.meta.repository.filtering import Filtering
 from project.core.meta.repository.extract_metadata import ExtractMetadata
 from project.core.meta.repository.metadata_repository import MetadataRepository
@@ -233,13 +233,13 @@ class Pipeline:
         await cls.save_data(groups = group_phase_0)
         cls.to_execute_callbacks(path)
 
-        groups = await PipelineFase2.phase_2(
+        groups = await Phase2.phase_2(
             lista = lista, 
             path = path
         )
         
-        await PipelineFase3.phase_3(
-            lista_incompletas = groups[SongStatus.INCOMPLETE], 
+        await Phase3.phase_3(
+            incomplete_list = groups[SongStatus.INCOMPLETE], 
             path = path
         )
 

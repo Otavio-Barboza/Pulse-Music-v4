@@ -60,8 +60,8 @@ class Phase2:
     async def resolve_both(cls, both_list : list[SongMetadata], path : str):
         from .pipeline import Pipeline
 
-        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
-        CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
+        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Artistas'
+        CAMINHO_ALBUNS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -180,7 +180,7 @@ class Phase2:
         return best_item, best_score
     
     @classmethod
-    async def _choose_artist(
+    async def choose_artist(
         cls, 
         score: float, 
         best_item: dict, 
@@ -223,8 +223,8 @@ class Phase2:
     ):
         from .pipeline import Pipeline
 
-        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
-        CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
+        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Artistas'
+        CAMINHO_ALBUNS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -235,7 +235,7 @@ class Phase2:
                     fonts = fonts,
                     strategy = cls._medium_strategy()
                 )
-                defined_artist = await cls._choose_artist(
+                defined_artist = await cls.choose_artist(
                     score = best_score,
                     best_item = best_item,
                     song = song
@@ -336,7 +336,7 @@ class Phase2:
                     fonts = fonts,
                     strategy = cls._medium_strategy()
                 )
-                defined_artist = await cls._choose_artist(
+                defined_artist = await cls.choose_artist(
                     score = best_score,
                     best_item = best_item,
                     song = song
@@ -466,8 +466,8 @@ class Phase2:
     @classmethod
     async def resolve_no_artist_filtered_or_no_id3(cls, id3_only_list : list[SongMetadata], filtered_only_list : list[SongMetadata], path : str):
         from .pipeline import Pipeline
-        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
-        CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
+        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Artistas'
+        CAMINHO_ALBUNS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -479,7 +479,7 @@ class Phase2:
                     song = song,
                     strategy = cls._estrategia_artista_filtrado()
                 )
-                defined_artist = await cls._choose_artist(
+                defined_artist = await cls.choose_artist(
                     score = best_score,
                     best_item = best_item,
                     song = song
@@ -579,7 +579,7 @@ class Phase2:
                     song = song,
                     strategy = cls._estrategia_artista_nativo()
                 )
-                defined_artist = await cls._choose_artist(
+                defined_artist = await cls.choose_artist(
                     score = best_score,
                     best_item = best_item,
                     song = song
@@ -692,7 +692,7 @@ class Phase2:
         return (0.75 * similarity_title + 0.15 * popularity)
     
     @classmethod
-    def _analyze_consensus(cls, itens):
+    def analyze_consensus(cls, itens):
         artist = [i['artist']['name'] for i in itens[:5]]
         dominant_artist = max(set(artist), key = artist.count)
         frequency = artist.count(dominant_artist)
@@ -706,24 +706,13 @@ class Phase2:
             'artist_for_search' : lambda song: None,
             'calculate_score' : cls._calculate_score_title_only
         }
-    
-    @classmethod
-    async def _sort_artists_by_title_only(cls, gap, sim_1, top5) -> str | SongStatus:
-        artist = top5[0]["artist"]["name"]
-
-        if sim_1 >= 0.85 and gap >= 0.05:
-            return artist, SongStatus.HIGH
-        elif sim_1 >= 0.80 and gap >= 0.02:
-            return artist, SongStatus.MEDIUM
-        else:
-            return artist, SongStatus.LOW
         
     @classmethod
     async def resolve_title_only(cls,  title_only_list: list[SongMetadata], path: Path):
         from .pipeline import Pipeline
 
-        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Artistas'
-        CAMINHO_ALBUNS = f'Assets/Data/Contas/{GerenciadorContas.contas_cache["conta_atual"]}/Imagens/Albuns'
+        CAMINHO_ARTISTAS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Artistas'
+        CAMINHO_ALBUNS = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Albuns'
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -768,7 +757,7 @@ class Phase2:
                 sim_1 = top5[0]['score_calculado']
                 sim_2 = top5[1]['score_calculado'] if len(top5) > 1 else 0
                 gap = sim_1 - sim_2
-                consensus, dominant_artist = cls._analyze_consensus(top5)
+                consensus, dominant_artist = cls.analyze_consensus(top5)
 
                 defined_artist, status_artista_final = await cls._classificar_artistas_apenas_titulo(
                     gap = gap, sim_1 = sim_1, consensus = consensus, top5 = top5

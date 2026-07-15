@@ -14,7 +14,7 @@ class ScannerModel:
         ScannerStatus.ON_SCANNER, ScannerStatus.ON_PIPELINE_PLAYLIST
     )
     _status_operation: ScannerStatus = ScannerStatus.ON
-    _status_procesesses: ScannerStatus | None = None
+    status_procesesses: ScannerStatus | None = None
     _number_of_active_taks: int = 0
     
     @classmethod
@@ -42,7 +42,7 @@ class ScannerModel:
             
     @classmethod
     def set_status_prosesses(cls, status: ScannerStatus | None = None):
-        cls._status_procesesses = status
+        cls.status_procesesses = status
     
     @classmethod
     def start_task(cls):

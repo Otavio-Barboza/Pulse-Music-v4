@@ -1,6 +1,12 @@
+# import de interface
 from project.ui.others.colors import color
-from Assets.App.Meta.Controller.scanner_controller import ScannerController
+
+# import de back-end
+from project.core.meta.controller.scanner_controller import ScannerController
+
+# imports geral
 import flet as ft
+
 
 class AppBar(ft.AppBar):
     def __init__(self, abrir_config):
@@ -86,17 +92,17 @@ class AppBar(ft.AppBar):
         
         self.page.end_drawer = self.conteudo_drawer
 
-        ScannerController.registar_callback(
-            evento = 'informacao_processo_scanner',
-            funcao = self.alterar_texto_drawer
+        ScannerController.register_callback(
+            event = 'processes_information_scanner',
+            function = self.alterar_texto_drawer
         )
-        ScannerController.registar_callback(
-            evento = 'icone_status_scanner',
-            funcao = self.alterar_icone
+        ScannerController.register_callback(
+            event = 'icon_status_scanner',
+            function = self.alterar_icone
         )
-        ScannerController.registar_callback(
-            evento = 'progress_status_scanner',
-            funcao = self.alterar_progress
+        ScannerController.register_callback(
+            event = 'progress_status_scanner',
+            function = self.alterar_progress
         )
 
     def fechar_overlays(self, e):

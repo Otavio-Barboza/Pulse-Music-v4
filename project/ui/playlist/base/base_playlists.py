@@ -15,13 +15,13 @@ import flet as ft
 
 
 class ColumnCards(ft.Column):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             spacing = 0
         )
-
-        self.conteudo = ContentPlaylist(open_function = self.open_function)
-        self.estado = PlaylistManager(grid = self.conteudo.grid)
+        self.page = page
+        self.column_content = ContentPlaylist(open_function = self.open_function)
+        self.state = PlaylistManager(grid = self.column_content.grid)
 
         self.button_add_play = ft.TextButton(
             col = 4,
@@ -49,7 +49,7 @@ class ColumnCards(ft.Column):
                 icon_size = 20
             )
         )
-        self.button_retorna_play = ft.TextButton(
+        self.button_return_play = ft.TextButton(
             col = 4,
             text = 'Voltar',
             on_click = self.voltar,
@@ -86,15 +86,15 @@ class ColumnCards(ft.Column):
 
                     controls = [
                         self.button_add_play,
-                        self.button_retorna_play
+                        self.button_return_play
                     ]
                 )
             ),
-            self.conteudo
+            self.column_content
         ]
 
-        StateApp.register_callback(event = 'overlay_tips', func = ServiceSettings.save_overlay_tips)
-        StateApp.register_callback('actualization_on_click', self.mudar_on_click)
+        StateApp.register_callback(event = "overlay_tips", func = ServiceSettings.save_overlay_tips)
+        StateApp.register_callback("actualization_on_click", self.mudar_on_click)
 
     def mudar_on_click(self, valor):
         if valor == True:
@@ -108,9 +108,9 @@ class ColumnCards(ft.Column):
         self.page.overlay.append(
             OverlayTip(
                 page = self.page,
-                estado = self.estado,
-                conteudo = self.conteudo,
-                modo = PlalistOverlayMode.CREATE
+                state = self.state,
+                content = self.column_content,
+                mode = PlalistOverlayMode.CREATE
             )
         )
         self.page.update()
@@ -120,20 +120,20 @@ class ColumnCards(ft.Column):
         self.page.overlay.append(
             ContainerOverlay(
                 page = self.page,
-                estado = self.estado,
-                conteudo = self.conteudo,
+                state = self.state,
+                column_content = self.column_content,
                 modo = PlalistOverlayMode.CREATE
             )
         )
         self.page.update()
     
-    def _atualizar_botoes(self):
-        if self.estado.modo == PlaylistMode.GRID:
+    def update_buttons(self):
+        if self.state.mode == PlaylistMode.GRID:
             self.button_add_play.visible = True
-            self.button_retorna_play.visible = False
-        elif self.estado.modo == PlaylistMode.LIST:
+            self.button_return_play.visible = False
+        elif self.state.mode == PlaylistMode.LIST:
             self.button_add_play.visible = False
-            self.button_retorna_play.visible = True
+            self.button_return_play.visible = True
 
         self.update()
 
@@ -141,15 +141,15 @@ class ColumnCards(ft.Column):
         """
             Intermedio ao ContentPlaylist para o carregamento dos cards ao inicializar o player
         """
-        self._atualizar_botoes()
-        self.conteudo.carregar()
+        self.update_buttons()
+        self.column_content.carregar()
     
     def open_function(self):
-        self.estado.modo = PlaylistMode.LIST
-        self._atualizar_botoes()
+        self.state.modo = PlaylistMode.LIST
+        self.update_buttons()
 
     def voltar(self, e):
-        self.estado.modo = PlaylistMode.GRID
-        self._atualizar_botoes()
-        self.conteudo.fechar_playlist()
-        self.conteudo.carregar()
+        self.state.modo = PlaylistMode.GRID
+        self.update_buttons()
+        self.column_content.fechar_playlist()
+        self.column_content.carregar()

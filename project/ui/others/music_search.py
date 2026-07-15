@@ -7,12 +7,12 @@ import flet as ft
 
 
 class MusicSearch(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             expand = True,
             padding = ft.padding.all(10)
         )
-
+        self.page = page
         self.lista_ex = [
             'Ex: Infinity - Guru Josh',
             'Ex: Imagine Dragons - Believer',

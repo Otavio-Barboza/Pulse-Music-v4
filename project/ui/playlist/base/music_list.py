@@ -38,17 +38,17 @@ class ListViewMusic(ft.ListView):
             event = 'actualization_container', 
             callback = self.att_container
         )
-        PlaylistState.registar_callback(
+        PlaylistState.register_callback(
             event = 'update_displayed_musics',
-            funcao = self.recarregar
+            function = self.recarregar
         )
-        PlaylistState.registar_callback(
+        PlaylistState.register_callback(
             event = 'actualization_not_favorited',
-            funcao = self.att_nao_favoritas
+            function = self.att_nao_favoritas
         )
-        PlaylistState.registar_callback(
+        PlaylistState.register_callback(
             event = 'actualization_favorited',
-            funcao = self.att_favoritas
+            function = self.att_favoritas
         )
 
         if self.modo_favorita is not None:            

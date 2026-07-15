@@ -79,7 +79,7 @@ class PlaylistManager:
             Carrega cada card na inicilização do App
         """
 
-        self.list_playlist = PlaylistRepository.listar_playlists()
+        self.list_playlist = PlaylistRepository.list_playlists()
 
         for playlist in self.list_playlist:
             self.grid.adicionar_playlist(

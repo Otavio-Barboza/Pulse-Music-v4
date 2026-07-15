@@ -20,7 +20,8 @@ import flet as ft
 
 class PlayerSection:
 
-    def __init__(self):
+    def __init__(self, page):
+        self.page = page
         self.overlays = []
         
         self.barra_duração_compacta = CompactProgressBar()

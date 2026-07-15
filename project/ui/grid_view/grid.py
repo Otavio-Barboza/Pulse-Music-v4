@@ -16,7 +16,7 @@ import os
 
 
 class GridImages(ft.GridView):
-    def __init__(self, mode: GridMode, path : str):
+    def __init__(self, mode: GridMode, page: ft.Page):
         super().__init__(
             max_extent = 200 if mode == GridMode.ARTIST else 250,
             expand = True,
@@ -24,7 +24,7 @@ class GridImages(ft.GridView):
             run_spacing = 15,
             padding = ft.padding.all(15)
         )
-
+        self.page = page
         self.mode = mode
 
         self.controls = []
@@ -121,7 +121,6 @@ class GridImages(ft.GridView):
         if mode != self.mode:
             return
         
-        # path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/{"Artistas" if mode == GridMode.ARTIST else "Albuns"}'
         if mode == GridMode.ARTIST:
             path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "artists"
         elif mode == GridMode.ALBUM:
@@ -129,7 +128,6 @@ class GridImages(ft.GridView):
         else:
             ...
             
-        print(path)
         self.controls.clear()
         
         for img in os.listdir(path):

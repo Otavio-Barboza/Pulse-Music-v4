@@ -19,14 +19,14 @@ class Player:
         AudioLoop.player.pause()
         AudioLoop.player.delete()
 
-        AudioLoop.set_player(pyglet.media.Player())
+        # AudioLoop.set_player(pyglet.media.Player())
 
-        @AudioLoop.player.event
-        def on_eos():
-            Monitoring.notify_end()
+        # @AudioLoop.player.event
+        # def on_eos():
+        #     Monitoring.notify_end()
 
-        font: pyglet.media.Source | pyglet.media.StreamingSource = pyglet.media.load(str(path))
-        AudioLoop.player.queue(font)
+        # font= pyglet.media.load(str(path))
+        AudioLoop.player.queue(str(path))
 
     @classmethod
     def play(cls):

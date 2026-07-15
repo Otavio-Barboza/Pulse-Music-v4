@@ -5,6 +5,7 @@ from core.playlists.models.playlist import Playlist
 from core.playlists.models.playlist_config import PlaylistConfig
 from core.playlists.models.playlist_card import PlaylistCard
 from core.playlists.repository.path import CreatePlaylist
+from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
@@ -20,9 +21,9 @@ class PlaylistRepository:
         Returns:
             list[Playlist]: lista com objetos Playlist().
         """
+        
         lista_plays = []
-        CAMINHO_JSON_PLAYLIST = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/playlists.json'
-        playlists = Utils.sync_load_json(CAMINHO_JSON_PLAYLIST)
+        playlists = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json")
 
         for p in playlists['playlists']:
             if p != 'favoritas':
@@ -45,7 +46,7 @@ class PlaylistRepository:
             list[PlaylistCard]: Lista com objetos PlaylistCard()
         """
         usuario = AccountManager.accounts_cache
-        playlists = cls.carregar_itens()
+        playlists = cls.load_itens()
         cards = []
 
         for pl in playlists:
@@ -218,7 +219,7 @@ class PlaylistRepository:
         Args:
             id (str): ID da Playlist
         """
-        from ...Meta.Scanner.scanner import Scanner
+        from core.meta.scanner.scanner import Scanner
         
         caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists/{id}'
         leitura_json = Utils.sync_load_json(f'{caminho}/config_play.json')
@@ -249,8 +250,7 @@ class PlaylistRepository:
     
     @classmethod
     def remove_dead_content(cls, id: str, path: Path):
-        from ...Meta.Scanner.scanner import Scanner
-        import asyncio
+        from core.meta.scanner.scanner import Scanner
 
         chaves_para_remover = set()
 

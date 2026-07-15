@@ -12,11 +12,11 @@ import flet as ft
 
 
 class AccountSettings(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center,
         )
-
+        self.page = page
         self.data = None
 
         self.text_field = ft.TextField(
@@ -180,7 +180,7 @@ class AccountSettings(ft.Container):
         Returns:
             list : lista das accounts disponíveis.
         """
-        return AccountManager.accounts_cache['account']
+        return AccountManager.accounts_cache["accounts"]
     
     # widgets
     def _create_button(
@@ -345,6 +345,8 @@ class AccountSettings(ft.Container):
         Args:
             user (class User): atributos de User.
         """
+        print(user.to_dict())
+
 
         self.user_name.value = user.name
         self.email.value = user.email

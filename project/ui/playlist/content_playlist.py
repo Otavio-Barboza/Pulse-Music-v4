@@ -37,11 +37,11 @@ class ContentPlaylist(ft.Container):
         """
             Carrega os Cards na tela na inicialização do player
         """
-        self.estado.carregar_playlists()
+        self.estado.load_playlists()
         self.update()
 
     def abrir_config_playlist(self, e):
-        self.estado.abrir_config_playlist(e)
+        self.estado.open_config_playlist(e)
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(

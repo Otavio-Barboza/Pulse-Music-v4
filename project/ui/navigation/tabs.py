@@ -15,7 +15,7 @@ import flet as ft
 
 
 class TabsNavigation(ft.Tabs):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             selected_index = 0,
             animation_duration = 300,
@@ -39,7 +39,7 @@ class TabsNavigation(ft.Tabs):
                 weight = ft.FontWeight.W_300
             )
         )
-        
+        self.page = page
         self._icones_tabs = []
         self._labels_tabs = []
         self.lista_labels = [
@@ -50,18 +50,12 @@ class TabsNavigation(ft.Tabs):
             {'label' : 'Pesquisar', 'icon' : ft.Icons.YOUTUBE_SEARCHED_FOR_ROUNDED}
         ]
 
-        self.playlist = ColumnCards()
-        self.pesquisa_musica = MusicSearch()
-        self.artistas = GridImages(
-            mode = GridMode.ARTIST,
-            path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Artistas'
-        )
-        self.albuns = GridImages(
-            mode = GridMode.ALBUM,
-            path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Albuns'
-        )
+        self.playlist = ColumnCards(self.page)
+        self.pesquisa_musica = MusicSearch(self.page)
+        self.artistas = GridImages(mode = GridMode.ARTIST, page = self.page)
+        self.albuns = GridImages(mode = GridMode.ALBUM, page = self.page)
         
-        self._criar_tabs()
+        self._create_tabs()
 
         self.tabs = [
             ft.Tab(
@@ -92,7 +86,7 @@ class TabsNavigation(ft.Tabs):
 
         ResizeManager.register(self._ajustar_tabs)
 
-    def _criar_tabs(self):
+    def _create_tabs(self):
         for l in self.lista_labels:
             label, icone = self._tab_label(
                 icon=l["icon"],
@@ -122,11 +116,9 @@ class TabsNavigation(ft.Tabs):
 
         return row, icone
 
-    def _ajustar_tabs(self, e=None):
+    def _ajustar_tabs(self, e = None):
         compact: float | int = self.page.width < 576
         
-        icon: ft.Icons
-
         for icon in self._icones_tabs:
             icon.visible = not compact
 

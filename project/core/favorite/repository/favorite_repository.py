@@ -3,14 +3,14 @@ from core.services.account_manager import AccountManager
 from core.utils.utils import Utils
 from core.song.model.song import Song
 from core.favorite.enum.favorite_enum import Favorited
+from core.utils.path import AppPaths
 
 # imports gerais
+from pathlib import Path
 import json, os
 
 
 class FavoriteRepository:
-
-    CAMINHO_FAVORITAS = f"Assets/Data/Contas/{'AccountManager.accounts_cache[current_account]'}/Song/favoritas.json"
 
     @classmethod
     def format_object_in_json(cls, data: Song, status: Favorited) -> str | dict[str, dict[str, str]]:
@@ -24,7 +24,7 @@ class FavoriteRepository:
 
     @classmethod
     def list_favorite(cls) -> list[str]:
-        favorite_json: dict = Utils.sync_load_json(cls.CAMINHO_FAVORITAS)
+        favorite_json: dict = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "music" / "favorites.json")
         favorite_keys: list[str] = []
 
         key: str
@@ -37,7 +37,7 @@ class FavoriteRepository:
     
     @classmethod
     def list_favorite_objects(cls) -> list[Song]:
-        favorite_json: dict = Utils.sync_load_json(cls.CAMINHO_FAVORITAS)
+        favorite_json: dict = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "music" / "favorites.json")
         list_music: list[Song] = []
         
         key: str

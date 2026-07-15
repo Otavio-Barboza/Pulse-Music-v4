@@ -75,9 +75,9 @@ class User:
     def to_dict(self) -> dict[str, str]:
         return {
             'id' : self._account_id,
-            'nome' : self._name,
+            'name' : self._name,
             "email" : self._email,
-            "imagem" : self._image
+            "image" : self._image
         }
 
     # def save_json(self):

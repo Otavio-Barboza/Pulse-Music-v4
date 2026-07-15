@@ -11,7 +11,7 @@ class PlaylistState:
     _callbacks = {}
 
     @classmethod
-    def registet_callback(cls, event: str, function: callable):
+    def register_callback(cls, event: str, function: callable):
         if event not in cls._callbacks:
             cls._callbacks[event] = []
         cls._callbacks[event].append(function)

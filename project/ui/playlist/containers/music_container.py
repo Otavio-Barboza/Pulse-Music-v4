@@ -154,7 +154,6 @@ class RowContainer(ft.Container):
         ReproductionManager.update_queues()
 
     def desfavoritar(self, data):
-
         FavoriteState.remove_favorite_json(data)
         FavoriteState.remove_music_to_playback(data)
         ReproductionManager.update_queues()

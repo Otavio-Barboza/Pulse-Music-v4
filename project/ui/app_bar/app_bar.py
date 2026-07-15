@@ -3,13 +3,14 @@ from ui.others.colors import color
 
 # import de back-end
 from core.meta.controller.scanner_controller import ScannerController
+from core.utils.path import AppPaths
 
 # imports geral
 import flet as ft
 
 
 class AppBar(ft.AppBar):
-    def __init__(self, abrir_config):
+    def __init__(self, open_configurations, page: ft.Page):
         super().__init__(
             bgcolor = color.preto7,
             leading_width = 50,
@@ -23,10 +24,10 @@ class AppBar(ft.AppBar):
                     controls = [
                         ft.CircleAvatar(
                             radius = 20,
-                            bgcolor = color.branco,
+                            # bgcolor = color.branco,
         
                             content = ft.Image(
-                                src = r'Assets/Global/Images/Logo/logo_v2.png',
+                                src = str(AppPaths.ASSETS_IMAGE / "logos" / "logo_vet.svg"),
                                 border_radius = 100
                             )
                         ),
@@ -40,12 +41,12 @@ class AppBar(ft.AppBar):
                 )
             )
         )
-
-        self.abrir_config = abrir_config
+        self.page = page
+        self.open_configurations = open_configurations
         
         self.config_btn = ft.IconButton(
             icon = ft.Icons.SETTINGS,
-            on_click =  lambda e: self.abrir_config()
+            on_click =  lambda e: self.open_configurations()
         )
         
         self.icon_status = ft.Container(
@@ -89,7 +90,7 @@ class AppBar(ft.AppBar):
             self.icon_status,
             self.config_btn
         ]
-        
+
         self.page.end_drawer = self.conteudo_drawer
 
         ScannerController.register_callback(

@@ -132,9 +132,9 @@ class AccountManager:
                     except Exception:
                         pass
         
-        name: str = profile.get("nome", "")
+        name: str = profile.get("name", "")
         email: str = profile.get("email", "")
-        image: str = profile.get("imagem", "")
+        image: str = profile.get("image", "")
 
         cls._current_user = User(
             account_id = account_id,

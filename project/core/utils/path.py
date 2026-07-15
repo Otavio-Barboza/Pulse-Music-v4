@@ -11,6 +11,7 @@ class AppPaths:
     BASE_DIR = Path(__file__).resolve().parents[2]  # ajuste conforme a localização deste arquivo
 
     # assets
+    ASSETS_IMAGE: Path = BASE_DIR / "assets" / "image"
     ASSETS_JSON: Path = BASE_DIR / "assets" / "auth" / "client_secret_google.json"
 
 
@@ -22,6 +23,3 @@ class AppPaths:
 
     # jsons
     ACCOUNT_JSON: Path = LOCAL_APP_DATA / "accounts.json"
-
-
-print(AppPaths.ACCOUNT_JSON)

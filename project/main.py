@@ -101,19 +101,15 @@ async def main(page: ft.Page):
         """
             Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "open_configurations").
         """     
-
+        nonlocal settings
         if settings is None:
-            settings = ScreenSettings()
+            settings = ScreenSettings(page)
             page.overlay.append(settings)
         else:
             if settings not in page.overlay:
                 page.overlay.append(settings)
         page.update()
 
-    await validate_login()
-    # await load_cache()
-
-    tabs = TabsNavigation()
 
     async def on_current_account(usuario):
         """
@@ -126,11 +122,18 @@ async def main(page: ft.Page):
     
     StateApp.register_callback("current_account", on_current_account)
     
-    player = PlayerSection()
-    page.appbar = AppBar(open_configurations = open_configurations)
+    await validate_login()
+    # await load_cache()
+
+    tabs = TabsNavigation(page)
+    page.appbar = AppBar(open_configurations = open_configurations, page = page)
+    
+    player = PlayerSection(page)
     
     page.add(
         ft.SafeArea(
+            expand = True,
+
             content = ft.Stack(
                 expand = True,
                 
@@ -161,8 +164,8 @@ async def main(page: ft.Page):
     
     page.on_resized = ResizeManager.to_execute
    
-    AudioLoop.start()
-    ReproductionManager.start()
+    # AudioLoop.start()
+    # ReproductionManager.start()
      
     page.run_task(
         ScannerModel.async_start_scanner

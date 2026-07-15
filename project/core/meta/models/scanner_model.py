@@ -22,13 +22,13 @@ class ScannerModel:
         cls.set_status(
             None
         )
-        Scanner.gerenciar_status()
+        Scanner.manager_status()
         
         while cls._status_operation != ScannerStatus.BREAK:
             if cls._status_operation == ScannerStatus.PAUSE:
                 await asyncio.sleep(1)
             else:
-                await Scanner._async_verificar_json()
+                await Scanner.verify_json()
                 await asyncio.sleep(5)
         else:
             raise('Scanner parou inesperadamente!')

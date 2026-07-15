@@ -13,13 +13,13 @@ import flet as ft
 
 
 class ScreenSettings(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             expand = True,
             bgcolor = color.preto6,
             padding = 0
         )
-
+        self.page = page
         # dicionário que guarda todos os botões
         self.buttons = {}
 
@@ -37,7 +37,7 @@ class ScreenSettings(ft.Container):
                 bottom_left = 10
             ),
 
-            content = AccountSettings(page = self.page)
+            content = AccountSettings(self.page)
         )
 
         self.content = ft.Row(
@@ -102,8 +102,8 @@ class ScreenSettings(ft.Container):
                                 horizontal = 15
                             ),
                             color = {
-                                ft.ft.ControlState.DEFAULT : color.branco,
-                                ft.ft.ControlState.HOVERED : color.preto_puro
+                                ft.ControlState.DEFAULT : color.branco,
+                                ft.ControlState.HOVERED : color.preto_puro
                             },
                             alignment = ft.alignment.center,
                             icon_size = 20

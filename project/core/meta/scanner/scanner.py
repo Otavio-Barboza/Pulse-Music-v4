@@ -8,6 +8,7 @@ from core.playlists.enum.playlist_enum import PlaylistLoaded
 from core.meta.controller.scanner_controller import ScannerController
 from core.services.controllers.grid_state import GridMode
 from core.meta.repository.filtering import Filtering
+from core.utils.path import AppPaths
 
 # imports gerais
 from collections import defaultdict
@@ -96,16 +97,14 @@ class Scanner:
         await asyncio.sleep(1)
 
     @classmethod
-    async def _verify_json(cls):
+    async def verify_json(cls):
         if cls._is_running:
             return
         
         cls._is_running = True
         
         try:
-            available_playlists = os.listdir(
-                f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists'
-            )
+            available_playlists = os.listdir(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists")
                 
             for playlist in available_playlists:
                 data_playlist = await MetadataRepository.return_artists_json()

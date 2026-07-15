@@ -75,17 +75,16 @@ async def main(page: ft.Page):
               →  Se tiver conta logada: notifica o StateApp ("conta_atual") para realizar o carregamento do usuario e informações ao player. 
               →  Senão: notifica o StateApp ("no_account") para realizar o login pelas contas Google.
         """
-        print()
+
         current_id = AccountManager.read_current_account_index()
-        print(current_id)
-        print()
+
         if current_id is not None:
             data = AccountManager.search_account_index(current_id)
             profile = open_profile(current_id)
 
             AccountManager.load_account(
                 account_id = current_id,
-                base_path = data["base_path"],   
+                base_path = Path(data["base_path"]),   
                 data = profile
             )
         else:

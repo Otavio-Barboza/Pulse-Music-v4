@@ -23,21 +23,21 @@ class PlayerSection:
     def __init__(self):
         self.overlays = []
         
-        self.barra_duração_compacta = CompactProgressBar(page = self.page)
-        self.barra_duração_expandida = CompactProgressBar(page = self.page)
+        self.barra_duração_compacta = CompactProgressBar()
+        self.barra_duração_expandida = CompactProgressBar()
         
-        self.info_compacto = PlayerInformation(page = self.page)
-        self.info_espandido = PlayerInformation(page = self.page)
-        self.icones_compacto = PlayerIcons(page = self.page)
-        self.icones_expandido = PlayerIcons(page = self.page)
-        self.comandos_compacto = PlayerCommands(page = self.page, expandir = self.expandir, player = self)
-        self.comandos_expandido = PlayerCommands(page = self.page, expandir = self.expandir, player = self)
+        self.info_compacto = PlayerInformation()
+        self.info_espandido = PlayerInformation()
+        self.icones_compacto = PlayerIcons()
+        self.icones_expandido = PlayerIcons()
+        self.comandos_compacto = PlayerCommands(expandir = self.expandir, player = self)
+        self.comandos_expandido = PlayerCommands(expandir = self.expandir, player = self)
         
         self.compacto = self._retornar_compacto(expandido = False)
         self.compacto_expandido = self._retornar_compacto(expandido = True)
 
-        self.info_expandido = ExpandedInformation(page = self.page)
-        self.menu_infos = InformationMenu(page = self.page, trocar_view = self._trocar_view)
+        self.info_expandido = ExpandedInformation()
+        self.menu_infos = InformationMenu(trocar_view = self._trocar_view)
         self.conteudo_infos = None
         
         self.expandido = ft.Container(

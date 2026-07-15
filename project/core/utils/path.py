@@ -19,8 +19,6 @@ class AppPaths:
     
     # pastas
     ACCOUNT: Path = LOCAL_APP_DATA / "account"
-    CONFIG: Path = LOCAL_APP_DATA / "config"
-    CACHE: Path = LOCAL_APP_DATA / "cache"
 
     # jsons
     ACCOUNT_JSON: Path = LOCAL_APP_DATA / "accounts.json"

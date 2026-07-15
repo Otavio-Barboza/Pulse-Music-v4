@@ -93,7 +93,7 @@ class ColumnCards(ft.Column):
             self.conteudo
         ]
 
-        StateApp.register_callback(evento = 'overlay_tips', func = ServiceSettings.save_overlay_tips)
+        StateApp.register_callback(event = 'overlay_tips', func = ServiceSettings.save_overlay_tips)
         StateApp.register_callback('actualization_on_click', self.mudar_on_click)
 
     def mudar_on_click(self, valor):

@@ -42,15 +42,15 @@ class CompactProgressBar(ft.Container):
         ResizeManager.register(self._on_resize)
 
         ReproductionManager.register_callback(
-            evento = 'slider_position', 
+            event = 'slider_position', 
             callback = self._att_dur_atual
         )
         ReproductionManager.register_callback(
-            evento = 'slider', 
+            event = 'slider', 
             callback = self._att_slider
         )
         ReproductionManager.register_callback(
-            evento = 'total_time',
+            event = 'total_time',
             callback = self._att_dur_total
         )
 

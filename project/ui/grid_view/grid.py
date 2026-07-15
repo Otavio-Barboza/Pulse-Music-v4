@@ -7,8 +7,10 @@ from core.song.enum.song_enum import ReproductionMode
 from core.meta.cache.global_cache import cache_metadata
 from core.meta.repository.extract_metadata import ExtractMetadata
 from core.services.account_manager import AccountManager
+from core.utils.path import AppPaths
 
 # imports gerais
+from pathlib import Path
 import flet as ft
 import os
 
@@ -30,7 +32,7 @@ class GridImages(ft.GridView):
         
         GridState.register_callback(
             event = 'att_grid',
-            function = self.build_images
+            func = self.build_images
         )
     
     def click(self, e):
@@ -115,12 +117,19 @@ class GridImages(ft.GridView):
             lista = song_list
         )
 
-    def build_images(self, mode : GridMode):    
+    def build_images(self, mode: GridMode):    
         if mode != self.mode:
             return
         
-        path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/{"Artistas" if mode == GridMode.ARTIST else "Albuns"}'
-        
+        # path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/{"Artistas" if mode == GridMode.ARTIST else "Albuns"}'
+        if mode == GridMode.ARTIST:
+            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "artists"
+        elif mode == GridMode.ALBUM:
+            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "albums"
+        else:
+            ...
+            
+        print(path)
         self.controls.clear()
         
         for img in os.listdir(path):

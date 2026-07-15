@@ -53,12 +53,12 @@ class TabsNavigation(ft.Tabs):
         self.playlist = ColumnCards()
         self.pesquisa_musica = MusicSearch()
         self.artistas = GridImages(
-            modo = GridMode.ARTIST,
-            caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Artistas'
+            mode = GridMode.ARTIST,
+            path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Artistas'
         )
         self.albuns = GridImages(
-            modo = GridMode.ALBUM,
-            caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Albuns'
+            mode = GridMode.ALBUM,
+            path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Albuns'
         )
         
         self._criar_tabs()

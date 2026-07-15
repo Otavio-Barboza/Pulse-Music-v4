@@ -63,12 +63,9 @@ class AccountManager:
         """
             Função para carregar o accounts.json armazenando os cados em cache (cls.accounts_cache).
         """
-        print(f"EXISTE: {AppPaths.ACCOUNT_JSON.exists()}")
 
         if AppPaths.ACCOUNT_JSON.exists():
-            print(cls.accounts_cache)
             cls.accounts_cache = Utils.sync_load_json(AppPaths.ACCOUNT_JSON)
-            print(cls.accounts_cache)
             return True
         else:
             return False

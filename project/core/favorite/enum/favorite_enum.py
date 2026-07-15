@@ -1,3 +1,4 @@
+# import geral
 from enum import Enum
 
 

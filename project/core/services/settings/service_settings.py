@@ -1,7 +1,11 @@
+# imports de back-end
 from project.core.utils.utils import Utils
 from project.core.utils.path import AppPaths
 from project.core.services.account_manager import AccountManager
+
+# imports gerais
 from pathlib import Path
+
 
 class ServiceSettings:
     

@@ -2,7 +2,7 @@
 from project.ui.others.colors import color
 
 # import de back-end
-from ... import LetrasServices
+from project.core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
 import flet as ft
@@ -38,13 +38,13 @@ class TranslationContent(ft.Container):
 
             items = [
                 ft.PopupMenuItem(
-                    text = idioma,
+                    text = language,
                     data = {
                         'uf' : uf,
-                        'idioma' : idioma
+                        'language' : language
                     },                                        
                     on_click = self.selecionar_idioma
-                ) for idioma, uf in LetrasServices._LINGUAGENS_DIPONIVEIS.items()
+                ) for language, uf in LyricsServices.AVAILABLE_LANGUAGES.items()
             ]
         )
 
@@ -73,7 +73,7 @@ class TranslationContent(ft.Container):
                     spacing = 30,
                     controls = [
                         ft.Text(
-                            value = 'Selecione um idioma',
+                            value = 'Selecione um language',
                             size = 26,
                             weight = ft.FontWeight.BOLD
                         ),
@@ -85,18 +85,18 @@ class TranslationContent(ft.Container):
         )
 
     def carregar_letra(self):
-        from .....App.Letras.Cache.memoria_letras import LetrasMemoria
+        from project.core.lyrics.cache.cache_lyrics import CacheLyrics
 
-        if LetrasMemoria._cache_letra is None:
+        if CacheLyrics.cache_lyrics is None:
             return 'Nenhuma letra carregada para tradução'
         else:
-            return LetrasServices.executar_traducao(LetrasMemoria._cache_letra)
+            return LyricsServices.start_translation(CacheLyrics.cache_lyrics)
 
     def selecionar_idioma(self, e):
-        from .....App.Letras.Cache.memoria_letras import LetrasMemoria
+        from project.core.lyrics.cache.cache_lyrics import CacheLyrics
 
-        LetrasMemoria.atualizar_cache(e.control.data.get('idioma'))
-        LetrasServices.TRADUTOR.target = e.control.data.get('uf')
+        CacheLyrics.update_cache(e.control.data.get('language'))
+        LyricsServices.translator.target = e.control.data.get('uf')
         
-        self.letra.content.value = LetrasServices.executar_traducao(e.control.data.get('idioma'))
+        self.letra.content.value = LyricsServices.start_translation(e.control.data.get('language'))
         self.update()

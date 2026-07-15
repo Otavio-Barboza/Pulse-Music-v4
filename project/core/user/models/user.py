@@ -1,4 +1,6 @@
+# imports gerais
 import os, json
+
 
 class User:
 

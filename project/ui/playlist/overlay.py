@@ -3,7 +3,7 @@ from project.ui.others.colors import color
 
 # imports de back-end
 from project.core.playlists.enum.playlist_enum import PlalistOverlayMode
-from ...App.Meta.Pipeline.pipeline import Pipeline
+from project.core.meta.pipeline.pipeline import Pipeline
 
 # imports gerais
 from tkinter import filedialog, Tk
@@ -474,7 +474,7 @@ class ContainerOverlay(ft.Container):
 
     async def start_pipeline(self, path: str, id: str):
         await asyncio.to_thread(
-            Pipeline._processar_wrapper_sync,
+            Pipeline.start_wrapper_sync,
             path,
             [],
             id

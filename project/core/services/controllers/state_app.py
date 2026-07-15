@@ -1,4 +1,6 @@
+# imports gerais
 import inspect, asyncio
+
 
 class StateApp:
     current_account = None

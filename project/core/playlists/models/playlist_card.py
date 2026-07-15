@@ -1,5 +1,7 @@
+# imports gerais
 from pathlib import Path
 from flet import Colors
+
 
 class PlaylistCard:
     def __init__(

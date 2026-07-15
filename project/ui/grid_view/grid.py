@@ -4,95 +4,96 @@ from project.ui.others.overlay_images import OverlayImages
 # imports de back-end
 from project.core.services.controllers.grid_state import GridMode, GridState
 from project.core.song.enum.song_enum import ReproductionMode
-from ...App.Meta.Memoria.memoria_global import memoria
-from ...App.Meta.Repository.extrai_metadados import ExtracaoMetadados
+from project.core.meta.cache.global_cache import cache_metadata
+from project.core.meta.repository.extract_metadata import ExtractMetadata
 from project.core.services.account_manager import AccountManager
 
 # imports gerais
 import flet as ft
 import os
 
+
 class GridImages(ft.GridView):
-    def __init__(self, modo : GridMode, caminho : str):
+    def __init__(self, mode: GridMode, path : str):
         super().__init__(
-            max_extent = 200 if modo == GridMode.ARTIST else 250,
+            max_extent = 200 if mode == GridMode.ARTIST else 250,
             expand = True,
             spacing = 65,
             run_spacing = 15,
             padding = ft.padding.all(15)
         )
 
-        self.modo = modo
+        self.mode = mode
 
         self.controls = []
-        self.reconstruir_imagens(self.modo)
+        self.build_images(self.mode)
         
         GridState.register_callback(
             event = 'att_grid',
-            function = self.reconstruir_imagens
+            function = self.build_images
         )
     
     def click(self, e):
         from project.core.song.model.song import Song
         from project.core.song.model.reproduction import Reproduction
         
-        lista_mus = []
+        song_list = []
         
-        if self.modo == GridMode.ARTIST:
+        if self.mode == GridMode.ARTIST:
             modo_playlist = ReproductionMode.ARTIST
-            dados = memoria.artistas.to_dict()
+            dados = cache_metadata.artists.to_dict()
             
-            for chave, musica in dados.get(e.control.data).items():
-                if chave == 'musicas':
-                    for mus in musica:
-                        lista_mus.append(
+            for key, song in dados.get(e.control.data).items():
+                if key == 'songs':
+                    for music in song:
+                        song_list.append(
                             Song(
                                 mode = modo_playlist,
                                 name = os.path.basename(
-                                    mus.get('caminho_completo')
+                                    music.get('caminho_completo')
                                 ).replace(
                                     '.mp3', ''
                                 ),
-                                path = mus.get('caminho_completo'),
-                                key = mus.get('key')
+                                path = music.get('caminho_completo'),
+                                key = music.get('key')
                             )
                         )
                 
-            caminho = dados.get(e.control.data).get('musicas')[0].get('caminho_completo')
-            img = ExtracaoMetadados.carregar_imagem_big_base64(
-                caminho_arquivo = caminho, 
+            path = dados.get(e.control.data).get('songs')[0].get('caminho_completo')
+            img = ExtractMetadata.load_image_big_base64(
+                caminho_arquivo = path, 
                 tipo = 'artist'
             )
             nome = dados.get(e.control.data).get('nome_artistas')
         else:
             modo_playlist = ReproductionMode.ALBUM
-            dados = memoria.albuns.to_dict()
+            dados = cache_metadata.albums.to_dict()
             
-            for musica in dados.get(e.control.data).values():
-                for caminho_musica in musica:
-                    lista_mus.append(
+            for song in dados.get(e.control.data).values():
+                for song_path in song:
+                    song_list.append(
                         Song(
                             mode = ReproductionMode.ALBUM,
                             
                             name = os.path.basename(
-                                caminho_musica.get('caminho_da_musica_completa')
+                                song_path.get('caminho_da_musica_completa')
                             ).replace('.mp3', ''),
                             
                             path = os.path.normpath(
-                                caminho_musica.get('caminho_da_musica_completa')
+                                song_path.get('caminho_da_musica_completa')
                             ),
                             
-                            key = caminho_musica.get('chave_da_musica')
+                            key = song_path.get('chave_da_musica')
                         ) 
                     )                
 
-            for musica in lista_mus:
-                if musica.caminho is not None:
-                    caminho = musica.caminho
+            for song in song_list:
+                if song.path is not None:
+                    path = song.path
                     break
                 
-            img = ExtracaoMetadados.carregar_imagem_big_base64(
-                caminho_arquivo = caminho, 
+            img = ExtractMetadata.load_image_big_base64(
+                caminho_arquivo = path, 
                 tipo = 'album'
             )
             nome = e.control.data
@@ -101,8 +102,8 @@ class GridImages(ft.GridView):
         self.page.overlay.append(
             OverlayImages(
                 image_big = img,
-                music = lista_mus,
-                mode = self.modo,
+                music = song_list,
+                mode = self.mode,
                 name = nome,
                 playlist_mode = modo_playlist
             )
@@ -110,31 +111,29 @@ class GridImages(ft.GridView):
         self.page.update()
         
         Reproduction.load_songs_from_mode(
-            modo = modo_playlist,
-            lista = lista_mus
+            mode = modo_playlist,
+            lista = song_list
         )
 
-
-    def reconstruir_imagens(self, modo : GridMode):
-        
-        if modo != self.modo:
+    def build_images(self, mode : GridMode):    
+        if mode != self.mode:
             return
         
-        caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/{"Artistas" if modo == GridMode.ARTIST else "Albuns"}'
+        path = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/{"Artistas" if mode == GridMode.ARTIST else "Albuns"}'
         
         self.controls.clear()
         
-        for img in os.listdir(caminho):
-            chave_img = img.removesuffix('.jpg')
+        for img in os.listdir(path):
+            image_key = img.removesuffix('.jpg')
             
-            if self.modo == GridMode.ARTIST:
-                nome = memoria.artistas.to_dict().get(chave_img).get('nome_artistas')
+            if self.mode == GridMode.ARTIST:
+                nome = cache_metadata.artists.to_dict().get(image_key).get('nome_artistas')
             else:
-                nome = chave_img
+                nome = image_key
                 
             self.controls.extend([
                 ft.Container(
-                    data = chave_img,
+                    data = image_key,
                     on_click = self.click,
 
                     content = ft.Column(
@@ -143,8 +142,8 @@ class GridImages(ft.GridView):
 
                         controls = [
                             Imagem(
-                                src = f'{caminho}/{img}', 
-                                modo = self.modo
+                                src = f'{path}/{img}', 
+                                mode = self.mode
                             ),
                             ft.Text(
                                 value = nome,
@@ -161,10 +160,10 @@ class GridImages(ft.GridView):
 
 
 class Imagem(ft.Image):
-    def __init__(self, src : str, modo : GridMode):
+    def __init__(self, src : str, mode : GridMode):
         super().__init__(
             src = src if src else r'',
-            border_radius = ft.border_radius.all(100) if modo == GridMode.ARTIST else ft.border_radius.all(7.5),
+            border_radius = ft.border_radius.all(100) if mode == GridMode.ARTIST else ft.border_radius.all(7.5),
             filter_quality = ft.FilterQuality.HIGH,
             fit = ft.ImageFit.COVER
         )

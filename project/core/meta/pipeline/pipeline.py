@@ -85,7 +85,7 @@ class Pipeline:
             )
 
     @classmethod
-    def processar_wrapper_sync(cls, path: str, object_list: list = [], id_playlist: str | None = None) -> list[SongMetadata]:
+    def start_wrapper_sync(cls, path: str, object_list: list = [], id_playlist: str | None = None) -> list[SongMetadata]:
         
         ScannerModel.start_task()
         ScannerModel.set_status_prosesses(
@@ -111,7 +111,7 @@ class Pipeline:
             print(f"[PIPELINE ERROR]: {e}")
             traceback.print_exc()
         finally:
-            ScannerModel.finalizar_tarefa()
+            ScannerModel.finaly_task()
             
             if not ScannerModel.return_is_busy():
                 ScannerModel.set_status_prosesses(

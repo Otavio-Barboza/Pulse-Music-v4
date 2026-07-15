@@ -1,5 +1,7 @@
+# imports gerais
 from pathlib import Path
 import os
+
 
 class AppPaths:
 

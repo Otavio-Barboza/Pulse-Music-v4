@@ -1,6 +1,9 @@
+# import geral
 import flet as ft
 
+
 class Colors:
+
     def __init__(self):
         self.branco = '#ececec'
         self.branco2 = '#f9f9f9'

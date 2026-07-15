@@ -12,13 +12,12 @@ from project.core.utils.utils import Utils
 from project.core.utils.path import AppPaths
 from project.core.services.account_manager import AccountManager
 from project.core.services.controllers.resize_manager import ResizeManager
-from Assets.App.Audio.Model.audio import AudioLoop
-from Assets.App.Audio.Controller.sessao import SessaoReproducao
-from Assets.App.Meta.Repository.persistencia import Persistencia
-from Assets.App.Meta.Models.scanner_model import ScannerModel
-from Assets.App.Meta.Memoria.memoria_global import memoria
-from Assets.App.Meta.Memoria.memoria_artistas import MemoriaArtistas
-from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria
+from project.core.song.model.audio import AudioLoop
+from project.core.song.controller.reproduction_manager import ReproductionManager
+from project.core.meta.models.scanner_model import ScannerModel
+from project.core.meta.cache.global_cache import cache_metadata
+from project.core.meta.cache.cache_artists import CacheArtists
+from project.core.lyrics.cache.cache_lyrics import CacheLyrics
 
 # imports de bibliotecas  gerais
 from pathlib import Path
@@ -90,12 +89,12 @@ async def main(page: ft.Page):
         else:
             StateApp.notify("no_account")
 
-    async def carregar_memoria():
-        data: dict = await Persistencia.ler_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
-        memoria.carregar(data)
+    async def load_cache():
+        data: dict = await Utils.sync_load_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
+        cache_metadata.load(data)
         
-        await MemoriaArtistas.carregar()
-        LetrasMemoria.carregar_memoria()
+        await CacheArtists.load()
+        CacheLyrics.load_cache()
 
     def open_configurations():
         """
@@ -103,7 +102,7 @@ async def main(page: ft.Page):
         """     
 
         if settings is None:
-            settings = ScreenSettings(page)
+            settings = ScreenSettings()
             page.overlay.append(settings)
         else:
             if settings not in page.overlay:
@@ -111,7 +110,7 @@ async def main(page: ft.Page):
         page.update()
 
     await validate_login()
-    await carregar_memoria()
+    await load_cache()
 
     tabs = TabsNavigation()
 
@@ -126,8 +125,8 @@ async def main(page: ft.Page):
     
     StateApp.register_callback("current_account", on_current_account)
     
-    player = PlayerSection(page = page)
-    page.appbar = AppBar(page = page, open_configurations = open_configurations)
+    player = PlayerSection()
+    page.appbar = AppBar(open_configurations = open_configurations)
     
     page.add(
         ft.SafeArea(
@@ -161,11 +160,11 @@ async def main(page: ft.Page):
     
     page.on_resized = ResizeManager.to_execute
    
-    AudioLoop.iniciar()
-    SessaoReproducao.inicar()
+    AudioLoop.start()
+    ReproductionManager.start()
      
     page.run_task(
-        ScannerModel._async_iniciar_scanner
+        ScannerModel.async_start_scanner
     )
 
 

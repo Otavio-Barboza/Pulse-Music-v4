@@ -1,5 +1,9 @@
+# import de front-end
 from project.ui.others.colors import color
+
+# import geral
 import flet as ft
+
 
 class ContainerLoading(ft.Container):
     def __init__(self):

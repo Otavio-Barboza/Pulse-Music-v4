@@ -2,7 +2,7 @@
 from project.ui.others.colors import color
 
 # import de back-end
-from Assets.App.Letras.Controller.letras_services import LetrasServices 
+from project.core.lyrics.controller.lyrics_services import LyricsServices 
 
 # import geral
 import flet as ft
@@ -28,19 +28,19 @@ class LyricsContainer(ft.Container):
         )
 
         self.callback = self.atualizar_letra
-        LetrasServices.registrar_callback(
-            evento = 'att_letra',
+        LyricsServices.register_callback(
+            event = "actualization_lyric",
             callback = self.atualizar_letra
         )
 
     def did_mount(self):
-        LetrasServices.set_tela_expandida(True)
+        LyricsServices.set_expanded_screen(True)
 
     def will_unmount(self):
-        LetrasServices.set_tela_expandida(False)
+        LyricsServices.set_expanded_screen(False)
         
-        if self.callback in LetrasServices._callbacks['att_letra']:
-            LetrasServices._callbacks['att_letra'].remove(self.callback)
+        if self.callback in LyricsServices.callbacks["actualization_lyric"]:
+            LyricsServices.callbacks["actualization_lyric"].remove(self.callback)
         
     def carregar_letra(self) -> str:
         from Assets.App.Letras.Cache.memoria_letras import LetrasMemoria

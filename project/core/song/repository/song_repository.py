@@ -1,7 +1,7 @@
 # imports de back-end
 from project.core.song.model.song import Song
 from project.core.song.enum.song_enum import ReproductionMode
-from ...Meta.Repository.tarefas import ManagesMetadata
+from project.core.meta.repository.tasks import Task
 from project.core.utils.utils import Utils
 from project.core.services.account_manager import AccountManager
 
@@ -20,7 +20,7 @@ class SongRepository:
                 path = os.path.normpath(
                     os.path.join(path, song)
                 ),
-                key = ManagesMetadata.gerar_track_id(
+                key = Task.return_track_id(
                     os.path.normpath(
                         os.path.join(path, song)
                     )

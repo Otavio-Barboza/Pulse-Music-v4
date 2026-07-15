@@ -1,9 +1,12 @@
-import smtplib, dotenv, os
+# imports gerais
 from email.message import EmailMessage
 from datetime import datetime
+import smtplib, dotenv, os
+
 
 dotenv.load_dotenv(r'Assets\App\Env\.env')
 SENHA_APP = os.getenv('SENHA_APP')
+
 
 def send_email(
     message: str,

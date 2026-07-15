@@ -16,7 +16,7 @@ class AudioLoop:
         cls.player = content
         
     @classmethod
-    def iniciar(cls):
+    def start(cls):
         if cls._initialized:
             return
         

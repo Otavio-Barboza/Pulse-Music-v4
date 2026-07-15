@@ -1,5 +1,6 @@
 from project.core.playlists.models.playlist_config import PlaylistConfig
 
+
 class Playlist:
     def __init__(
         self, 

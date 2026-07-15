@@ -1,4 +1,5 @@
 class EstadoSection:
+    
     state = {
         'view' : []
     }

@@ -14,12 +14,12 @@ class FavoriteRepository:
 
     @classmethod
     def format_object_in_json(cls, data: Song, status: Favorited) -> str | dict[str, dict[str, str]]:
-        from ...Audio.Model.modo_reproducao import ModoReprodução
+        from project.core.song.enum.song_enum import ReproductionMode
         return data.chave, {
             'status' : status,
             'nome' : data.nome,
             'caminho' : data.caminho,
-            'modo' : ModoReprodução.FAVORITA.value
+            'modo' : ReproductionMode.FAVORITE.value
         }
 
     @classmethod

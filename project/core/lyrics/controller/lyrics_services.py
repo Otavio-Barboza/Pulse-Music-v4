@@ -12,32 +12,32 @@ import requests
 
 class LyricsServices:
 
-    _expanded_screen: bool = False
+    expanded_screen: bool = False
     GENIUS = Genius()
     translator = Translator()
 
-    _AVAILABLE_LANGUAGES : dict[str, str] = {}    
+    AVAILABLE_LANGUAGES : dict[str, str] = {}    
     for language, uf in translator._languages.items():
-        _AVAILABLE_LANGUAGES[
+        AVAILABLE_LANGUAGES[
             language.replace(" ", "_")
         ] = uf
 
-    _callbacks = {}
+    callbacks = {}
 
     @classmethod
     def register_callback(cls, event: str, callback : callable):
-        if event not in cls._callbacks:
-            cls._callbacks[event] = []
-        cls._callbacks[event].append(callback)
+        if event not in cls.callbacks:
+            cls.callbacks[event] = []
+        cls.callbacks[event].append(callback)
 
     @classmethod
-    def notifify(cls, data, event : str):
-        for callback in cls._callbacks.get(event, []):
+    def notify(cls, data, event : str):
+        for callback in cls.callbacks.get(event, []):
             callback(data)
 
     @classmethod
     def set_expanded_screen(cls, valor : bool):
-        cls._expanded_screen = valor
+        cls.expanded_screen = valor
 
     @classmethod
     def get_lyric(cls, data: dict) -> str | None:
@@ -61,7 +61,7 @@ class LyricsServices:
 
             CacheLyrics.load_cache()
 
-            if cls._expanded_screen:
+            if cls.expanded_screen:
                 cls.notifify(
                     event = "actualization_lyric",
                     data = None

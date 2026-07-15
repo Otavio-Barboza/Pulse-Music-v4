@@ -5,7 +5,7 @@ from project.core.song.model.player import Player
 from project.core.song.enum.song_enum import ReproductionMode
 from project.core.song.model.song import Song
 from project.core.song.repository.song_repository import SongRepository
-from ...Letras.Controller.letras_services import LetrasServices
+from project.core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
 import random, threading, time
@@ -37,9 +37,9 @@ class ReproductionManager:
         'shuffle' : []
     }
 
-    LetrasServices.registrar_callback(
-        evento = 'buscar_letra',
-        callback = LetrasServices.buscar_letra
+    LyricsServices.register_callback(
+        event = 'get_lyrics',
+        callback = LyricsServices.get_lyric
     )
 
     # CALLBACKS
@@ -137,18 +137,18 @@ class ReproductionManager:
         cls.notify('play/pause')
         cls.notify('current_song')
         
-        LetrasServices.notify(
-            evento = 'buscar_letra',
+        LyricsServices.notify(
+            event = 'get_lyrics',
             dados = {
                 'chave' : cls.state.current_song.chave,
-                'nome' : cls.buscar_nome(),
-                'artista' : cls.buscar_artista()
+                'nome' : cls.get_name(),
+                'artista' : cls.get_artist()
             }
         )
 
-        if LetrasServices._tela_expandida:
-            LetrasServices.notify(
-                evento = 'att_letra',
+        if LyricsServices.expanded_screen:
+            LyricsServices.notify(
+                event = 'actualization_letra',
                 dados = None
             )
 

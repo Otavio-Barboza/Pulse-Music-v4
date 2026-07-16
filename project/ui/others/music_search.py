@@ -21,6 +21,13 @@ class MusicSearch(ft.Container):
             'Ex: Linkin Park - Numb'
         ]
 
+        self.caixa_texto = None
+        self.container_texto = None
+        self.content = None
+
+    
+    # FUNÇÕES DE CRIAÇÃO DE COMPONENTES
+    def _create_components(self):
         self.caixa_texto = ft.TextField(
             hint_text = 'Digite a musica...',
             hint_style = ft.TextStyle(
@@ -67,6 +74,7 @@ class MusicSearch(ft.Container):
             )
         )
 
+    def _build_class(self):
         self.content = ft.Column(
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
             alignment = ft.MainAxisAlignment.CENTER,
@@ -86,6 +94,15 @@ class MusicSearch(ft.Container):
             ]
         )
     
+
+    # FUNÇÃO DE INICIALIZAÇÃO
+    def load(self):
+        self._create_components()
+        self._build_class()
+        # self.update()
+
+
+    # CRIAÇÃO DE ITENs
     def _criar_textos(
             self, 
             texto : str, 

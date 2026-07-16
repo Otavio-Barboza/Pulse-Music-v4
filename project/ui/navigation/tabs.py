@@ -57,6 +57,13 @@ class TabsNavigation(ft.Tabs):
         
         self._create_tabs()
 
+        self.tabs = []
+
+
+    # CRIAÇÃO DOS COMPONENTES DE TABS
+    def _build_class(self):
+        self._create_tabs()
+
         self.tabs = [
             ft.Tab(
                 tab_content = self._labels_tabs[0],
@@ -84,13 +91,30 @@ class TabsNavigation(ft.Tabs):
             ),
         ]
 
-        ResizeManager.register(self._ajustar_tabs)
 
+    # FUNÇÕES PARA INICIALIZAR O CARREGAMENTO/CRIAÇÃO NO main()
+    def load(self):
+        # criando e carregando componentes
+        self._build_class()
+        self.playlist.load()
+        self.pesquisa_musica.load()
+        self.artistas.load()
+        self.albuns.load()
+
+    def connect(self):
+        # registrando callbacks
+        ResizeManager.register(self._ajustar_tabs)
+        self.playlist.connect()
+        self.artistas.connect()
+        self.albuns.connect()
+
+
+    # CRIAÇÃO DOS ITENS
     def _create_tabs(self):
         for l in self.lista_labels:
             label, icone = self._tab_label(
-                icon=l["icon"],
-                texto=l["label"]
+                icon = l["icon"],
+                texto = l["label"]
             )
 
             self._labels_tabs.append(label)
@@ -124,11 +148,11 @@ class TabsNavigation(ft.Tabs):
 
         self.update()
         
-    def atualizar_grids(self):
-        self.tabs[1].content.reconstruir_imagens(
-            modo = GridMode.ARTIST
-        )
-        self.tabs[1].update()
+    # def atualizar_grids(self):
+    #     self.tabs[1].content.reconstruir_imagens(
+    #         modo = GridMode.ARTIST
+    #     )
+    #     self.tabs[1].update()
     
     def carregar_favoritas(self):
         from core.song.model.song import Song

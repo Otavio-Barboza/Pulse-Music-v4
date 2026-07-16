@@ -20,27 +20,59 @@ import flet as ft
 
 class PlayerSection:
 
-    def __init__(self, page):
+    def __init__(self, page: ft.Page):
         self.page = page
         self.overlays = []
         
+        self.barra_duração_compacta = None
+        self.barra_duração_expandida = None
+       
+        self.info_compacto = None
+        self.info_espandido = None
+        
+        self.icones_compacto = None
+        self.icones_expandido = None
+        
+        self.comandos_compacto = None
+        self.comandos_expandido = None
+        
+        self.compacto = None
+        self.compacto_expandido = None
+        
+        self.info_expandido = None
+        self.menu_infos = None
+        self.conteudo_infos = None
+        
+        self.expandido = None
+
+        ResizeManager.register(self._redimensionar)
+
+
+    # CRIAÇÃO DE COMPONENTES DA CLASSE
+    def _create_components(self):
+        # progress bar
         self.barra_duração_compacta = CompactProgressBar()
         self.barra_duração_expandida = CompactProgressBar()
-        
+
+        # informações do compacto
         self.info_compacto = PlayerInformation()
         self.info_espandido = PlayerInformation()
+
+        # icones do compacto
         self.icones_compacto = PlayerIcons()
         self.icones_expandido = PlayerIcons()
+
+        # comandos do compacto
         self.comandos_compacto = PlayerCommands(expandir = self.expandir, player = self)
         self.comandos_expandido = PlayerCommands(expandir = self.expandir, player = self)
-        
+
+        # compacto
         self.compacto = self._retornar_compacto(expandido = False)
         self.compacto_expandido = self._retornar_compacto(expandido = True)
 
         self.info_expandido = ExpandedInformation()
         self.menu_infos = InformationMenu(trocar_view = self._trocar_view)
-        self.conteudo_infos = None
-        
+
         self.expandido = ft.Container(
             bgcolor = color.preto2,
             visible = False,
@@ -55,8 +87,17 @@ class PlayerSection:
             )
         )
 
+
+    # INICIALIZAÇÃO DA CLASSE
+    def load(self):
+        self._create_components()
+        # self.page.update()
+
+    def connect(self):
         ResizeManager.register(self._redimensionar)
 
+
+    # criação dos itens 
     def _retornar_compacto(self, expandido : bool) -> ft.Container:
         return ft.Container(
             height = 220,

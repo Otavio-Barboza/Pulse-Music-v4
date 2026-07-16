@@ -25,6 +25,30 @@ import asyncio
 import flet as ft
 
 
+"""
+    _summary_: ordem de execução do main()
+        ├── Configurar Page
+        │
+        ├── Declarar funções auxiliares
+        │
+        ├── Validar login
+        │
+        ├── Carregar cache
+        │
+        ├── Criar componentes principais
+        │
+        ├── Componentes.load()
+        │
+        ├── page.add(...)
+        │
+        ├── Registrar callbacks globais e componentes.connect()
+        │
+        ├── Inicializações finais
+        │
+        └── Disparar eventos globais
+"""
+
+
 def open_profile(current_id: str) -> dict:
     """
         Função para abrir o perfil.json e retornar os dados do perfil da atualc conta logada.
@@ -40,7 +64,8 @@ def open_profile(current_id: str) -> dict:
 
 async def main(page: ft.Page):
 
-    # configurações gerais do app
+    """  Configurações da page, gerais da aplicação  """
+
     page.title = "Pulse Music"
     page.padding = 0
     page.bgcolor = color.preto_puro_4
@@ -53,25 +78,20 @@ async def main(page: ft.Page):
         font_family = "google_sans_flex"
     )
     
-    
-    # variaveis globais do app
-    
-    settings: ScreenSettings | None = None
 
+    """  Declarar funções auxiliares  """
+
+    # configurações do app
     def open_configurations():
         """
             Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "open_configurations").
         """     
-        nonlocal settings
-        if settings is None:
-            settings = ScreenSettings(page)
-            page.overlay.append(settings)
-        else:
-            if settings not in page.overlay:
-                page.overlay.append(settings)
+        
+        page.overlay.append(ScreenSettings(page))
         page.update()
 
-    # funções auxiliares
+
+    # gerenciamento de contas
     async def on_sem_conta(_ = None):
         """
             Função chamada quando é notficado pelo StateApp estar ("no_account") existente, consequentemente chama o login_google() para realizá-lo.
@@ -80,9 +100,6 @@ async def main(page: ft.Page):
         page.update()
         await login_google()
         StateApp.notify("current_account", None)
-
-    
-    StateApp.register_callback("no_account", on_sem_conta)
     
     async def validate_login():
         """
@@ -105,22 +122,6 @@ async def main(page: ft.Page):
         else:
             StateApp.notify("no_account")
 
-    async def load_cache():
-        data: dict = await Utils.sync_load_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
-        cache_metadata.load(data)
-        
-        await CacheArtists.load()
-        CacheLyrics.load_cache()
-
-    await validate_login()
-    # await load_cache()
-    
-
-    page.appbar = AppBar(open_configurations = open_configurations, page = page)
-    tabs = TabsNavigation(page)
-    player = PlayerSection(page)
-    StateApp.register_callback("current_account", tabs.playlist.carregar)
-
     # def on_current_account(*_):
     #     """
     #         Função para carregar o conteúdo principal do app quando uma conta estiver logada.
@@ -130,10 +131,40 @@ async def main(page: ft.Page):
     #     """
     #     nonlocal tabs
     #     tabs.playlist.carregar()
+
+    # carregamento de cache
+    async def load_cache():
+        data: dict = await Utils.sync_load_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
+        cache_metadata.load(data)
+        
+        await CacheArtists.load()
+        CacheLyrics.load_cache()
+
+
+    """  Validar login  """
+
+    await validate_login()
+
+
+    """  Carregar cache  """
+
+    # await load_cache()
     
+
+    """  Criar componentes principais  """
+
+    page.appbar = AppBar(open_configurations = open_configurations, page = page)
+    tabs = TabsNavigation(page)
+    player = PlayerSection(page)
+
     
-    
-    
+    """  Carregando componentes  """
+
+    tabs.load()
+    player.load()
+
+
+    """  Adicionando componentes a page  """
     
     page.add(
         ft.SafeArea(
@@ -158,12 +189,20 @@ async def main(page: ft.Page):
             )
         )
     )
-    
-   
-    # StateApp.notify(
-    #     "current_account",
-    #     AccountManager.user()
-    # )
+
+
+    """  Registrando callbacks dos componentes e globais  """
+
+    # callbacks globais 
+    StateApp.register_callback("no_account", on_sem_conta)
+    StateApp.register_callback("current_account", tabs.playlist.carregar)
+
+    # callbacks individuais dos componentes
+    tabs.connect()
+    player.connect()
+
+
+    """  Inicializações gerais  """
 
     tabs.pesquisa_musica.iniciar_animacao()
     tabs.carregar_favoritas()
@@ -172,10 +211,18 @@ async def main(page: ft.Page):
    
     # AudioLoop.start()
     # ReproductionManager.start()
-     
+
+
+    """  Notificação e execução de eventos globais  """
+    
     page.run_task(
         ScannerModel.async_start_scanner
     )
+
+    # StateApp.notify(
+    #     "current_account",
+    #     AccountManager.user()
+    # )
 
 
 if __name__ == "__main__":

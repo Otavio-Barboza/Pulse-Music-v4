@@ -28,13 +28,70 @@ class GridImages(ft.GridView):
         self.mode = mode
 
         self.controls = []
-        self.build_images(self.mode)
+
+
+    # CRIAÇÃO DE COMPONENTES
+    def _build_class(self, mode: GridMode):    
+        if mode != self.mode:
+            return
         
+        if mode == GridMode.ARTIST:
+            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "artists"
+        elif mode == GridMode.ALBUM:
+            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "albums"
+        else:
+            ...
+            
+        self.controls.clear()
+        
+        for img in os.listdir(path):
+            image_key = img.removesuffix('.jpg')
+            
+            if self.mode == GridMode.ARTIST:
+                nome = cache_metadata.artists.to_dict().get(image_key).get('nome_artistas')
+            else:
+                nome = image_key
+                
+            self.controls.extend([
+                ft.Container(
+                    data = image_key,
+                    on_click = self.click,
+
+                    content = ft.Column(
+                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                        alignment = ft.MainAxisAlignment.START,
+
+                        controls = [
+                            Imagem(
+                                src = f'{path}/{img}', 
+                                mode = self.mode
+                            ),
+                            ft.Text(
+                                value = nome,
+                                text_align = ft.TextAlign.CENTER,
+                                size = 16,
+                                weight = ft.FontWeight.W_300,
+                                max_lines = 2,
+                                overflow = ft.TextOverflow.FADE
+                            )
+                        ]
+                    )
+                )
+            ])
+
+
+    # INICIALIZAÇÃO DA CLASSE
+    def load(self):
+        self._build_class(self.mode)
+        # self.update()
+
+    def connect(self):
         GridState.register_callback(
             event = 'att_grid',
-            func = self.build_images
+            func = self._build_class
         )
-    
+
+
     def click(self, e):
         from core.song.model.song import Song
         from core.song.model.reproduction import Reproduction
@@ -116,54 +173,6 @@ class GridImages(ft.GridView):
             mode = modo_playlist,
             lista = song_list
         )
-
-    def build_images(self, mode: GridMode):    
-        if mode != self.mode:
-            return
-        
-        if mode == GridMode.ARTIST:
-            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "artists"
-        elif mode == GridMode.ALBUM:
-            path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "albums"
-        else:
-            ...
-            
-        self.controls.clear()
-        
-        for img in os.listdir(path):
-            image_key = img.removesuffix('.jpg')
-            
-            if self.mode == GridMode.ARTIST:
-                nome = cache_metadata.artists.to_dict().get(image_key).get('nome_artistas')
-            else:
-                nome = image_key
-                
-            self.controls.extend([
-                ft.Container(
-                    data = image_key,
-                    on_click = self.click,
-
-                    content = ft.Column(
-                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                        alignment = ft.MainAxisAlignment.START,
-
-                        controls = [
-                            Imagem(
-                                src = f'{path}/{img}', 
-                                mode = self.mode
-                            ),
-                            ft.Text(
-                                value = nome,
-                                text_align = ft.TextAlign.CENTER,
-                                size = 16,
-                                weight = ft.FontWeight.W_300,
-                                max_lines = 2,
-                                overflow = ft.TextOverflow.FADE
-                            )
-                        ]
-                    )
-                )
-            ])
 
 
 class Imagem(ft.Image):

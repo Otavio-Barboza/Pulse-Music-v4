@@ -85,8 +85,8 @@ class ColumnCards(ft.Column):
             )
         )
 
-    def _create_controls(self):
-        self.controls.append(    
+    def _build_class(self):
+        self.controls = [    
             ft.Container(
                 margin = ft.margin.only(
                     top = 10,
@@ -103,14 +103,14 @@ class ColumnCards(ft.Column):
                 )
             ),
             self.column_content
-        )
+        ]
 
 
     # FUNÇÃO DE CARREGAMENTO DO COMPONENTES
     def load(self):
         self._create_components()
-        self._create_controls()
-        self.update()
+        self._build_class()
+        # self.update()
 
     def connect(self):
         StateApp.register_callback(event = "overlay_tips", func = ServiceSettings.save_overlay_tips)

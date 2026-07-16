@@ -10,11 +10,11 @@ import flet as ft
 
 
 class OtherSettings(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             alignment = ft.alignment.center
         )
-        
+        self.page = page
         self.switch = ft.Switch(
             label = 'Ativar dicas',
             value = ServiceSettings.load_overlay(),

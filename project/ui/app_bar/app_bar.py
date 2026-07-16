@@ -24,10 +24,10 @@ class AppBar(ft.AppBar):
                     controls = [
                         ft.CircleAvatar(
                             radius = 20,
-                            # bgcolor = color.branco,
+                            bgcolor = color.branco,
         
                             content = ft.Image(
-                                src = str(AppPaths.ASSETS_IMAGE / "logos" / "logo_vet.svg"),
+                                src = r"assets\images\logos\logo_v2.png",
                                 border_radius = 100
                             )
                         ),

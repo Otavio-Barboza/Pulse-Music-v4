@@ -11,11 +11,11 @@ import flet as ft
 
 
 class SettingsSupport(ft.Container):
-    def __init__(self):
+    def __init__(self, page):
         super().__init__(
             expand = True
         )
-
+        self.page = page
         self.text_field = ft.TextField(
             hint_text = 'Digite a mensagem...',
             hint_style = ft.TextStyle(
@@ -70,7 +70,7 @@ class SettingsSupport(ft.Container):
                                     radius = 40,
                                     bgcolor = color.branco,
                                     content = ft.Image(
-                                        src = r'Assets\Global\Images\Logo\logo_v2.png',
+                                        src = r'assets\images\logos\logo_v2.png',
                                         border_radius = ft.border_radius.all(100),
                                         filter_quality = ft.FilterQuality.HIGH,
                                         fit = ft.ImageFit.COVER
@@ -200,11 +200,17 @@ class SettingsSupport(ft.Container):
         message = self.text_field.value.strip()
         
         if len(message) > 1500:
-            UtilsUi.snack_bar("A mensagem pode ter no máximo 1000 caracteres.")
+            UtilsUi.snack_bar(
+                text = "A mensagem pode ter no máximo 1000 caracteres.",
+                page = self.page    
+            )
             return
         
         if not message:
-            UtilsUi.snack_bar("Digite uma mensagem antes de enviar 😅")
+            UtilsUi.snack_bar(
+                text = "Digite uma mensagem antes de enviar 😅",
+                page = self.page
+            )
             return
         
         try:
@@ -218,7 +224,13 @@ class SettingsSupport(ft.Container):
             self.text_field.value = ''
             self.text_field.update()
 
-            UtilsUi.snack_bar("Mensagem enviada com sucesso! 📬")
+            UtilsUi.snack_bar(
+                text = "Mensagem enviada com sucesso! 📬",
+                page = self.page
+            )
         except Exception as err:
-            UtilsUi.snack_bar("Erro ao enviar mensagem 😬")
+            UtilsUi.snack_bar(
+                text = "Erro ao enviar mensagem 😬",
+                page = self.page
+            )
             print("Erro ao enviar e-mail:", err)

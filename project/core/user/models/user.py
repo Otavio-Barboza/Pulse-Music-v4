@@ -38,7 +38,7 @@ class User:
         
         if valor != self._name:
             self._name = valor
-            self.notify_callbacks()
+            # self.notify_callbacks()
 
     @property
     def email(self) -> str:
@@ -55,7 +55,7 @@ class User:
         
         if valor != self._image:
             self._image = valor
-            self.notify_callbacks()
+            # self.notify_callbacks()
     
 
     # callbacks

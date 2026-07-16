@@ -4,6 +4,7 @@ from ui.settings.account_settings import AccountSettings
 from ui.settings.about_settings import AboutSettings
 from ui.settings.settings_support import SettingsSupport
 from ui.settings.other_settings import OtherSettings
+from ui.utils.utils_ui import UtilsUi
 
 # imports de back-end
 from core.services.controllers.state_app import StateApp
@@ -174,26 +175,34 @@ class ScreenSettings(ft.Container):
 
         current_content = self.content_area.content
 
-        if hasattr(current_content, "parar_loop"):
-            current_content.parar_loop()
+        if hasattr(current_content, "stop_loop"):
+            current_content.stop_loop()
+
         if section_id == "account":
             self.content_area.content = AccountSettings(page = self.page)
         elif section_id == "about":
-            about = AboutSettings(page = self.page)
-            self.content_area.content = about
-            about.iniciar_loop()
+            self.content_area.content = AboutSettings(page = self.page)
+            self.content_area.content.start_loop()
         elif section_id == "appearance":
             self.content_area.content = ft.Column(
                 expand = True,
                 controls = [
-                    ft.Text("Em Desenvolvimento Configurações de Aparência", size=18)
+                    ft.Text(
+                        value = "Em Desenvolvimento Configurações de Aparência", 
+                        size = 18
+                    )
                 ]
             )
         elif section_id == "others":
             self.content_area.content = OtherSettings(page = self.page)
         elif section_id == "support":
             self.content_area.content = SettingsSupport(page = self.page)
-
+        else:
+            UtilsUi.snack_bar(
+                text = "Erro ao trocar a seção de configurações",
+                page = self.page
+            )
+            
         self.content_area.update()
         
         key: str

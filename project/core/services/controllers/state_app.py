@@ -41,7 +41,7 @@ class StateApp:
     def select_config_section(cls, section_name: str):
         # Botão na seção configurações do menu
         cls.current_configuration_session = section_name
-        cls.notify("secao_config", section_name)
+        cls.notify("configurations_session", section_name)
 
     @classmethod
     def open_configurations(cls):

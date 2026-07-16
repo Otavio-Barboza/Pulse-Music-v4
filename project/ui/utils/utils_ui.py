@@ -8,8 +8,8 @@ import flet as ft
 class UtilsUi:
 
     @classmethod
-    def snack_bar(cls, text: str):
-        ft.Page.open(
+    def snack_bar(cls, text: str, page: ft.Page):
+        page.open(
             ft.SnackBar(
                 bgcolor = color.cinza2,
 
@@ -21,4 +21,4 @@ class UtilsUi:
                 )
             )
         )
-        ft.Page.update()
+        page.update()

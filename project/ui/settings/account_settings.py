@@ -57,19 +57,17 @@ class AccountSettings(ft.Container):
             size = 16,
             weight = ft.FontWeight.W_500
         )
-        self.image = ft.CircleAvatar(
+        self.image_account = ft.CircleAvatar(
             foreground_image_src = '',
             radius = 35,
             bgcolor = ft.Colors.TRANSPARENT
         )
 
         StateApp.register_callback('current_account', self.when_account_updates)
-
-        user = AccountManager.user()
         
-        if user is not None:
-            user.register_callback(self.update_fields)
-            self.update_fields(user)
+        if AccountManager.user() is not None:
+            # user.register_callback(self.update_fields)
+            self.update_fields(AccountManager.user())
         
         self.account_selection = ft.Column(
             visible = False,
@@ -104,7 +102,7 @@ class AccountSettings(ft.Container):
                                 ft.Container(
                                     col = {'xs' : 12, 'md' : 3},
                                     alignment = ft.alignment.center,
-                                    content = self.image
+                                    content = self.image_account
                                 ),
                                 
                                 ft.Container(
@@ -335,7 +333,7 @@ class AccountSettings(ft.Container):
         self.update()
 
         AccountManager.user().name = new_name
-        AccountManager.user().save_json()
+        AccountManager.save_accounts_json()
         AccountManager.update_name_in_index(account_id = self.data, new_name = new_name)
 
     def update_fields(self, user: User):
@@ -345,16 +343,13 @@ class AccountSettings(ft.Container):
         Args:
             user (class User): atributos de User.
         """
-        print(user.to_dict())
-
-
         self.user_name.value = user.name
         self.email.value = user.email
-        self.image.foreground_image_src = user.image
+        self.image_account.foreground_image_src = user.image
         self.data = user.id
         self.update()
 
-    def when_account_updates(self, dados : User | dict):
+    def when_account_updates(self, dados: User | dict):
         """
             Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
         """
@@ -362,7 +357,7 @@ class AccountSettings(ft.Container):
         if isinstance(dados, User):
             user = dados
             # registra callback para atualizações futuras
-            user.register_callback(self.update_fields)
+            # user.register_callback(self.update_fields)
             self.update_fields(user)
             return
 

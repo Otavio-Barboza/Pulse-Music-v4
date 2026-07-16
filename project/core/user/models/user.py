@@ -7,6 +7,12 @@ from pathlib import Path
 import os, json
 
 
+""" _summary_: 
+        - Classe User para ser o modelo de usuário, respoinsabilidade dela é para armazenar os dados e ser o molde do usuário no player. 
+        - Responsabilidade de gravar json, atualizar dados, remover dados será centralizada em AccountManager.
+"""
+
+
 class User:
 
     def __init__(self, account_id: str, base_path: Path, name: str, email: str, image: str):
@@ -38,7 +44,6 @@ class User:
         
         if valor != self._name:
             self._name = valor
-            # self.notify_callbacks()
 
     @property
     def email(self) -> str:
@@ -55,21 +60,6 @@ class User:
         
         if valor != self._image:
             self._image = valor
-            # self.notify_callbacks()
-    
-
-    # callbacks
-    def register_callback(self, func: callable):
-        if callable(func):
-            self._callbacks.append(func)
-
-    def notify_callbacks(self):
-        for func in self._callbacks:
-            try:
-                func(self)
-            except Exception:
-                pass
-    
     
     # carregar
     def to_dict(self) -> dict[str, str]:
@@ -79,30 +69,3 @@ class User:
             "email" : self._email,
             "image" : self._image
         }
-
-    # def save_json(self):
-    #     """
-    #         Função para salvar os dados no profile.json quando uma nova conta é criada.
-    #     """
-    #     path: str = os.path.join(self._base_path, 'profile.json')
-
-    #     Utils.sync_update_json(path = self._base_path / "profile.json", data = self.to_dict())
-        
-    #     self._dirty = True
-
-    def load_profile_json(cls, base_path: str) -> dict:
-        """
-            Função para carregar o profile.json
-
-        Args:
-            base_path (str): pasta da conta + profile.json
-
-        Returns:
-            None | dict : nada ou dicionário com os dados do profile.json
-        """
-        path: str = os.path.join(base_path, "profile.json")
-
-        if not os.path.exists(path):
-            return None
-        with open(path, "r", encoding = "utf-8") as js:
-            return json.load(js)

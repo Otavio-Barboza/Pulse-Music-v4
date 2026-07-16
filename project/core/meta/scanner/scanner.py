@@ -11,6 +11,7 @@ from core.meta.repository.filtering import Filtering
 from core.utils.path import AppPaths
 
 # imports gerais
+from pathlib import Path
 from collections import defaultdict
 import os, asyncio
 
@@ -104,6 +105,9 @@ class Scanner:
         cls._is_running = True
         
         try:
+            if not Path(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists").exists():
+                return
+            
             available_playlists = os.listdir(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists")
                 
             for playlist in available_playlists:

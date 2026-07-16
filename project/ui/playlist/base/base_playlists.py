@@ -20,9 +20,19 @@ class ColumnCards(ft.Column):
             spacing = 0
         )
         self.page = page
-        self.column_content = ContentPlaylist(open_function = self.open_function)
-        self.state = PlaylistManager(grid = self.column_content.grid)
+        self.column_content = None
+        self.state = None
+        self.button_add_play = None
+        self.button_return_play = None
+        self.controls = []
 
+
+    # FUNÇÕES PARA CRIAÇÃO DOS COMPONENTES
+    def _create_components(self):
+        self.column_content = ContentPlaylist(open_function = self.open_function)
+
+        self.state = PlaylistManager(grid = self.column_content.grid)
+ 
         self.button_add_play = ft.TextButton(
             col = 4,
             text = 'Adicionar Nova Playlist',
@@ -49,6 +59,7 @@ class ColumnCards(ft.Column):
                 icon_size = 20
             )
         )
+
         self.button_return_play = ft.TextButton(
             col = 4,
             text = 'Voltar',
@@ -74,7 +85,8 @@ class ColumnCards(ft.Column):
             )
         )
 
-        self.controls = [
+    def _create_controls(self):
+        self.controls.append(    
             ft.Container(
                 margin = ft.margin.only(
                     top = 10,
@@ -91,11 +103,21 @@ class ColumnCards(ft.Column):
                 )
             ),
             self.column_content
-        ]
+        )
 
+
+    # FUNÇÃO DE CARREGAMENTO DO COMPONENTES
+    def load(self):
+        self._create_components()
+        self._create_controls()
+        self.update()
+
+    def connect(self):
         StateApp.register_callback(event = "overlay_tips", func = ServiceSettings.save_overlay_tips)
         StateApp.register_callback("actualization_on_click", self.mudar_on_click)
+    
 
+    # FUNÇÕES DA OPERAÇÃO DA CLASSE
     def mudar_on_click(self, valor):
         if valor == True:
             self.button_add_play.on_click = self._abrir_overlay_dica

@@ -62,7 +62,6 @@ async def login_google():
     _email: str = data.get("email")
     _image: str = data.get("picture")
     _account_id: str = data.get("sub")
-    print(_account_id)
     _base_path: str = AppPaths.ACCOUNT / _account_id
 
     # aumentar qualidade da image da conta (trocar s96 por s256)
@@ -104,9 +103,6 @@ async def login_google():
         base_path = _base_path,
         data = data_profile
     )
-
-    # criando a base do cls.accounts_cache (repassando a estrutura vazia invés do None)
-    AccountManager.save_accounts_json()
 
     # Adicionando o conteúdo real da conta criado em cache no cls.accounts_cache
     AccountManager.add_account_to_index(

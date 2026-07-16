@@ -84,6 +84,22 @@ class AccountManager:
         )
 
     @classmethod
+    def save_profile_json(cls):
+        """
+            _summary_: Função para atualizar o profile.json com os dados novos após atualização da caixa de texto para o nome novo.
+        """
+
+        profile_json = Utils.sync_load_json(
+            AppPaths.ACCOUNT / cls.accounts_cache["current_account"] / "profile.json"
+        )
+
+        profile_json["name"] = cls.user().name
+        Utils.sync_update_json(
+            path = AppPaths.ACCOUNT / cls.accounts_cache["current_account"] / "profile.json",
+            data = profile_json
+        )
+
+    @classmethod
     def search_account_index(cls, account_id: str) -> dict:
         """
             Busca a conta por id específico.
@@ -114,37 +130,27 @@ class AccountManager:
             base_path (str): Pasta base da conta
             data (dict | None, optional): Dados retornados ao ler a conta. { Defaults to None }
         """
-        
-        profile: dict = {}
-        
-        if data:
-            profile.update(data)
 
-        # se faltar alguma chave, tenta carregar do disco
-        if not profile.get("nome") or not profile.get("email") or not profile.get("imagem"):
-            profile_path: Path = base_path / "profile.json"
+        # # se faltar alguma chave, tenta carregar do disco
+        # if not profile.get("nome") or not profile.get("email") or not profile.get("imagem"):
+        #     profile_path: Path = base_path / "profile.json"
             
-            if profile_path.exists():
-                with open(str(profile_path), "r", encoding = "utf-8") as f:
-                    try:
-                        disc = json.load(f)
-                        profile.update(disc)
-                    except Exception:
-                        pass
-        
-        name: str = profile.get("name", "")
-        email: str = profile.get("email", "")
-        image: str = profile.get("image", "")
+        #     if profile_path.exists():
+        #         with open(str(profile_path), "r", encoding = "utf-8") as f:
+        #             try:
+        #                 disc = json.load(f)
+        #                 profile.update(disc)
+        #             except Exception:
+        #                 pass
 
         cls._current_user = User(
             account_id = account_id,
             base_path = base_path,
-            name = name,
-            email = email,
-            image = image
+            name = data.get("name"),
+            email = data.get("email"),
+            image = data.get("image")
         )
 
-        StateApp.notify("current_acount", cls._current_user)
 
     @classmethod
     def user(cls) -> User:
@@ -187,14 +193,14 @@ class AccountManager:
         # adicionando uma nova conta a lista de contas do cache
         cls.accounts_cache["accounts"].append(novo)
         cls.accounts_cache["current_account"] = account_id
-        cls.save_accounts_json()
         
-        return True
-    
+        cls.save_accounts_json()
+        cls.save_profile_json()
+        
     @classmethod
-    def update_name_in_index(cls, account_id : str, new_name : str):
+    def update_name_in_index(cls, account_id: str, new_name: str):
         """
-            Atualiza o nome específico do usuário (via ft.TextField) no contas.json. 
+            atualiza o nome do usuário no accounts.json
 
         Args:
             id_conta (str): ID da conta.
@@ -237,7 +243,7 @@ class AccountManager:
 
         # carrega Usuario a partir do perfil.json
         cls.load_account(account_id = account_id, pasta_base = path, dados = accounts)
-        cls.accounts_cache["current_acount"] = account_id
+        cls.accounts_cache["current_account"] = account_id
         cls.save_accounts_json()
 
         return True
@@ -256,7 +262,7 @@ class AccountManager:
             return None
         
     @classmethod
-    def delete_account(cls, account_id : str):
+    def delete_account(cls, account_id: str):
         """
             Função para excluir a atual conta.
               →  Se não tiver mais contas salvas além da atual: Notifica o StateApp por estar 'sem_conta' disponível.
@@ -267,7 +273,7 @@ class AccountManager:
         """
         cls.load_json_accounts()
 
-        path: str = AppPaths.ACCOUNT_JSON
+        path: Path = AppPaths.ACCOUNT / account_id
         
         if path.exists():
             shutil.rmtree(path)
@@ -281,7 +287,7 @@ class AccountManager:
             if cls.accounts_cache.get("accounts"):
                 other_account = cls.accounts_cache.get("accounts")[0]
                 
-                cls.accounts_cache["current_acount"] = other_account.get("id")
+                cls.accounts_cache["current_account"] = other_account.get("id")
                 cls.save_accounts_json()
 
                 cls.load_account(
@@ -290,9 +296,9 @@ class AccountManager:
                     dados = other_account
                 )
             else:
-                cls.accounts_cache["current_acount"] = None
+                cls.accounts_cache["current_account"] = None
                 cls._current_user = None
                 cls.save_accounts_json()
                 StateApp.notify("sem_conta")
         
-        StateApp.notify("current_acount", cls.accounts_cache)
+        StateApp.notify("current_account", cls.accounts_cache)

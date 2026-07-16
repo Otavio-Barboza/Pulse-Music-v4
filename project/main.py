@@ -55,9 +55,22 @@ async def main(page: ft.Page):
     
     
     # variaveis globais do app
+    
     settings: ScreenSettings | None = None
 
-    
+    def open_configurations():
+        """
+            Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "open_configurations").
+        """     
+        nonlocal settings
+        if settings is None:
+            settings = ScreenSettings(page)
+            page.overlay.append(settings)
+        else:
+            if settings not in page.overlay:
+                page.overlay.append(settings)
+        page.update()
+
     # funções auxiliares
     async def on_sem_conta(_ = None):
         """
@@ -66,6 +79,8 @@ async def main(page: ft.Page):
         page.overlay.clear()
         page.update()
         await login_google()
+        StateApp.notify("current_account", None)
+
     
     StateApp.register_callback("no_account", on_sem_conta)
     
@@ -97,38 +112,28 @@ async def main(page: ft.Page):
         await CacheArtists.load()
         CacheLyrics.load_cache()
 
-    def open_configurations():
-        """
-            Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "open_configurations").
-        """     
-        nonlocal settings
-        if settings is None:
-            settings = ScreenSettings(page)
-            page.overlay.append(settings)
-        else:
-            if settings not in page.overlay:
-                page.overlay.append(settings)
-        page.update()
-
-
-    async def on_current_account(usuario):
-        """
-            Função para carregar o conteúdo principal do app quando uma conta estiver logada.
-
-        Args:
-            usuario (class Usuario) : O usuário atual é repassado a função tornando mainupulável diretamente ao conteúdo do main.
-        """
-        tabs.playlist.carregar()
-    
-    StateApp.register_callback("current_account", on_current_account)
-    
     await validate_login()
     # await load_cache()
-
-    tabs = TabsNavigation(page)
-    page.appbar = AppBar(open_configurations = open_configurations, page = page)
     
+
+    page.appbar = AppBar(open_configurations = open_configurations, page = page)
+    tabs = TabsNavigation(page)
     player = PlayerSection(page)
+    StateApp.register_callback("current_account", tabs.playlist.carregar)
+
+    # def on_current_account(*_):
+    #     """
+    #         Função para carregar o conteúdo principal do app quando uma conta estiver logada.
+
+    #     Args:
+    #         usuario (class Usuario) : O usuário atual é repassado a função tornando mainupulável diretamente ao conteúdo do main.
+    #     """
+    #     nonlocal tabs
+    #     tabs.playlist.carregar()
+    
+    
+    
+    
     
     page.add(
         ft.SafeArea(
@@ -154,10 +159,11 @@ async def main(page: ft.Page):
         )
     )
     
-    StateApp.notify(
-        "current_account",
-        AccountManager.user()
-    )
+   
+    # StateApp.notify(
+    #     "current_account",
+    #     AccountManager.user()
+    # )
 
     tabs.pesquisa_musica.iniciar_animacao()
     tabs.carregar_favoritas()

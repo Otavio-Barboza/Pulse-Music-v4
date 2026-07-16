@@ -44,7 +44,7 @@ class AccountSettings(ft.Container):
 
             cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
-            on_submit = self.novo_nome_user
+            on_submit = self.new_user_name
         )
 
         self.user_name = self._create_text(
@@ -63,7 +63,7 @@ class AccountSettings(ft.Container):
             bgcolor = ft.Colors.TRANSPARENT
         )
 
-        StateApp.register_callback('current_account', self.when_account_updates)
+        StateApp.register_callback('current_account', self.update_fields)
         
         if AccountManager.user() is not None:
             # user.register_callback(self.update_fields)
@@ -143,7 +143,7 @@ class AccountSettings(ft.Container):
                     self.text_field,
                     
                     self._create_button(
-                        text_button = 'Adicionar new conta', 
+                        text_button = 'Adicionar nova conta', 
                         id = 'new', 
                         background_color = color.amarelo3,
                         text_color = color.preto7,
@@ -178,7 +178,7 @@ class AccountSettings(ft.Container):
         Returns:
             list : lista das accounts disponíveis.
         """
-        return AccountManager.accounts_cache["accounts"]
+        return AccountManager.accounts_cache.get("accounts")
     
     # widgets
     def _create_button(
@@ -319,7 +319,7 @@ class AccountSettings(ft.Container):
         )
     
     # funçionalidades
-    def novo_nome_user(self, e):
+    def new_user_name(self, e):
         """
             Função para atualizar o nome do usuário atual pela caixa de text.
 
@@ -334,7 +334,11 @@ class AccountSettings(ft.Container):
 
         AccountManager.user().name = new_name
         AccountManager.save_accounts_json()
-        AccountManager.update_name_in_index(account_id = self.data, new_name = new_name)
+        AccountManager.save_profile_json()
+        AccountManager.update_name_in_index(
+            account_id = self.data, 
+            new_name = new_name
+        )
 
     def update_fields(self, user: User):
         """
@@ -349,31 +353,12 @@ class AccountSettings(ft.Container):
         self.data = user.id
         self.update()
 
-    def when_account_updates(self, dados: User | dict):
-        """
-            Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
-        """
-        # se vier um objeto User, atualiza direto
-        if isinstance(dados, User):
-            user = dados
-            # registra callback para atualizações futuras
-            # user.register_callback(self.update_fields)
-            self.update_fields(user)
-            return
-
-        # se vier o index (dict), podemos carregar campos a partir dele:
-        if isinstance(dados, dict):
-            # tenta pegar id atual do index e buscar usuário em memória
-            try:
-                current_id: str = dados.get("current_account")
-                
-                if current_id:
-                    # tentar select conta (isso chamará carregar_conta() e notificar novamente)
-                    AccountManager.select_account_by_id(current_id)
-            except Exception:
-                pass
-
-        self._create_selections()
+    # def when_account_updates(self):
+    #     """
+    #         Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
+    #     """
+        
+    #     self.update_fields(AccountManager.user())
 
     def switch_mandatory_account(self, id_new_account: str):
         """
@@ -386,21 +371,23 @@ class AccountSettings(ft.Container):
 
         AccountManager.delete_account(_id_to_delete)
         AccountManager.select_account_by_id(id_new_account)
+        # self.update_fields()
         
-    def delete_current_account(self):
+    async def delete_current_account(self):
         """
             Função para delete a atual conta.
               →  Se o as account disponíveis forem mais de que 2: Abre overlay na classe SelecionarContaObrigatoria para a seleção de outra conta.
               →  Senão: Chama diretamente o AccountManager para a exclusão, caso haja uma única disponível, é alterado automáticamente para essa; senão é notificado o StateApp ('sem_conta') para realizar o novo login.
         """
-        account = AccountManager.accounts_cache['account']
+        account = AccountManager.accounts_cache['accounts']
 
         if len(account) > 2:
-            self.page.overlay.clear()
+            # self.page.overlay.clear()
             self.page.overlay.append(
                 SelecionarContaObrigatória(
-                    on_click = self.switch_mandatory_account
-                )
+                    page = self.page,
+                    function = self.switch_mandatory_account
+                ) 
             )
             self.page.update()
         else:
@@ -421,22 +408,23 @@ class AccountSettings(ft.Container):
             AccountManager.select_account_by_id(account_id)
             self._create_selections()
         elif e.control.data.get('action') == 'delete':
-            self.delete_current_account()
+            await self.delete_current_account()
             self._create_selections()
         else:
             print(e.control.data)
 
 
 class SelecionarContaObrigatória(ft.Container):
-    def __init__(self, on_click):
+    def __init__(self, function: callable, page: ft.Page):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
             blur = 5,
             bgcolor = ft.Colors.with_opacity(0.9, color.preto1)
-        )
+        )   
+        self.page = page
+        self.function = function
 
-        self.on_click = on_click
         self.accounts = AccountManager.accounts_cache
         self.current_id = AccountManager.read_current_account_index()
         self.options = ft.Column(controls = [])
@@ -468,15 +456,7 @@ class SelecionarContaObrigatória(ft.Container):
         )
         
         self.on_click = self.close_overlay
-
-    def _select(self, account_id: str):
-        """
-            Função que atua como callback para aplicar a abertura e funcionamento da seleção da conta obrigatória.
-
-        Args:
-            account_id (str): ID da conta
-        """
-        self.on_click(account_id)
+        # print(self.page)
     
     def _on_click(self, e):
         """
@@ -485,8 +465,9 @@ class SelecionarContaObrigatória(ft.Container):
         Args:
             e (evento): evento do clique.
         """
-        self._select(e.control.data)
-        self.page.overlay.clear()
+        self.function(e.control.data)
+        print(self.page)
+        self.page.overlay.remove(self)
         self.page.update()
     
     def close_overlay(self, e):

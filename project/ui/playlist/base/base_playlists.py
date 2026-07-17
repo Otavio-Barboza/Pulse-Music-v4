@@ -131,7 +131,7 @@ class ColumnCards(ft.Column):
             OverlayTip(
                 page = self.page,
                 state = self.state,
-                content = self.column_content,
+                content_tips = self.column_content,
                 mode = PlalistOverlayMode.CREATE
             )
         )
@@ -143,8 +143,7 @@ class ColumnCards(ft.Column):
             ContainerOverlay(
                 page = self.page,
                 state = self.state,
-                column_content = self.column_content,
-                modo = PlalistOverlayMode.CREATE
+                mode = PlalistOverlayMode.CREATE
             )
         )
         self.page.update()

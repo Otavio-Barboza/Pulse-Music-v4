@@ -26,10 +26,10 @@ class PlaylistRepository:
         playlists = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json")
 
         for p in playlists['playlists']:
-            if p != 'favoritas':
+            if p != 'favorites':
                 id_play = playlists['playlists'].get(p)
-                nome_play = id_play.get('nome')
-                tipo_play = id_play.get('tipo')
+                nome_play = id_play.get('name')
+                tipo_play = id_play.get('type')
 
                 lista_plays.append(Playlist(
                     id = p,
@@ -273,14 +273,13 @@ class PlaylistRepository:
 
     @classmethod
     def check_playlist_names(cls) -> list[str]:
-        caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists'
         nomes_playlists_existentes = list()
 
-        for c in os.listdir(
-            caminho
+        for account in os.listdir(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists"
         ):
             config_play_json = Utils.sync_load_json(
-                f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists/{c}/config_play.json'
+                AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / account / "config_play.json"
             )
 
             nome = config_play_json.get('nome')
@@ -292,14 +291,16 @@ class PlaylistRepository:
     
     @classmethod
     def check_existing_folders(cls) -> list[str]:
-        caminho_base = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists'
+
+        base_path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists"
+        
         pastas_existentes = list()
 
         for playlist in os.listdir(
-            caminho_base
+            base_path
         ):
             config_play_json = Utils.sync_load_json(
-                f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists/{playlist}/config_play.json'
+                AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist / "config_play.json"
             )
 
             caminho_pasta = config_play_json['musicas'].get('pasta')

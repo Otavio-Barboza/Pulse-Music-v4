@@ -10,16 +10,17 @@ import flet as ft
 
 
 class OverlayTip(ft.Container):
-    def __init__(self, estado, conteudo, modo):
+    def __init__(self, state, content_tips, mode, page: ft.Page):
         super().__init__(
             expand = True,
             alignment = ft.alignment.center,
             bgcolor = ft.Colors.with_opacity(0.9, color.preto3)
         )
 
-        self.estado = estado
-        self.conteudo = conteudo
-        self.modo = modo
+        self.state = state
+        self.content_tips = content_tips
+        self.mode = mode
+        self.page = page
 
         self.fechar = self._icon_button('Fechar')
         self.ok = self._text_button('Não mostrar novamente')
@@ -143,9 +144,8 @@ class OverlayTip(ft.Container):
         self.page.overlay.append(
             ContainerOverlay(
                 page = self.page,
-                estado = self.estado,
-                conteudo = self.conteudo,
-                modo = self.modo
+                state = self.state,
+                mode = self.mode
             )
         )
         self.page.update()
@@ -159,9 +159,8 @@ class OverlayTip(ft.Container):
         self.page.overlay.append(
             ContainerOverlay(
                 page = self.page,
-                estado = self.estado,
-                conteudo = self.conteudo,
-                modo = self.modo
+                state = self.state,
+                mode = self.mode
             )
         )
         self.page.update()

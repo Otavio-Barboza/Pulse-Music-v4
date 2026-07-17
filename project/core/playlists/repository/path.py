@@ -3,6 +3,7 @@ from ui.others.colors import color
 
 # import de back-end
 from core.services.account_manager import AccountManager
+from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
@@ -127,12 +128,12 @@ class CreatePlaylist:
             list[str] | tuple[str, str]: duas listas (listagem das imagens) e uma tupla (caminho de cada pasta)
         """
         return os.listdir(
-            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "albums"
         ), os.listdir(
-            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
-        ), tuple(
-            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Albuns', 
-            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Musica'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
+        ), (
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "albums", 
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
         )
     
     @classmethod

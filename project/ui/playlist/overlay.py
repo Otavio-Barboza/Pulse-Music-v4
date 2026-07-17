@@ -12,12 +12,12 @@ import asyncio
 
 
 class ContainerOverlay(ft.Container):
-    def __init__(self, state, mode : PlalistOverlayMode):
+    def __init__(self, state, mode : PlalistOverlayMode, page: ft.Page):
         super().__init__(
             alignment = ft.alignment.center,
             expand = True
-        )
-
+        )   
+        self.page = page
         self.state = state # PlaylistManager
         self.mode = mode
 

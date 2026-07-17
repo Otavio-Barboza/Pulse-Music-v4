@@ -131,17 +131,8 @@ class AccountManager:
             data (dict | None, optional): Dados retornados ao ler a conta. { Defaults to None }
         """
 
-        # # se faltar alguma chave, tenta carregar do disco
-        # if not profile.get("nome") or not profile.get("email") or not profile.get("imagem"):
-        #     profile_path: Path = base_path / "profile.json"
-            
-        #     if profile_path.exists():
-        #         with open(str(profile_path), "r", encoding = "utf-8") as f:
-        #             try:
-        #                 disc = json.load(f)
-        #                 profile.update(disc)
-        #             except Exception:
-        #                 pass
+        print("image: ", data.get("image"))
+        print(data)
 
         cls._current_user = User(
             account_id = account_id,
@@ -235,17 +226,25 @@ class AccountManager:
         cls.load_json_accounts()
         
         accounts: dict = cls.search_account_index(account_id)
-
+        print(cls.accounts_cache)
+        
         if not accounts:
             return False
         
-        path: str = accounts.get("pasta_base")
+        profile_json = Utils.sync_load_json(
+            AppPaths.ACCOUNT / account_id / "profile.json"
+        )
+        print(profile_json)
 
         # carrega Usuario a partir do perfil.json
-        cls.load_account(account_id = account_id, pasta_base = path, dados = accounts)
+        cls.load_account(account_id = account_id, base_path = accounts.get("base_path"), data = profile_json)
         cls.accounts_cache["current_account"] = account_id
         cls.save_accounts_json()
 
+        print(cls.user().name)
+        print(cls.user().image)
+        print(cls.user().id)
+        print(cls.user().email)
         return True
     
     @classmethod
@@ -292,13 +291,18 @@ class AccountManager:
 
                 cls.load_account(
                     account_id = other_account.get("id"),
-                    pasta_base = other_account.get("base_path"),
-                    dados = other_account
+                    base_path = other_account.get("base_path"),
+                    data = other_account
                 )
             else:
                 cls.accounts_cache["current_account"] = None
                 cls._current_user = None
                 cls.save_accounts_json()
-                StateApp.notify("sem_conta")
+                
+                from core.services.auth.google_login_auth import login_google
+                import asyncio
+
+                asyncio.create_task(login_google())
+                # StateApp.notify("sem_conta")
         
-        StateApp.notify("current_account", cls.accounts_cache)
+        # StateApp.notify("current_account", cls.accounts_cache)

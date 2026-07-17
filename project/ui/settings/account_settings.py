@@ -63,11 +63,11 @@ class AccountSettings(ft.Container):
             bgcolor = ft.Colors.TRANSPARENT
         )
 
-        StateApp.register_callback('current_account', self.update_fields)
+        # StateApp.register_callback('current_account', self.update_fields)
         
         if AccountManager.user() is not None:
             # user.register_callback(self.update_fields)
-            self.update_fields(AccountManager.user())
+            self.update_fields()
         
         self.account_selection = ft.Column(
             visible = False,
@@ -243,6 +243,8 @@ class AccountSettings(ft.Container):
         _list_accounts: list[dict] = self.return_available_accounts()
         _current_id: str = AccountManager.read_current_account_index()
         
+        # print(_list_accounts)
+
         self.account_selection.controls.clear()
 
         if len(_list_accounts) == 1:
@@ -271,7 +273,7 @@ class AccountSettings(ft.Container):
                             
                             content = ft.TextButton(
                                 data = {'action' : 'select', 'id' : account.get('id')},
-                                text = account.get('nome'),
+                                text = account.get('name'),
                                 on_click = self._action_items,
                                 width = 300,
 
@@ -295,7 +297,7 @@ class AccountSettings(ft.Container):
                         )
                     )
 
-        self.update()
+        # self.update()
 
     def _create_text(self, text: str, size: int, weight: ft.FontWeight):
         """
@@ -340,17 +342,15 @@ class AccountSettings(ft.Container):
             new_name = new_name
         )
 
-    def update_fields(self, user: User):
+    def update_fields(self):
         """
             Função para atualizar os campos principais chamada em self.when_account_updates.
-
-        Args:
-            user (class User): atributos de User.
         """
-        self.user_name.value = user.name
-        self.email.value = user.email
-        self.image_account.foreground_image_src = user.image
-        self.data = user.id
+
+        self.user_name.value = AccountManager.user().name
+        self.email.value = AccountManager.user().email
+        self.image_account.foreground_image_src = AccountManager.user().image
+        self.data = AccountManager.user().id
         self.update()
 
     # def when_account_updates(self):
@@ -371,7 +371,7 @@ class AccountSettings(ft.Container):
 
         AccountManager.delete_account(_id_to_delete)
         AccountManager.select_account_by_id(id_new_account)
-        # self.update_fields()
+        self.update_fields()
         
     async def delete_current_account(self):
         """
@@ -400,16 +400,25 @@ class AccountSettings(ft.Container):
     async def _action_items(self, e):
         if e.control.data.get('action') == 'new':
             await login_google()
+            
+            self.update_fields()
             self._create_selections()
+            self.update()
         elif e.control.data.get('action') == 'alter':
             await self._toggle_switch_account()
         elif e.control.data.get('action') == 'select':
-            account_id = e.control.data['id']
+            account_id = e.control.data["id"]
+            print()
+            # print(account_id)
             AccountManager.select_account_by_id(account_id)
+
             self._create_selections()
+            self.update_fields()
+            self.update()
         elif e.control.data.get('action') == 'delete':
             await self.delete_current_account()
             self._create_selections()
+            self.update()
         else:
             print(e.control.data)
 

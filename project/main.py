@@ -4,10 +4,9 @@ from ui.player_section.section_player import PlayerSection
 from ui.settings.screen_settings import ScreenSettings
 from ui.navigation.tabs import TabsNavigation
 from ui.others.colors import color
+from ui.others.overlay_login import OverlayLogin
 
 # imports de arquivos back-end
-from core.services.controllers.state_app import StateApp
-from core.services.auth.google_login_auth import login_google
 from core.utils.utils import Utils
 from core.utils.path import AppPaths
 from core.services.account_manager import AccountManager
@@ -84,53 +83,11 @@ async def main(page: ft.Page):
     # configurações do app
     def open_configurations():
         """
-            Função para abrir as configurações em overlay (repassada por parâmetro no AppBar em "open_configurations").
+            Função para abrir as configurações em overlay.
         """     
         
         page.overlay.append(ScreenSettings(page))
         page.update()
-
-
-    # gerenciamento de contas
-    async def on_sem_conta(_ = None):
-        """
-            Função chamada quando é notficado pelo StateApp estar ("no_account") existente, consequentemente chama o login_google() para realizá-lo.
-        """
-        page.overlay.clear()
-        page.update()
-        await login_google()
-        StateApp.notify("current_account", None)
-    
-    async def validate_login():
-        """
-            Função que valida o login. 
-              →  Se tiver conta logada: notifica o StateApp ("conta_atual") para realizar o carregamento do usuario e informações ao player. 
-              →  Senão: notifica o StateApp ("no_account") para realizar o login pelas contas Google.
-        """
-
-        current_id = AccountManager.read_current_account_index()
-
-        if current_id is not None:
-            data = AccountManager.search_account_index(current_id)
-            profile = open_profile(current_id)
-
-            AccountManager.load_account(
-                account_id = current_id,
-                base_path = Path(data["base_path"]),   
-                data = profile
-            )
-        else:
-            StateApp.notify("no_account")
-
-    # def on_current_account(*_):
-    #     """
-    #         Função para carregar o conteúdo principal do app quando uma conta estiver logada.
-
-    #     Args:
-    #         usuario (class Usuario) : O usuário atual é repassado a função tornando mainupulável diretamente ao conteúdo do main.
-    #     """
-    #     nonlocal tabs
-    #     tabs.playlist.carregar()
 
     # carregamento de cache
     async def load_cache():
@@ -140,10 +97,53 @@ async def main(page: ft.Page):
         await CacheArtists.load()
         CacheLyrics.load_cache()
 
+    # função para validar o login
+    async def validate_login() -> bool:
+        """
+            Função que valida o login. 
+              →  Retorna True se houver alguma conta logada. 
+              →  Retorna False de nenhuma conta existir/estiver logada.
+        """
 
+        current_id = AccountManager.read_current_account_index()
+
+        if current_id is None:
+            return False
+        
+        data = AccountManager.search_account_index(current_id)
+        profile = open_profile(current_id)
+
+        AccountManager.load_account(
+            account_id = current_id,
+            base_path = Path(data["base_path"]),   
+            data = profile
+        )
+
+        return True
+        
+    # overlay do primeiro login
+    async def abrir_overlay():
+        _overlay = OverlayLogin(page)
+
+        page.overlay.append(_overlay)
+        page.update()
+
+        await _overlay.login_finished.wait()
+
+        _overlay.opacity = 0
+        _overlay.update()
+
+        await asyncio.sleep(1)
+
+        page.overlay.remove(_overlay)
+        page.update()
+    
+    
     """  Validar login  """
 
-    await validate_login()
+    if not await validate_login():
+        # carrega uma overlay dinâmivo para o usuário fazer o login via google, quando terminar acontece uma animação fade out e carrega o restante de todo o app.
+        await abrir_overlay()
 
 
     """  Carregar cache  """
@@ -153,7 +153,10 @@ async def main(page: ft.Page):
 
     """  Criar componentes principais  """
 
-    page.appbar = AppBar(open_configurations = open_configurations, page = page)
+    page.appbar = AppBar(
+        open_configurations = open_configurations, 
+        page = page
+    )
     tabs = TabsNavigation(page)
     player = PlayerSection(page)
 
@@ -191,19 +194,17 @@ async def main(page: ft.Page):
     )
 
 
-    """  Registrando callbacks dos componentes e globais  """
-
-    # callbacks globais 
-    StateApp.register_callback("no_account", on_sem_conta)
-    StateApp.register_callback("current_account", tabs.playlist.carregar)
+    """  Registrando callbacks dos componentes  """
 
     # callbacks individuais dos componentes
+    
     tabs.connect()
     player.connect()
 
 
     """  Inicializações gerais  """
 
+    tabs.playlist.carregar()
     tabs.pesquisa_musica.iniciar_animacao()
     tabs.carregar_favoritas()
     
@@ -218,11 +219,6 @@ async def main(page: ft.Page):
     page.run_task(
         ScannerModel.async_start_scanner
     )
-
-    # StateApp.notify(
-    #     "current_account",
-    #     AccountManager.user()
-    # )
 
 
 if __name__ == "__main__":

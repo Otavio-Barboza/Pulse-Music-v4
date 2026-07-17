@@ -69,5 +69,5 @@ class OverlayLogin(ft.Container):
         )
 
     async def login(self, event):
-        await login_google()
+        await login_google(self.page)
         self.login_finished.set()

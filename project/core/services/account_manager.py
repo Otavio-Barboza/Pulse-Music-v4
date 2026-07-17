@@ -131,9 +131,6 @@ class AccountManager:
             data (dict | None, optional): Dados retornados ao ler a conta. { Defaults to None }
         """
 
-        print("image: ", data.get("image"))
-        print(data)
-
         cls._current_user = User(
             account_id = account_id,
             base_path = base_path,
@@ -226,7 +223,6 @@ class AccountManager:
         cls.load_json_accounts()
         
         accounts: dict = cls.search_account_index(account_id)
-        print(cls.accounts_cache)
         
         if not accounts:
             return False
@@ -234,17 +230,12 @@ class AccountManager:
         profile_json = Utils.sync_load_json(
             AppPaths.ACCOUNT / account_id / "profile.json"
         )
-        print(profile_json)
 
         # carrega Usuario a partir do perfil.json
         cls.load_account(account_id = account_id, base_path = accounts.get("base_path"), data = profile_json)
         cls.accounts_cache["current_account"] = account_id
         cls.save_accounts_json()
 
-        print(cls.user().name)
-        print(cls.user().image)
-        print(cls.user().id)
-        print(cls.user().email)
         return True
     
     @classmethod
@@ -261,7 +252,7 @@ class AccountManager:
             return None
         
     @classmethod
-    def delete_account(cls, account_id: str):
+    async def delete_account(cls, page, account_id: str):
         """
             Função para excluir a atual conta.
               →  Se não tiver mais contas salvas além da atual: Notifica o StateApp por estar 'sem_conta' disponível.
@@ -281,18 +272,21 @@ class AccountManager:
             conta for conta in cls.accounts_cache["accounts"]
             if conta.get("id") != account_id
         ]
-
+        
         if account_id:
             if cls.accounts_cache.get("accounts"):
                 other_account = cls.accounts_cache.get("accounts")[0]
-                
+                account_profile = Utils.sync_load_json(
+                    AppPaths.ACCOUNT / other_account.get("id") / "profile.json"
+                )
+
                 cls.accounts_cache["current_account"] = other_account.get("id")
                 cls.save_accounts_json()
 
                 cls.load_account(
                     account_id = other_account.get("id"),
                     base_path = other_account.get("base_path"),
-                    data = other_account
+                    data = account_profile
                 )
             else:
                 cls.accounts_cache["current_account"] = None
@@ -302,7 +296,4 @@ class AccountManager:
                 from core.services.auth.google_login_auth import login_google
                 import asyncio
 
-                asyncio.create_task(login_google())
-                # StateApp.notify("sem_conta")
-        
-        # StateApp.notify("current_account", cls.accounts_cache)
+                await login_google(page)

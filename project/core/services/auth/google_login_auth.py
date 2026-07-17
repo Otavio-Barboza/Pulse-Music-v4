@@ -1,3 +1,6 @@
+# import de front-end
+from ui.utils.utils_ui import UtilsUi
+
 # imports de back-end
 from core.services.account_manager import AccountManager
 from core.utils.path import AppPaths
@@ -8,7 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 import aiohttp, datetime
 
 
-async def login_google():
+async def login_google(page):
     """
         Faz o login via Google OAuth e retorna:
         →  nome
@@ -63,6 +66,17 @@ async def login_google():
     _image: str = data.get("picture")
     _account_id: str = data.get("sub")
     _base_path: str = AppPaths.ACCOUNT / _account_id
+
+    # validando conta, já a selecionada no login já exista é dado o return para encerrar o processo.
+    accounts_json = await Utils.async_load_json(AppPaths.ACCOUNT_JSON)
+    account: dict
+    for account in accounts_json.get("accounts"):
+        if account.get("id") == _account_id:
+            UtilsUi.snack_bar(
+                text = "Essa conta já existe, escolha outra ou troque de conta.",
+                page = page
+            )
+            return
 
     # aumentar qualidade da image da conta (trocar s96 por s256)
     if _image and "s96" in _image:

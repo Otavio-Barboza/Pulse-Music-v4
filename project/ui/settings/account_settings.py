@@ -346,21 +346,13 @@ class AccountSettings(ft.Container):
         """
             Função para atualizar os campos principais chamada em self.when_account_updates.
         """
-
         self.user_name.value = AccountManager.user().name
         self.email.value = AccountManager.user().email
         self.image_account.foreground_image_src = AccountManager.user().image
         self.data = AccountManager.user().id
         self.update()
 
-    # def when_account_updates(self):
-    #     """
-    #         Callback do StateApp: 'dados' será o objeto User (quando carregado) ou o index (quando index foi atualizado). Verificamos o tipo.
-    #     """
-        
-    #     self.update_fields(AccountManager.user())
-
-    def switch_mandatory_account(self, id_new_account: str):
+    async def switch_mandatory_account(self, id_new_account: str):
         """
             Função para realizar a troca obrigatória da conta ao delete a atual.
         Args:
@@ -369,9 +361,15 @@ class AccountSettings(ft.Container):
 
         _id_to_delete: str = AccountManager.read_current_account_index()
 
-        AccountManager.delete_account(_id_to_delete)
+        await AccountManager.delete_account(
+            page = self.page,
+            account_id = _id_to_delete
+        )
         AccountManager.select_account_by_id(id_new_account)
+        
+        self._create_selections()
         self.update_fields()
+        self.update()
         
     async def delete_current_account(self):
         """
@@ -382,7 +380,6 @@ class AccountSettings(ft.Container):
         account = AccountManager.accounts_cache['accounts']
 
         if len(account) > 2:
-            # self.page.overlay.clear()
             self.page.overlay.append(
                 SelecionarContaObrigatória(
                     page = self.page,
@@ -391,7 +388,13 @@ class AccountSettings(ft.Container):
             )
             self.page.update()
         else:
-            AccountManager.delete_account(self.data)
+            await AccountManager.delete_account(
+                page = self.page,
+                account_id = self.data)
+
+            self._create_selections()
+            self.update_fields()
+            self.update()
         
     async def _toggle_switch_account(self):
         self.account_selection.visible = not self.account_selection.visible
@@ -399,7 +402,7 @@ class AccountSettings(ft.Container):
 
     async def _action_items(self, e):
         if e.control.data.get('action') == 'new':
-            await login_google()
+            await login_google(self.page)
             
             self.update_fields()
             self._create_selections()
@@ -408,8 +411,6 @@ class AccountSettings(ft.Container):
             await self._toggle_switch_account()
         elif e.control.data.get('action') == 'select':
             account_id = e.control.data["id"]
-            print()
-            # print(account_id)
             AccountManager.select_account_by_id(account_id)
 
             self._create_selections()
@@ -417,8 +418,6 @@ class AccountSettings(ft.Container):
             self.update()
         elif e.control.data.get('action') == 'delete':
             await self.delete_current_account()
-            self._create_selections()
-            self.update()
         else:
             print(e.control.data)
 
@@ -465,22 +464,21 @@ class SelecionarContaObrigatória(ft.Container):
         )
         
         self.on_click = self.close_overlay
-        # print(self.page)
     
-    def _on_click(self, e):
+    async def _on_click(self, e):
         """
             Função para 'chamar' o callback self._select
 
         Args:
             e (evento): evento do clique.
         """
-        self.function(e.control.data)
-        print(self.page)
+        print(f"E.CONTROL.DATA: {e.control.data}")
+        await self.function(e.control.data)
         self.page.overlay.remove(self)
         self.page.update()
     
     def close_overlay(self, e):
-        self.page.overlay.clear()
+        self.page.overlay.remove(self)
         self.page.update()
     
     def _create_options(self):

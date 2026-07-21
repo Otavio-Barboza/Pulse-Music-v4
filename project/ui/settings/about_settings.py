@@ -442,13 +442,13 @@ class AboutSettings(ft.Container):
         if not self.page:
             return
         
-        indice = random.randint(0, len(self._TIPS) - 1)
-        self.text_tip.value = self._TIPS[indice][0]
+        index = random.randint(0, len(self._TIPS) - 1)
+        self.text_tip.value = self._TIPS[index][0]
         
         for icon in self.row_icons.controls:
-            icon.color = color.amarelo4 if icon.data == indice else color.branco
+            icon.color = color.amarelo4 if icon.data == index else color.branco
 
-        self.container_tips.bgcolor = self._TIPS[indice][1]        
+        self.container_tips.bgcolor = self._TIPS[index][1]        
         self.update()
     
     def start_loop(self):

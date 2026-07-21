@@ -17,51 +17,52 @@ import flet as ft
 
 
 class ListViewMusic(ft.ListView):
-    def __init__(self, musicas : list[Song], modo_favorita : ReproductionMode | None = None):
+    def __init__(self, page: ft.Page, musics: list[Song], favorite_mode: ReproductionMode | None = None):
         super().__init__(
             spacing = 10,
             expand = True
         )  
 
-        self.musicas = musicas
-        self.modo_favorita = modo_favorita
+        self.page = page
+        self.musics = musics
+        self.favorite_mode = favorite_mode
 
         self.controls = []
         
-        self._callback = self.att_container
-        self._callback_qtde = self.recarregar
-        self._callback_favoritas = self.att_nao_favoritas
-        self._callback_favorita = self.att_favoritas
-        self._carregar()
+        self._callback = self.acutalization_container
+        self._callback_qtde = self.reload
+        self._callback_favoritas = self.actualization_unfavorited
+        self._callback_favorita = self.actualization_favorited
+        self._load()
         
         ReproductionManager.register_callback(
             event = 'actualization_container', 
-            callback = self.att_container
+            callback = self.acutalization_container
         )
         PlaylistState.register_callback(
             event = 'update_displayed_musics',
-            function = self.recarregar
+            function = self.reload
         )
         PlaylistState.register_callback(
             event = 'actualization_not_favorited',
-            function = self.att_nao_favoritas
+            function = self.actualization_unfavorited
         )
         PlaylistState.register_callback(
             event = 'actualization_favorited',
-            function = self.att_favoritas
+            function = self.actualization_favorited
         )
 
-        if self.modo_favorita is not None:            
-            self._callback_favoritar = self.adicionar_favorita
-            self._callback_desfavoritar = self.remover_favorita
+        if self.favorite_mode is not None:            
+            self._callback_favoritar = self.add_favorite
+            self._callback_desfavoritar = self.remove_favorite
 
             FavoriteState.register_callback(
                 event = 'add_to_favorites',
-                callback = self.adicionar_favorita
+                callback = self.add_favorite
             )
             FavoriteState.register_callback(
                 event = 'unfavorite',
-                callback = self.remover_favorita
+                callback = self.remove_favorite
             )
 
     def will_unmount(self):        
@@ -70,100 +71,100 @@ class ListViewMusic(ft.ListView):
         PlaylistState._callbacks['actualization_not_favorited'].remove(self._callback_favoritas)
         PlaylistState._callbacks['actualization_favorited'].remove(self._callback_favorita)
         
-        if self.modo_favorita is not None:
+        if self.favorite_mode is not None:
             FavoriteState._callbacks['add_to_favorites'].remove(self._callback_favoritar)
             FavoriteState._callbacks['unfavorite'].remove(self._callback_desfavoritar)
     
-    def _carregar(self):        
-        if self.musicas is None:
+    def _load(self):        
+        if self.musics is None:
             return
         
-        chaves_favoritas = FavoriteState.list_favorite()
+        favorites_key = FavoriteState.list_favorite()
 
-        for musica in self.musicas:
+        for song in self.musics:
 
-            if musica.chave in chaves_favoritas:
+            if song.key in favorites_key:
                 status = Favorited.FAVORITED
             else:
                 status = Favorited.NOT_FAVORITED
             
             container = RowContainer(
                 page = self.page,
-                musica = musica,
+                song = song,
                 status_favoritada = status
             )
             
             self.controls.append(container)
             
-    def recarregar(self, pasta):        
+    def reload(self, path):        
         if (
             isinstance(PlaylistState._playlist_aberta, dict) and
             PlaylistState._playlist_aberta['open_or_close'] == PlaylistLoaded.OPEN
         ):
             try:                
-                if self.modo_favorita is None:
-                    fonte = PlaylistFont(
-                        path = pasta,
+                if self.favorite_mode is None:
+                    font = PlaylistFont(
+                        path = path,
                         mode = ReproductionMode.PLAYLIST
                     )
 
-                    self.musicas = fonte.carregar()
-                    fonte.carregar_playlist(self.musicas)
+                    self.musics = font.load()
+                    font.load_playlist(self.musics)
 
-                ReproductionManager.atualizar_filas_scanner()
+                ReproductionManager.update_queue_scanner()
 
                 self.controls.clear()
-                self._carregar()
+                self._load()
                 self.update()
             except Exception as e:
                 print(f'CALLBACK RECARREGA PLATLIST ERROR: {e}')
 
-    def adicionar_favorita(self, data):
-        if self.modo_favorita is None:
+    def add_favorite(self, data):
+        if self.favorite_mode is None:
             return
         
         self.controls.append(
             RowContainer(
                 page = self.page,
-                musica = data,
-                status_favoritada = data.modo
+                song = data,
+                status_favoritada = data.mode
             )
         )
         self.update()
 
-        PlaylistState.notificar(
-            evento = 'actualization_favorited',
-            dados = data.chave
+        PlaylistState.notify(
+            event = 'actualization_favorited',
+            data = data.key
         )
     
-    def remover_favorita(self, data):
-        container_para_remover = None
+    def remove_favorite(self, data):
+        container_to_remove = None
         
         for container in self.controls:
-            if container.data.chave == data.chave:
-                container_para_remover = container
+            if container.data.key == data.key:
+                container_to_remove = container
 
-        self.controls.remove(container_para_remover)
+        self.controls.remove(container_to_remove)
         self.update()
 
-        PlaylistState.notificar(
-            'att_favoritadas',
-            data.chave
+        PlaylistState.notify(
+            event = 'actualization_not_favorited',
+            data = data.key
         )
 
-    def att_nao_favoritas(self, chave):
+    def actualization_unfavorited(self, key):
         for container in self.controls:
-            if container.data.chave == chave:
-                container.att_icon()
+            if container.data.key == key:
+                container.actualization_icon()
                 break
 
-    def att_favoritas(self, chave):
+    def actualization_favorited(self, key):
         for container in self.controls:
-            if container.data.chave == chave:
-                container.att_icon_favoritado()
+            if container.data.key == key:
+                container.actualization_favrited_icon()
                 break
 
-    def att_container(self, sessao : ReproductionManager):
+    def acutalization_container(self, sessao: ReproductionManager):
         if not self.page:
             return
         
@@ -172,9 +173,9 @@ class ListViewMusic(ft.ListView):
                 continue
 
             if (
-                sessao.estado.musica_atual is not None and
-                container.data.chave is not None and
-                container.data.chave == sessao.estado.musica_atual.chave
+                sessao.estado.current_song is not None and
+                container.data.key is not None and
+                container.data.key == sessao.estado.current_song.key
             ):
                 container.bgcolor = color.amarelo3
             else:

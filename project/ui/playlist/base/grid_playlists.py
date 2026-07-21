@@ -7,7 +7,7 @@ import flet as ft
 
 
 class GridPlaylists(ft.GridView):
-    def __init__(self, on_abrir, on_remover, carregar_musicas):
+    def __init__(self, on_open, on_remove, load_songs):
         super().__init__(
             max_extent = 270,
             spacing = 12,
@@ -15,15 +15,15 @@ class GridPlaylists(ft.GridView):
             clip_behavior = ft.ClipBehavior.NONE
         )
 
-        self.on_abrir = on_abrir
-        self.on_remover = on_remover
-        self.carregar_musicas = carregar_musicas
+        self.on_open = on_open
+        self.on_remove = on_remove
+        self.load_songs = load_songs
         self.cards = {}
     
     def adicionar_playlist(
         self, 
         playlist_id : str, 
-        nome : str, 
+        name : str, 
         qtde_mus : int,
         color : str | ft.Colors,
         img : str,
@@ -32,14 +32,14 @@ class GridPlaylists(ft.GridView):
         card = PlaylistCard(
             page = self.page,
             playlist_id = playlist_id,
-            nome = nome,
-            qtde_musicas = qtde_mus,
-            color_fundo = color,
-            imagem_fundo = img,
-            pasta = path,
-            on_abrir = lambda e: self.on_abrir(playlist_id),
-            on_remover = lambda e: self.on_remover(playlist_id),
-            carregar_playlist = lambda e: self.carregar_musicas(playlist_id, path)
+            name = name,
+            number_of_songs = qtde_mus,
+            backgroud_color = color,
+            backgroud_image = img,
+            path = path,
+            on_open = lambda e: self.on_open(playlist_id),
+            on_remove = lambda e: self.on_remove(playlist_id),
+            load_playlist = lambda e: self.load_songs(playlist_id, path)
         )
 
         if self.cards.get(playlist_id, None) is None:
@@ -47,10 +47,10 @@ class GridPlaylists(ft.GridView):
             self.controls.append(card)
             self.update()
     
-    def atualizar_playlist(
+    def update_playlist(
         self,
         playlist_id: str,
-        nome: str,
+        name: str,
         color: str | ft.Colors,
         img: str,
         path: str,
@@ -62,10 +62,10 @@ class GridPlaylists(ft.GridView):
             return  # segurança
 
         # Atualiza dados básicos
-        card.nome_play.value = nome
-        card.imagem.content.src = img
-        card.container_info.bgcolor = color
-        card.pasta = path
+        card.name_play.value = name
+        card._image.content.src = img
+        card.container_information.bgcolor = color
+        card.path = path
         card.data['pasta'] = path
 
         if qtde_mus is not None:

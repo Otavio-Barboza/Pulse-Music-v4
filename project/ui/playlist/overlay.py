@@ -1,5 +1,6 @@
 # import de interface
 from ui.others.colors import color
+from ui.utils.utils_ui import UtilsUi
 
 # imports de back-end
 from core.playlists.enum.playlist_enum import PlalistOverlayMode
@@ -46,7 +47,7 @@ class ContainerOverlay(ft.Container):
 
         self.path_text = ft.Text(
             col = 6,
-            value = 'Nenhuma path de musicas selecionada',
+            value = "Nenhuma path de musicas selecionada",
             size = 16,
             max_lines = 1,
             text_align = ft.TextAlign.CENTER
@@ -54,14 +55,14 @@ class ContainerOverlay(ft.Container):
 
         self.text_name = ft.Text(
             col = 6,
-            value = 'Adicione o name da sua playlist',
+            value = "Adicione o name da sua playlist",
             size = 18,
             max_lines = 2,
             text_align = ft.TextAlign.CENTER
         )
 
         self.text_field = ft.TextField(
-            hint_text = 'Digite o name da sua playlist...',
+            hint_text = "Digite o name da sua playlist...",
             hint_style = ft.TextStyle(
                 color = color.cinza1,
                 size = 16
@@ -116,8 +117,8 @@ class ContainerOverlay(ft.Container):
                             self.text_field,
                             
                             self._create_button(
-                                click = 'path', 
-                                text = 'Selecionar Pasta com as Músicas', 
+                                click = "path", 
+                                text = "Selecionar Pasta com as Músicas", 
                                 col = 4, 
                                 background_color = color.laranja2, 
                                 text_color = color.branco
@@ -154,7 +155,7 @@ class ContainerOverlay(ft.Container):
                                 size = 16,
                                 weight = ft.FontWeight.BOLD,
                                 letter_spacing = 1,
-                                font_family = 'sansita'
+                                font_family = "sansita"
                             ),
 
                             unselected_label_text_style = ft.TextStyle(
@@ -163,29 +164,29 @@ class ContainerOverlay(ft.Container):
 
                             tabs = [
                                 ft.Tab(
-                                    text = 'Albuns',
+                                    text = "Albuns",
                                     content = ft.GridView(
                                         max_extent = 220,
                                         controls = [
-                                            self._create_image_card(f'{self.paths[0]}/{img}') for img in self.albums
+                                            self._create_image_card(f"{self.paths[0]}/{img}") for img in self.albums
                                         ]
                                     )
                                 ),
 
                                 ft.Tab(
-                                    text = 'Capas de Músicas',
+                                    text = "Capas de Músicas",
 
                                     content = ft.GridView(
                                         max_extent = 220,
 
                                         controls = [
-                                            self._create_image_card(f'{self.paths[1]}/{img}') for img in self.covers
+                                            self._create_image_card(f"{self.paths[1]}/{img}") for img in self.covers
                                         ]
                                     )
                                 ),
 
                                 ft.Tab(
-                                    text = 'Cor de Fundo da Playlist',
+                                    text = "Cor de Fundo da Playlist",
 
                                     content = ft.Container(
                                         padding = ft.padding.only(top = 10),
@@ -206,7 +207,7 @@ class ContainerOverlay(ft.Container):
 
                                                                 controls = [
                                                                     ft.Text(
-                                                                        value = 'Regule a opacity da color',
+                                                                        value = "Regule a opacity da color",
                                                                         size = 16,
                                                                         text_align = ft.TextAlign.CENTER
                                                                     ),
@@ -214,9 +215,9 @@ class ContainerOverlay(ft.Container):
                                                                     self.opacity_slider,
                                                                     
                                                                     self._create_button(
-                                                                        click = 'opacity',
+                                                                        click = "opacity",
                                                                         col = None,
-                                                                        text = 'Salvar Opacidade',
+                                                                        text = "Salvar Opacidade",
                                                                         background_color = color.azul_medio2,
                                                                         text_color = color.branco
                                                                     )
@@ -250,16 +251,16 @@ class ContainerOverlay(ft.Container):
                     ft.ResponsiveRow(
                         controls = [
                             self._create_button(
-                                click = 'cancel', 
-                                text = 'Cancelar', 
+                                click = "cancel", 
+                                text = "Cancelar", 
                                 col = 6,
                                 background_color = color.vermelho,
                                 text_color = color.branco
                             ),
 
                             self._create_button(
-                                click = 'concluir', 
-                                text = 'Concluir', 
+                                click = "concluir", 
+                                text = "Concluir", 
                                 col = 6,
                                 background_color = color.amarelo,
                                 text_color = color.preto1
@@ -285,7 +286,7 @@ class ContainerOverlay(ft.Container):
         self.container_color_opacity.bgcolor = playlist.style["color"]
         self.container_color_opacity.opacity = playlist.style["opacity"]
         self.text_name.value = f"Nome da playlist: {playlist.name}"
-        self.path_text.value = f"Pasta: {playlist.musicas['path']}"
+        self.path_text.value = f"Pasta: {playlist.musicas["path"]}"
 
     def _create_image_card(self, image):
         card = ft.Container(
@@ -323,7 +324,7 @@ class ContainerOverlay(ft.Container):
             on_click = self._select_color,
 
             content = ft.Text(
-                value = color.replace('Colors.', '').upper(),
+                value = color.replace("Colors.", "").upper(),
                 text_align = ft.TextAlign.CENTER,
                 weight = ft.FontWeight.W_300
             )
@@ -348,13 +349,13 @@ class ContainerOverlay(ft.Container):
         text_color: str, 
         background_color: str
     ) -> ft.TextButton:
-        if click == 'cancel':
+        if click == "cancel":
             click = self.close_overlay
-        elif click == 'concluir':
+        elif click == "concluir":
             click = self.confirm
-        elif click == 'path':
+        elif click == "path":
             click = self.open_selector_path
-        elif click == 'opacity':
+        elif click == "opacity":
             click = self.save_opacity
         else:
             click =  None
@@ -428,19 +429,19 @@ class ContainerOverlay(ft.Container):
 
         self.page.open(
             ft.SnackBar(
-                content = ft.Text('Valor de Opacidade Salva')
+                content = ft.Text("Valor de Opacidade Salva")
             )
         )
 
     def _submit_name(self, e):
         self.state.name = self.text_field.value
-        self.text_name.value = f'Nome da playlist: {self.text_field.value}'
-        self.text_field.value = ''
+        self.text_name.value = f"Nome da playlist: {self.text_field.value}"
+        self.text_field.value = ""
         self.update()
     
     def _change(self, e):
         self.state.name = self.text_field.value
-        self.text_name.value = f'Nome da playlist: {self.text_field.value}'
+        self.text_name.value = f"Nome da playlist: {self.text_field.value}"
         self.update()
 
     def open_selector_path(self, e):
@@ -451,21 +452,19 @@ class ContainerOverlay(ft.Container):
         
 
         if path in self.check_existing_paths():
-            self.page.open(
-                ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com essa path de músicas, escolha outra!')
-                )
+            UtilsUi.snack_bar(
+                page = self.page,
+                text = "Já existe uma playlist com essa path de músicas, escolha outra!"
             )
-            self.page.update()
         else:
             self.state.path = path
-            self.path_text.value = f'Pasta selecionada: {path}'
+            self.path_text.value = f"Pasta selecionada: {path}"
             self.path_text.update()
     
     def close_overlay(self, e):
-        self.state.image = r'Assets\Global\Images\Padrao\capa_playlist_padrao.png'
+        self.state.image = r"assets\images\placeholders\capa_playlist_padrao.png"
         self.state.name = None
-        self.state.color = '#3d3d3d'
+        self.state.color = "#3d3d3d"
         self.state.opacity = 1.0
         self.state.path = None
         
@@ -488,33 +487,25 @@ class ContainerOverlay(ft.Container):
 
     def create_playlist(self):
         if self.state.name is None:
-            self.page.open(
-                ft.SnackBar(
-                    content = ft.Text('Atribua um name a sua playlist primeiro')
-                )
+            UtilsUi.snack_bar(
+                page = self.page,
+                text = "Atribua um name a sua playlist primeiro"
             )
-            self.page.update()
         elif self.state.name in self.check_existing_playlists():
-            self.page.open(
-                ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com esse name, escolha outro!')
-                )
+            UtilsUi.snack_bar(
+                page = self.page,
+                text = "Já existe uma playlist com esse name, escolha outro!"
             )
-            self.page.update()
         elif self.state.path is None:
-            self.page.open(
-                ft.SnackBar(
-                    content = ft.Text('Selecione uma path para criar')
-                )
+            UtilsUi.snack_bar(
+                page = self.page,
+                text = "Selecione uma path para criar"
             )
-            self.page.update()
         elif self.state.path in self.check_existing_paths():
-            self.page.open(
-                ft.SnackBar(
-                    content = ft.Text('Já existe uma playlist com essa path de músicas, escolha outra!')
-                )
+            UtilsUi.snack_bar(
+                page = self.page,
+                text = "Já existe uma playlist com essa path de músicas, escolha outra!"
             )
-            self.page.update()
         else:
             id = self.state.create_playlist()
             self.page.run_task(

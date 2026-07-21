@@ -98,7 +98,7 @@ class OverlayTip(ft.Container):
     def _text_button(self, text : str) -> ft.TextButton:
         return ft.TextButton(
             text = text,
-            on_click = self._parar,
+            on_click = self._stop,
             height = 45,
 
             style = ft.ButtonStyle(
@@ -121,7 +121,7 @@ class OverlayTip(ft.Container):
     def _icon_button(self, text : str) -> ft.IconButton:
         return ft.IconButton(
             icon = ft.Icons.CLOSE,
-            on_click = self._fechar,
+            on_click = self._close,
 
             style = ft.ButtonStyle(
                 color = {
@@ -139,7 +139,7 @@ class OverlayTip(ft.Container):
             )
         )
     
-    def _parar(self, e):
+    def _stop(self, e):
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(
@@ -154,7 +154,7 @@ class OverlayTip(ft.Container):
         StateApp.notify(event = 'actualization_on_click', data = False)
         StateApp.notify(event = 'actualization_switch', data = False)
     
-    def _fechar(self, e):
+    def _close(self, e):
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(

@@ -37,7 +37,7 @@ class ColumnCards(ft.Column):
             col = 4,
             text = 'Adicionar Nova Playlist',
             icon = ft.Icons.PLAYLIST_ADD,
-            on_click = self._abrir_overlay_dica if ServiceSettings.load_overlay() else self._criar_overlay,
+            on_click = self.open_overlay_tips if ServiceSettings.load_overlay() else self._create_overlay,
             visible = True,
             
             style = ft.ButtonStyle(
@@ -63,7 +63,7 @@ class ColumnCards(ft.Column):
         self.button_return_play = ft.TextButton(
             col = 4,
             text = 'Voltar',
-            on_click = self.voltar,
+            on_click = self.previous,
             visible = False,
 
             style = ft.ButtonStyle(
@@ -114,18 +114,18 @@ class ColumnCards(ft.Column):
 
     def connect(self):
         StateApp.register_callback(event = "overlay_tips", func = ServiceSettings.save_overlay_tips)
-        StateApp.register_callback("actualization_on_click", self.mudar_on_click)
+        StateApp.register_callback("actualization_on_click", self.alter_on_click)
     
 
     # FUNÇÕES DA OPERAÇÃO DA CLASSE
-    def mudar_on_click(self, valor):
+    def alter_on_click(self, valor):
         if valor == True:
-            self.button_add_play.on_click = self._abrir_overlay_dica
+            self.button_add_play.on_click = self.open_overlay_tips
         else:
-            self.button_add_play.on_click = self._criar_overlay
+            self.button_add_play.on_click = self._create_overlay
         self.update()
 
-    def _abrir_overlay_dica(self, e):
+    def open_overlay_tips(self, e):
         self.page.overlay.clear()
         self.page.overlay.append(
             OverlayTip(
@@ -137,7 +137,7 @@ class ColumnCards(ft.Column):
         )
         self.page.update()
 
-    def _criar_overlay(self, e):
+    def _create_overlay(self, e):
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(
@@ -158,19 +158,19 @@ class ColumnCards(ft.Column):
 
         self.update()
 
-    def carregar(self):
+    def load(self):
         """
             Intermedio ao ContentPlaylist para o carregamento dos cards ao inicializar o player
         """
         self.update_buttons()
-        self.column_content.carregar()
+        self.column_content.load()
     
     def open_function(self):
         self.state.modo = PlaylistMode.LIST
         self.update_buttons()
 
-    def voltar(self, e):
+    def previous(self, e):
         self.state.modo = PlaylistMode.GRID
         self.update_buttons()
-        self.column_content.fechar_playlist()
-        self.column_content.carregar()
+        self.column_content.close_playlist()
+        self.column_content.load()

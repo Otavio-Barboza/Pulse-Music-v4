@@ -14,14 +14,14 @@ class PlaylistFont(ReproductionFont):
         self.mode = mode
         self.path = path
     
-    def carregar(self) -> list:
+    def load(self) -> list:
         return SongRepository.load_songs(
             path = self.path,
             mode = self.mode
         )
     
-    def carregar_playlist(self, lista_musicas):
+    def load_playlist(self, song_list: list):
         Reproduction.load_songs_from_mode(
             mode = self.mode, 
-            list = lista_musicas
+            list = song_list
         )

@@ -27,26 +27,26 @@ class ContentPlaylist(ft.Container):
         self.grid: ft.GridView = GridPlaylists(
             on_abrir = self.abrir_config_playlist,
             on_remover = self._remover_playlist,
-            carregar_musicas = self.abrir_playlist
+            load_songs = self.open_playlist
         )
-        self.estado = PlaylistManager(self.grid)
+        self.state = PlaylistManager(self.grid)
         
         self.content = self.grid
 
-    def carregar(self):
+    def load(self):
         """
             Carrega os Cards na tela na inicialização do player
         """
-        self.estado.load_playlists()
+        self.state.load_playlists()
         self.update()
 
     def abrir_config_playlist(self, e):
-        self.estado.open_config_playlist(e)
+        self.state.open_config_playlist(e)
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(
                 page = self.page,
-                estado = self.estado,
+                state = self.state,
                 modo = PlalistOverlayMode.UPDATE
             ) 
         )
@@ -59,16 +59,16 @@ class ContentPlaylist(ft.Container):
             playlist_id (str): ID da playlist
         """
 
-        self.estado.remover_playlist(playlist_id)
+        self.state.remove_playlist(playlist_id)
 
-    def _criar_play(self):
+    def _create_playlist(self):
         """
             Ordem: Estadoplaylist -> Grid & Repositorio -> CreatePlaylist
         """
         
-        self.estado.criar_playlist()
+        self.state.create_playlist()
         
-    def abrir_playlist(self, id : str, data : str):
+    def open_playlist(self, id : str, data : str):
         """
             Ordem: PlaylistManager ->
         Args:
@@ -82,18 +82,18 @@ class ContentPlaylist(ft.Container):
             mode = ReproductionMode.PLAYLIST
         )
         
-        lista_de_musicas = fonte.carregar()
+        list_music = fonte.load()
         
-        fonte.carregar_playlist(
-            lista_musicas = lista_de_musicas
+        fonte.load_playlist(
+            lista_musicas = list_music
         )
 
         self.open_function()
 
         list_view = ListViewMusic(
             page = self.page,
-            musicas = lista_de_musicas,
-            modo_favorita = None
+            musics = list_music,
+            favorite_mode = None
         )
         
         self.content = list_view
@@ -104,7 +104,7 @@ class ContentPlaylist(ft.Container):
             status = PlaylistLoaded.OPEN
         )
         
-    def fechar_playlist(self):        
+    def close_playlist(self):        
         self.content = self.grid
         self.update()
 

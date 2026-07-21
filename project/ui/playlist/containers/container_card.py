@@ -11,52 +11,52 @@ import flet as ft
 class PlaylistCard(ft.Container):
     def __init__(
             self, 
-            on_abrir, 
-            on_remover, 
-            carregar_playlist,
-            playlist_id : str, 
-            nome : str, 
-            qtde_musicas : int,
-            color_fundo : str | ft.Colors,
-            imagem_fundo : str,
-            pasta : str | None,
-            opacidade : float = 1.0
+            on_open, 
+            on_remove, 
+            load_playlist,
+            playlist_id: str, 
+            name: str, 
+            number_of_songs: int,
+            backgroud_color: str | ft.Colors,
+            backgroud_image: str,
+            path: str | None,
+            opacity: float = 1.0
         ):
         super().__init__(
             height = 270,
             width = 270,
             border_radius = ft.border_radius.all(20),
             scale = 1.0,
-            data = {"id" : playlist_id, "pasta" : pasta},
+            data = {"id" : playlist_id, "path" : path},
             animate = ft.Animation(200, ft.AnimationCurve.SLOW_MIDDLE),
             on_hover = self._hover,
         )
 
-        self.nome_playlist = nome
-        self.qtde_musicas = str(qtde_musicas)
+        self.playlist_name = name
+        self.number_of_songs = str(number_of_songs)
         self.playlist_id = playlist_id
-        self.color_fundo = color_fundo
-        self.imagem_fundo = imagem_fundo
-        self.opacidade = opacidade
-        self.pasta = pasta
-        self.on_abrir = on_abrir
-        self.on_remover = on_remover
-        self.carregar_playlist = carregar_playlist
-        self.on_click = lambda e: self.carregar_playlist(playlist_id)
+        self.backgroud_color = backgroud_color
+        self.backgroud_image = backgroud_image
+        self.opacity = opacity
+        self.path = path
+        self.on_open = on_open
+        self.on_remove = on_remove
+        self.load_playlist = load_playlist
+        self.on_click = lambda e: self.load_playlist(playlist_id)
 
-        self.imagem = ft.Container(
+        self._image = ft.Container(
             width = 270,
             expand = True,
 
             content = ft.Image(
-                src = self.imagem_fundo,
+                src = self.backgroud_image,
                 fit = ft.ImageFit.COVER
             )
         )
-        self.nome_play = self._retornar_textos(self.nome_playlist)
-        self.qtde = self._retornar_textos(f'{self.qtde_musicas} músicas')
+        self.name_play = self._create_text(self.playlist_name)
+        self.qtde = self._create_text(f'{self.number_of_songs} músicas')
 
-        self.infos = ft.PopupMenuButton(
+        self.information = ft.PopupMenuButton(
             icon = ft.Icons.MORE_VERT_ROUNDED,
             icon_color = color.preto3,
             surface_tint_color = color.branco,
@@ -72,21 +72,21 @@ class PlaylistCard(ft.Container):
             items = [
                 ft.PopupMenuItem(
                     text = "Configurações Playlist",
-                    data = nome,
-                    on_click = self.on_abrir
+                    data = name,
+                    on_click = self.on_open
                 ),
 
                 ft.PopupMenuItem(
                     text = "Excluir Playlist",
-                    data = nome,                                        
-                    on_click = self.on_remover
+                    data = name,                                        
+                    on_click = self.on_remove
                 )
             ]
         )
 
-        self.container_info = ft.Container(
+        self.container_information = ft.Container(
             height = 60,
-            bgcolor = self.color_fundo,
+            bgcolor = self.backgroud_color,
 
             padding = ft.padding.only(
                 top = 5,
@@ -103,12 +103,12 @@ class PlaylistCard(ft.Container):
                         spacing = 3,
 
                         controls = [
-                            self.nome_play,
+                            self.name_play,
                             self.qtde
                         ]
                     ),
 
-                    self.infos
+                    self.information
                 ]
             )
         )
@@ -117,22 +117,22 @@ class PlaylistCard(ft.Container):
             spacing = 0,
 
             controls = [
-                self.imagem,
-                self.container_info
+                self._image,
+                self.container_information
             ]
         )
 
         StateApp.register_callback(
             event = 'actualization_number_songs_of_playlist',
-            func = self.alterar_qtde_de_musicas_playlist
+            func = self.change_number_of_songs_in_playlist
         )
 
-    def alterar_qtde_de_musicas_playlist(self, quantidade : dict):
+    def change_number_of_songs_in_playlist(self, number: dict):
         if not self.page:
             return
         
-        if quantidade["id"] == self.data["id"]:
-            self.qtde.value = f'{quantidade["qtde"]} músicas'
+        if number["id"] == self.data["id"]:
+            self.qtde.value = f'{number["qtde"]} músicas'
             
         try:
             self.update()
@@ -140,7 +140,7 @@ class PlaylistCard(ft.Container):
             print(ase)
             return
             
-    def _retornar_textos(self, texto : str) -> ft.Text:
+    def _create_text(self, texto : str) -> ft.Text:
         return ft.Text(
             value = texto,
             size = 16,
@@ -149,7 +149,7 @@ class PlaylistCard(ft.Container):
             max_lines = 1
         )
     
-    def _hover(self, e : ft.HoverEvent):
+    def _hover(self, e: ft.HoverEvent):
         self.scale = 1.075 if e.data == 'true' else 1.0
         self.opacity = 0.8 if e.data == 'true' else 1.0
         self.update()
@@ -157,7 +157,7 @@ class PlaylistCard(ft.Container):
     def dispose(self):
         callbacks = StateApp._callbacks.get('actualization_number_songs_of_playlist', [])
         
-        if self.alterar_qtde_de_musicas_playlist in callbacks:
+        if self.change_number_of_songs_in_playlist in callbacks:
             callbacks.remove(
-                self.alterar_qtde_de_musicas_playlist
+                self.change_number_of_songs_in_playlist
             )

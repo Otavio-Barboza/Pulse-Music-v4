@@ -243,8 +243,6 @@ class AccountSettings(ft.Container):
         _list_accounts: list[dict] = self.return_available_accounts()
         _current_id: str = AccountManager.read_current_account_index()
         
-        # print(_list_accounts)
-
         self.account_selection.controls.clear()
 
         if len(_list_accounts) == 1:
@@ -381,7 +379,7 @@ class AccountSettings(ft.Container):
 
         if len(account) > 2:
             self.page.overlay.append(
-                SelecionarContaObrigatória(
+                SelectAccountRequired(
                     page = self.page,
                     function = self.switch_mandatory_account
                 ) 
@@ -422,7 +420,7 @@ class AccountSettings(ft.Container):
             print(e.control.data)
 
 
-class SelecionarContaObrigatória(ft.Container):
+class SelectAccountRequired(ft.Container):
     def __init__(self, function: callable, page: ft.Page):
         super().__init__(
             expand = True,

@@ -25,7 +25,7 @@ class ScreenSettings(ft.Container):
         self.buttons = {}
 
         # registrar para escutar mudanças de seção
-        StateApp.register_callback("configurations_session", self._quando_secao_mudar)
+        StateApp.register_callback("configurations_session", self._when_section_changes)
         
         self.side_menu = self._side_menu()
 
@@ -127,7 +127,7 @@ class ScreenSettings(ft.Container):
             ft.TextButton: Botoão de text
         """
 
-        botao = ft.TextButton(
+        button = ft.TextButton(
             text = text,
             width = 200,
             on_click = lambda e: self._selecionar(section_id),
@@ -152,10 +152,10 @@ class ScreenSettings(ft.Container):
             )
         )
 
-        self.buttons[section_id] = botao
-        return botao
+        self.buttons[section_id] = button
+        return button
 
-    def _selecionar(self, section: str):
+    def _select(self, section: str):
         """
             Quando é clicado em algum botão a ação é registrada no ouvinte do StateApp com o section 
 
@@ -164,7 +164,7 @@ class ScreenSettings(ft.Container):
         """
         StateApp.select_config_section(section)
 
-    def _quando_secao_mudar(self, section_id: str):
+    def _when_section_changes(self, section_id: str):
         """
             1. Altera o Conteúdo da seção principal conforme o botão clicado
             2. Navega nos intens do dict de botões para atualizar a color, isso caso a seção da chave seja a mesma que o section_id informado

@@ -10,7 +10,7 @@ import flet as ft
 
 
 class CompactProgressBar(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             alignment = ft.alignment.center
         )
@@ -21,11 +21,11 @@ class CompactProgressBar(ft.Container):
             inactive_color = color.preto8,
             active_color = color.amarelo,
             overlay_color = color.amarelo_opaco2,
-            on_change_end = self.mudar_pos_slider,
-            on_change_start = self.detectar_arrasto_slider
+            on_change_end = self.alter_position_slider,
+            on_change_start = self.detect_drag_slider
         )
-        self.duracao_atual = self._retornar_texto('00:00')
-        self.duracao_total = self._retornar_texto('00:00')
+        self.current_time = self._create_text('00:00')
+        self.total_time = self._create_text('00:00')
 
         self.content = ft.ResponsiveRow(
             alignment = ft.MainAxisAlignment.CENTER,
@@ -33,9 +33,9 @@ class CompactProgressBar(ft.Container):
             spacing = 0,
 
             controls = [
-                self.duracao_atual,
+                self.current_time,
                 self.slider,
-                self.duracao_total
+                self.total_time
             ]
         )
 
@@ -43,58 +43,58 @@ class CompactProgressBar(ft.Container):
 
         ReproductionManager.register_callback(
             event = 'slider_position', 
-            callback = self._att_dur_atual
+            callback = self.actualization_current_duration
         )
         ReproductionManager.register_callback(
             event = 'slider', 
-            callback = self._att_slider
+            callback = self.actualization_slider
         )
         ReproductionManager.register_callback(
             event = 'total_time',
-            callback = self._att_dur_total
+            callback = self.actualization_total_duration
         )
 
     def did_mount(self):
         self._on_resize()
 
     def _on_resize(self, e = None):
-        self.duracao_atual.visible = not self.page.width < 576
-        self.duracao_total.visible = not self.page.width < 576
+        self.current_time.visible = not self.page.width < 576
+        self.total_time.visible = not self.page.width < 576
         self.update()
 
-    def _retornar_texto(self, texto : str) -> ft.Text:
+    def _create_text(self, text: str) -> ft.Text:
         return ft.Text(
-            value = texto,
+            value = text,
             visible = True,
             col = {'md' : 1, 'sm' : 1.5},
             text_align = ft.TextAlign.CENTER
         )
 
-    def _att_slider(self, dados = None):
-        self.slider.max = ReproductionManager.estado.duracao_total
+    def actualization_slider(self, *_):
+        self.slider.max = ReproductionManager.state.total_time
         self.slider.min = 0
-        self.slider.value = ReproductionManager.estado.tempo_atual
+        self.slider.value = ReproductionManager.state.current_time
         self.slider.update()
     
-    def _att_dur_total(self, dados = None):
-        self.duracao_total.value = ReproductionManager.formatted_total_duration()
+    def actualization_total_duration(self, *_):
+        self.total_time.value = ReproductionManager.formatted_total_duration()
         self.update()
 
-    def _att_dur_atual(self, dados = None):
-        self.duracao_atual.value = ReproductionManager.formatted_current_duration() if ReproductionManager.estado.tempo_atual != 0.0 else '00:00'
+    def actualization_current_duration(self, *_):
+        self.current_time.value = ReproductionManager.formatted_current_duration() if ReproductionManager.state.current_time != 0.0 else '00:00'
         
         if (
-            ReproductionManager.estado.tempo_atual > 0 
+            ReproductionManager.state.current_time > 0 
              and
-            ReproductionManager.estado.duracao_total != 0.0
+            ReproductionManager.state.total_time != 0.0
         ):
-            self.slider.value = min(ReproductionManager.estado.tempo_atual, ReproductionManager.estado.duracao_total)
+            self.slider.value = min(ReproductionManager.state.current_time, ReproductionManager.state.total_time)
 
         self.update()
 
-    def detectar_arrasto_slider(self, e):
+    def detect_drag_slider(self, e):
         ReproductionManager.set_drag_slider(True)
     
-    def mudar_pos_slider(self, e):
+    def alter_position_slider(self, e):
         ReproductionManager.go_to(e.control.value)
         ReproductionManager.set_drag_slider(False)

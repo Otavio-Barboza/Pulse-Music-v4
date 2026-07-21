@@ -6,17 +6,18 @@ import flet as ft
 
 
 class ExpandedInformation(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             col = {'md' : 5, 'sm' : 12},
             alignment = ft.alignment.center,
             padding = ft.padding.all(10),
         )
+        self.page = page
 
-        self.imagem = ft.Container(
+        self._image = ft.Container(
             col = 12,
             padding = ft.padding.all(10),
-            content = self._adicionar_img()
+            content = self._add_image()
         )
 
         self.content = ft.Column(
@@ -25,20 +26,20 @@ class ExpandedInformation(ft.Container):
             controls = [
                 ft.ResponsiveRow(
                     controls = [
-                        self.imagem
+                        self._image
                     ]
                 )
             ]
         )
 
-        ReproductionManager.register_callback('current_song', self.att_infos_expandido)
+        ReproductionManager.register_callback('current_song', self.actualization_expanded_information)
     
-    def _criar_textos(self, valor : str = '') -> ft.Text:
+    def _create_text(self, value: str = '') -> ft.Text:
         return ft.Text(
-            value = valor
+            value = value
         )
     
-    def _adicionar_img(self, img : str = r'Assets\Global\Images\Padrao\capa_musicas_desconhecidas.png') -> ft.Image:
+    def _add_image(self, img: str = r'assets\images\placeholders\capa_musicas_desconhecidas.png') -> ft.Image:
         return ft.Image(
             src = img,
             border_radius = ft.border_radius.all(10),
@@ -48,8 +49,8 @@ class ExpandedInformation(ft.Container):
             width = 600
         )
     
-    def att_infos_expandido(self, dados = None):
-        self.imagem.content.src = ReproductionManager.get_cover()
+    def actualization_expanded_information(self, *_):
+        self._image.content.src = ReproductionManager.get_cover()
         
         if self.page:
             self.update()

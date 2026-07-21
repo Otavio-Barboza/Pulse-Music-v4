@@ -9,44 +9,45 @@ import flet as ft
 
 
 class PlayerInformation(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center_right,
             padding = ft.padding.only(left = 10)
         )
+        self.page = page
         
-        self.imagem = ft.Container(
+        self._image = ft.Container(
             height = 64,
             width = 128,
             col = {'xs' : 0, 'sm' : 3},
             visible = True,
-            content = self._criar_img()
+            content = self._create_images()
         )
-        self.nome_musica = self._nomes(nome = '')
-        self.nome_artista = self._nomes(nome = '')
+        self.song_name = self._create_text(name = '')
+        self.artist_name = self._create_text(name = '')
 
         self.content = ft.ResponsiveRow( 
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
             
             controls = [
-                self.imagem,
+                self._image,
 
                 ft.Column(
                     col = 9,
                     alignment = ft.MainAxisAlignment.CENTER,
 
                     controls = [
-                        self.nome_musica,
-                        self.nome_artista
+                        self.song_name,
+                        self.artist_name
                     ]
                 )
             ]
         )
 
-        ReproductionManager.register_callback('current_song', self.att_infos)
+        ReproductionManager.register_callback('current_song', self.actualization_information)
     
-    def _criar_img(self, img : str = r'Assets\Global\Images\Padrao\img_64_padrão.png') -> ft.Image:
+    def _create_images(self, img: str = r'assets\images\placeholders\img_64_padrão.png') -> ft.Image:
         return ft.Image(
             src = img,
             border_radius = ft.border_radius.all(15),
@@ -54,9 +55,9 @@ class PlayerInformation(ft.Container):
             filter_quality = ft.FilterQuality.HIGH
         )
     
-    def _nomes(self, nome : str) -> ft.Text:
+    def _create_text(self, name: str) -> ft.Text:
         return ft.Text(
-            value = nome,
+            value = name,
             size = 18,
             weight = ft.FontWeight.W_300,
             max_lines = 1,
@@ -64,8 +65,8 @@ class PlayerInformation(ft.Container):
             color = color.branco_puro
         )
     
-    def att_infos(self, dados = None):
-        self.nome_artista.value = ReproductionManager.get_artista()
-        self.nome_musica.value = ReproductionManager.state.current_song.name
-        self.imagem.content.src = ReproductionManager.get_cover()
+    def actualization_information(self, *_):
+        self.artist_name.value = ReproductionManager.get_artist()
+        self.song_name.value = ReproductionManager.state.current_song.name
+        self._image.content.src = ReproductionManager.get_cover()
         self.update()

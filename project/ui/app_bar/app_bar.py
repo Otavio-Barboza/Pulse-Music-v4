@@ -16,7 +16,7 @@ class AppBar(ft.AppBar):
             leading_width = 50,
 
             title = ft.Container(
-                on_click = self.fechar_overlays,
+                on_click = self.close_overlay,
                 content = ft.Row(
                     alignment = ft.MainAxisAlignment.START,
                     vertical_alignment = ft.CrossAxisAlignment.CENTER,
@@ -53,14 +53,14 @@ class AppBar(ft.AppBar):
             content = ft.Icon(
                 name = ft.Icons.SYNC_ROUNDED
             ),
-            on_click = self.mostrar_conteudo_icon_status
+            on_click = self.open_content_icon_status
         )
         
-        self.texto_drawer = self._retornar_texto(
-            texto = 'Scanner desativado'
+        self.drawer_text = self._create_text(
+            text = 'Scanner desativado'
         )
         
-        self.conteudo_drawer = ft.NavigationDrawer(
+        self.drawer_content = ft.NavigationDrawer(
             open = False,
             bgcolor = ft.Colors.TRANSPARENT,
             
@@ -81,7 +81,7 @@ class AppBar(ft.AppBar):
                         bottom_left = 10,
                         bottom_right = 10
                     ),
-                    content = self.texto_drawer
+                    content = self.drawer_text
                 )
             ]
         )
@@ -91,49 +91,49 @@ class AppBar(ft.AppBar):
             self.config_btn
         ]
 
-        self.page.end_drawer = self.conteudo_drawer
+        self.page.end_drawer = self.drawer_content
 
         ScannerController.register_callback(
             event = 'processes_information_scanner',
-            function = self.alterar_texto_drawer
+            function = self.alter_text_drawer
         )
         ScannerController.register_callback(
             event = 'icon_status_scanner',
-            function = self.alterar_icone
+            function = self.alter_icon
         )
         ScannerController.register_callback(
             event = 'progress_status_scanner',
-            function = self.alterar_progress
+            function = self.alter_progress
         )
 
-    def fechar_overlays(self, e):
+    def close_overlay(self, e):
         self.page.overlay.clear()
         self.page.update()
         
-    def mostrar_conteudo_icon_status(self, e):
-        self.page.open(self.conteudo_drawer)
+    def open_content_icon_status(self, e):
+        self.page.open(self.drawer_content)
         self.page.update()
         
-    def _retornar_texto(self, texto : str) -> ft.Text:
+    def _create_text(self, text : str) -> ft.Text:
         return ft.Text(
-            value = texto,
+            value = text,
             text_align = ft.TextAlign.LEFT,
             size = 14.5,
             weight = 500
         )
     
-    def alterar_texto_drawer(self, texto : str):
-        self.texto_drawer.value = texto
+    def alter_text_drawer(self, text : str):
+        self.drawer_text.value = text
         self.page.update()
 
-    def alterar_icone(self, dados = None):
+    def alter_icon(self, *_):
         self.icon_status.content = ft.ProgressRing(
             scale = 0.5,
             color = color.amarelo
         )
         self.icon_status.update()
 
-    def alterar_progress(self, dados = None):
+    def alter_progress(self, *_):
         self.icon_status.content = ft.Icon(
             name = ft.Icons.SYNC_ROUNDED
         )

@@ -2,14 +2,14 @@
 from ui.others.colors import color
 
 # import de back-end
-from core.services.controllers.estado_section import EstadoSection
+from core.services.controllers.estado_section import StateSection
 
 # import geral
 import flet as ft
 
 
 class InformationMenu(ft.Container):
-    def __init__(self, trocar_view):
+    def __init__(self, alter_view, page: ft.Page):
         super().__init__(
             height = 60,
             bgcolor = color.preto6,
@@ -17,22 +17,31 @@ class InformationMenu(ft.Container):
             border_radius= ft.border_radius.all(15),
             margin = ft.margin.symmetric(vertical = 5, horizontal = 10) 
         )
+        self.page = page
 
-        self.botoes = {}
+        self.buttons = {}
 
         self.content = ft.Row(
             col = 6,
             alignment = ft.MainAxisAlignment.CENTER,
             
             controls = [
-                self._botao(texto = 'Letra', view = 'letra', callback = trocar_view),
-                self._botao(texto = 'Traduções da Letra', view = 'traducao', callback = trocar_view)
+                self._create_text_button(
+                    text = 'Letra', 
+                    view = 'letra', 
+                    callback = alter_view
+                ),
+                self._create_text_button(
+                    text = 'Traduções da Letra', 
+                    view = 'traducao', 
+                    callback = alter_view
+                )
             ]
         )
 
-    def _botao(self, texto, view, callback):
-        botao = ft.TextButton(
-            text = texto,
+    def _create_text_button(self, text, view, callback):
+        button = ft.TextButton(
+            text = text,
             on_click = lambda e: callback(view),
             width = 150,
 
@@ -50,28 +59,34 @@ class InformationMenu(ft.Container):
             )
         )
 
-        self.botoes[view] = botao
-        return botao
+        self.buttons[view] = button
+        return button
     
     def did_mount(self):
-        EstadoSection.register('view', self._quando_view_mudar)
+        StateSection.register(
+            key = 'view', 
+            callback = self._when_alter_view
+        )
 
     def will_unmount(self):
-        EstadoSection.remove('view', self._quando_view_mudar)
+        StateSection.remove(
+            key = 'view', 
+            callback = self._when_alter_view
+        )
 
-    def _quando_view_mudar(self, view : str):
-        for chave, botao in self.botoes.items():
-            if chave == view:
-                botao.style.bgcolor = {
+    def _when_alter_view(self, view: str):
+        for key, button in self.buttons.items():
+            if key == view:
+                button.style.bgcolor = {
                     ft.ControlState.DEFAULT: color.amarelo3,
                     ft.ControlState.HOVERED: color.amarelo,
                 }
-                botao.style.color = color.preto1
+                button.style.color = color.preto1
             else:
-                botao.style.bgcolor = {
+                button.style.bgcolor = {
                     ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
                     ft.ControlState.HOVERED: color.preto4,
                 }
-                botao.style.color = color.branco
+                button.style.color = color.branco
         
         self.update()

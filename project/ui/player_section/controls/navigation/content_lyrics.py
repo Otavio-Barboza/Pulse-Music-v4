@@ -9,13 +9,14 @@ import flet as ft
 
 
 class LyricsContainer(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             padding = ft.padding.only(right = 30, left = 10),
             margin = ft.margin.only(bottom = 10),
             expand = True,
             alignment = ft.alignment.center
         )
+        self.page = page
 
         self.content = ft.Column(
             controls = [

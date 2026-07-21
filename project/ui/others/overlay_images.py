@@ -11,8 +11,9 @@ import flet as ft
 
 class OverlayImages(ft.Container):
     def __init__(
-        self, 
+        self,
         playlist_mode,
+        page: ft.Page,
         mode : GridMode, 
         image_big : str, 
         music : list, 
@@ -26,6 +27,7 @@ class OverlayImages(ft.Container):
             bgcolor = color.preto2
         )
         
+        self.page = page
         self.playlist_mode = playlist_mode
         self.mode = mode
         self.music = music

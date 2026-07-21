@@ -9,32 +9,33 @@ import flet as ft
 
 
 class PlayerIcons(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center
         )
-        
-        self.shuffle = self._criar_icons(
-            nome_icon = ft.Icons.SHUFFLE_ROUNDED,
-            color_fundo = color.azul_medio,
-            color_icon = color.branco,
-            on_click = self.toggle_aleatorio
+        self.page = page
+
+        self.shuffle = self._create_icons(
+            icon_name = ft.Icons.SHUFFLE_ROUNDED,
+            backgroud_color = color.azul_medio,
+            icon_color = color.branco,
+            on_click = self.toggle_shuffle
         )
 
-        self.tocar = self._criar_icons(
-            nome_icon = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED,
-            # color_borda = color.branco,
-            color_icon = color.amarelo,
-            color_fundo = color.preto2,
-            tamanho = 32,
-            on_click = self.toogle_tocar
+        self.play = self._create_icons(
+            icon_name = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED,
+            # border_color = color.branco,
+            icon_color = color.amarelo,
+            backgroud_color = color.preto2,
+            size = 32,
+            on_click = self.toggle_play
         )
 
-        self.repeat = self._criar_icons(
-            nome_icon = ft.Icons.REPEAT_ROUNDED,
-            color_fundo = color.azul_medio,
-            on_click = self.toggle_repetir
+        self.repeat = self._create_icons(
+            icon_name = ft.Icons.REPEAT_ROUNDED,
+            backgroud_color = color.azul_medio,
+            on_click = self.toggle_repeat
         )
 
         self.content = ft.Row(
@@ -42,64 +43,64 @@ class PlayerIcons(ft.Container):
 
             controls = [
                 self.shuffle,
-                self._criar_icons(
-                    nome_icon = ft.Icons.SKIP_PREVIOUS_ROUNDED,
-                    # color_borda = color.branco,
-                    color_icon = color.amarelo,
-                    color_fundo = color.preto2,
-                    tamanho = 27.5,
-                    on_click = self._anterior
+                self._create_icons(
+                    icon_name = ft.Icons.SKIP_PREVIOUS_ROUNDED,
+                    # border_color = color.branco,
+                    icon_color = color.amarelo,
+                    backgroud_color = color.preto2,
+                    size = 27.5,
+                    on_click = self.previous
                 ),
-                self.tocar,
-                self._criar_icons(
-                    nome_icon = ft.Icons.SKIP_NEXT_ROUNDED,
-                    # color_borda = color.branco,
-                    color_icon = color.amarelo,
-                    color_fundo = color.preto2, 
-                    tamanho = 27.5,
-                    on_click = self._proximo
+                self.play,
+                self._create_icons(
+                    icon_name = ft.Icons.SKIP_NEXT_ROUNDED,
+                    # border_color = color.branco,
+                    icon_color = color.amarelo,
+                    backgroud_color = color.preto2, 
+                    size = 27.5,
+                    on_click = self.next
                 ),
                 self.repeat
             ]
         )
 
-        ReproductionManager.register_callback('play/pause', self._atualizar_play_pause)
-        ReproductionManager.register_callback('repeat', self.att_repetir)
-        ReproductionManager.register_callback('shuffle', self.att_aleatorio)
+        ReproductionManager.register_callback('play/pause', self.actualization_play_pause)
+        ReproductionManager.register_callback('repeat', self.actualization_repeat)
+        ReproductionManager.register_callback('shuffle', self.actualization_shuffle)
     
-    def _criar_icons(
+    def _create_icons(
             self, 
-            nome_icon : ft.Icons, 
-            color_fundo : str = color.laranja2, 
-            color_icon : str = color.branco,
-            color_borda : str | ft.Colors = ft.Colors.TRANSPARENT,
-            tamanho : int | float = 25,
+            icon_name: ft.Icons, 
+            backgroud_color: str = color.laranja2, 
+            icon_color: str = color.branco,
+            border_color: str | ft.Colors = ft.Colors.TRANSPARENT,
+            size: int | float = 25,
             on_click = None
         ) -> ft.IconButton:
         return ft.IconButton(
-            icon = nome_icon,
+            icon = icon_name,
             style = ft.ButtonStyle(
                 bgcolor = {
                     ft.ControlState.DEFAULT : ft.Colors.TRANSPARENT,
-                    ft.ControlState.HOVERED : color_fundo
+                    ft.ControlState.HOVERED : backgroud_color
                 },
                 side = {
-                    ft.ControlState.HOVERED : ft.BorderSide(2, color_borda)
+                    ft.ControlState.HOVERED : ft.BorderSide(2, border_color)
                 },
                 color = {
                     ft.ControlState.DEFAULT : color.branco,
-                    ft.ControlState.HOVERED : color_icon
+                    ft.ControlState.HOVERED : icon_color
                 },
-                icon_size = tamanho
+                icon_size = size
             ),
             on_click = on_click
         )
 
-    def _atualizar_play_pause(self, dados = None):
-        self.tocar.icon = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED
-        self.tocar.update()
+    def actualization_play_pause(self, *_):
+        self.play.icon = ft.Icons.PAUSE if ReproductionManager.state.is_playing else ft.Icons.PLAY_CIRCLE_FILL_ROUNDED
+        self.play.update()
 
-    def att_repetir(self, dados = None):
+    def actualization_repeat(self, *_):
         self.repeat.icon = ft.Icons.REPEAT_ONE_ON_ROUNDED if ReproductionManager.configuration.repeat else ft.Icons.REPEAT_ROUNDED
 
         self.repeat.style = ft.ButtonStyle(
@@ -128,7 +129,7 @@ class PlayerIcons(ft.Container):
         )
         self.repeat.update()
 
-    def att_aleatorio(self, dados = None):
+    def actualization_shuffle(self, dados = None):
         self.shuffle.icon = ft.Icons.SHUFFLE_ON_ROUNDED if ReproductionManager.configuration.shuffle else ft.Icons.SHUFFLE_ROUNDED
         self.shuffle.style = ft.ButtonStyle(
             bgcolor = {
@@ -159,17 +160,17 @@ class PlayerIcons(ft.Container):
         )
         self.shuffle.update()
 
-    def toogle_tocar(self, e):
+    def toggle_play(self, e):
         ReproductionManager.toggle_play_pause()
     
-    def toggle_repetir(self, e):
+    def toggle_repeat(self, e):
         ReproductionManager.toggle_repeat()
 
-    def toggle_aleatorio(self, e):
+    def toggle_shuffle(self, e):
         ReproductionManager.toggle_shuffle()
     
-    def _proximo(self, e):
+    def next(self, e):
         ReproductionManager.next()
     
-    def _anterior(self, e):
+    def previous(self, e):
         ReproductionManager.previous()

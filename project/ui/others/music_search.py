@@ -1,5 +1,6 @@
 # import de interface
 from ui.others.colors import color
+from ui.utils.utils_ui import UtilsUi
 
 # imports gerais
 import asyncio, pywhatkit
@@ -7,13 +8,13 @@ import flet as ft
 
 
 class MusicSearch(ft.Container):
-    def __init__(self, page):
+    def __init__(self, page: ft.Page):
         super().__init__(
             expand = True,
             padding = ft.padding.all(10)
         )
         self.page = page
-        self.lista_ex = [
+        self.example_list = [
             'Ex: Infinity - Guru Josh',
             'Ex: Imagine Dragons - Believer',
             'Ex: Coldplay - Yellow',
@@ -21,14 +22,14 @@ class MusicSearch(ft.Container):
             'Ex: Linkin Park - Numb'
         ]
 
-        self.caixa_texto = None
-        self.container_texto = None
+        self.text_field = None
+        self.container_text = None
         self.content = None
 
     
     # FUNÇÕES DE CRIAÇÃO DE COMPONENTES
     def _create_components(self):
-        self.caixa_texto = ft.TextField(
+        self.text_field = ft.TextField(
             hint_text = 'Digite a musica...',
             hint_style = ft.TextStyle(
                 color = color.cinza1,
@@ -55,10 +56,10 @@ class MusicSearch(ft.Container):
 
             cursor_color = color.amarelo,
             content_padding = ft.Padding(16, 10, 16, 10),
-            on_submit = self._submeter_musica
+            on_submit = self._submit_music_name
         )
 
-        self.container_texto = ft.Container(
+        self.container_text = ft.Container(
             alignment = ft.alignment.center_left,
             width = 700,
             margin = ft.margin.only(
@@ -66,11 +67,11 @@ class MusicSearch(ft.Container):
                 bottom = 15
             ),
             content = self._criar_textos(
-                texto = 'Ex:',
-                tamanho = 20,
-                color_texto = color.branco2,
-                max_linhas = 1,
-                negrito = ft.FontWeight.W_300
+                text = 'Ex:',
+                size = 20,
+                text_color = color.branco2,
+                max_lines = 1,
+                weight = ft.FontWeight.W_300
             )
         )
 
@@ -82,15 +83,15 @@ class MusicSearch(ft.Container):
             controls = [
                 ft.Container(
                     content = self._criar_textos(
-                        texto = 'Pesquisar Música no YouTube',
-                        color_texto = color.amarelo4,
-                        negrito = ft.FontWeight.BOLD,
-                        tamanho = 50
+                        text = 'Pesquisar Música no YouTube',
+                        text_color = color.amarelo4,
+                        weight = ft.FontWeight.BOLD,
+                        size = 50
                     )
                 ),
             
-                self.container_texto,
-                self.caixa_texto
+                self.container_text,
+                self.text_field
             ]
         )
     
@@ -104,50 +105,50 @@ class MusicSearch(ft.Container):
 
     # CRIAÇÃO DE ITENs
     def _criar_textos(
-            self, 
-            texto : str, 
-            color_texto : str, 
-            negrito : ft.FontWeight, 
-            tamanho : int, 
-            overflow : ft.TextOverflow = ft.TextOverflow.FADE, 
-            max_linhas : int = 1, 
-            alinhamento : ft.TextAlign = ft.TextAlign.CENTER,
-            colunas : int | None = None,
-            fonte : str = 'inter'
-        ):
+        self, 
+        text: str, 
+        text_color: str, 
+        weight: ft.FontWeight, 
+        size: int, 
+        overflow: ft.TextOverflow = ft.TextOverflow.FADE, 
+        max_lines: int = 1, 
+        aligment: ft.TextAlign = ft.TextAlign.CENTER,
+        columns: int | None = None,
+        font: str = 'inter'
+    ):
         '''
             Função para criar os textos da tela sobre o app.
 
         Args:
-            texto (str): texto desejado colocar
-            color_texto (str): color a definir para o texto
-            negrito (ft.FontWeight): expessura da fonte
-            tamanho (int): tamanho da fonte
-            overflow (ft.TextOverflow, optional): Encolhimento do texto conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
-            max_linhas (int, optional): máximo de linhas para quebra de texto. { Defaults to 1 }
-            alinhamento (ft.TextAlign, optional): posicionamento do texto. { Defaults to ft.TextAlign.CENTER} 
-            colunas (int | None, optional): colunas que ocupará. { Defaults to None }
+            text (str): text desejado colocar
+            text_color (str): color a definir para o text
+            weight (ft.FontWeight): expessura da font
+            size (int): size da font
+            overflow (ft.TextOverflow, optional): Encolhimento do text conforme o espaço não existente. { Defaults to ft.TextOverflow.FADE }
+            max_lines (int, optional): máximo de linhas para quebra de text. { Defaults to 1 }
+            aligment (ft.TextAlign, optional): posicionamento do text. { Defaults to ft.TextAlign.CENTER} 
+            columns (int | None, optional): columns que ocupará. { Defaults to None }
 
         Returns:
             ft.Text : Texto a ser atríbuido
         '''
         return ft.Text(
-            value = texto,
-            color = color_texto,
-            weight = negrito,
-            size = tamanho,
+            value = text,
+            color = text_color,
+            weight = weight,
+            size = size,
             overflow = overflow,
-            max_lines = max_linhas,
-            text_align = alinhamento,
-            col = colunas,
-            font_family = fonte
+            max_lines = max_lines,
+            text_align = aligment,
+            col = columns,
+            font_family = font
         )
     
-    async def animacao_ex(self):
+    async def example_animation(self):
         anterior = ''
 
         while True:
-            for letra in self.lista_ex:
+            for letra in self.example_list:
                 for i in range(len(letra)):
                     atual = letra[i]
 
@@ -156,15 +157,15 @@ class MusicSearch(ft.Container):
                     else:
                         anterior += atual
                     
-                    self.container_texto.content.value = anterior
-                    self.container_texto.update()
+                    self.container_text.content.value = anterior
+                    self.container_text.update()
                         
                     await asyncio.sleep(0.4)
             
-    def iniciar_animacao(self):
-        self.page.run_task(self.animacao_ex)
+    def start_animation(self):
+        self.page.run_task(self.example_animation)
 
-    def pesquisar(self, musica):
+    def search(self, musica):
         try:
             pywhatkit.playonyt(musica)
             return True
@@ -172,19 +173,20 @@ class MusicSearch(ft.Container):
             print(erro)
             return False
 
-    def _submeter_musica(self, e):
-        nome = self.caixa_texto.value
-        resultado = self.pesquisar(nome)
+    def _submit_music_name(self, e):
+        name = self.text_field.value
+        result = self.search(name)
         
-        if resultado:
-            self.page.open(ft.SnackBar(
-                ft.Text(f'Música {nome} encontrada com sucesso!')
-            ))
-            self.caixa_texto.value = ''
-            self.caixa_texto.update()
-            self.page.update()
+        if result:
+            UtilsUi.snack_bar(
+                text = f"Música {name} encontrada com sucesso!",
+                page = self.page
+            )
+            self.text_field.value = ''
+            self.text_field.update()
+            self.text_field.update()
         else:
-            self.page.open(ft.SnackBar(
-                ft.Text(f'Música {nome} não encontrada, tente novamente!')
-            ))
-            self.page.update()
+            UtilsUi.snack_bar(
+                text = f"Música {name} não encontrada, tente novamente!",
+                page = self.page
+            )

@@ -9,12 +9,12 @@ import flet as ft
 
 
 class PlayerCommands(ft.Container):
-    def __init__(self, expandir, player):
+    def __init__(self, expandir, player, page: ft.Page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center
         )
-
+        self.page = page
         self.expandir = expandir
         self.player = player
 
@@ -43,7 +43,7 @@ class PlayerCommands(ft.Container):
             expand = True,
             visible = False,
             alignment = ft.alignment.center_right,
-            on_click = self._fechar_volume,
+            on_click = self.close_overlay,
             margin = ft.margin.only(right = 30, top = 340),
             
             content = ft.Container(
@@ -56,7 +56,7 @@ class PlayerCommands(ft.Container):
                 content = self.slider_volume_overlay
             )
         )
-        self.player.registrar_overlay(self.volume_overlay)
+        self.player.register_overlay(self.volume_overlay)
         
         self.volume = ft.Container(
             col = 8,
@@ -66,8 +66,8 @@ class PlayerCommands(ft.Container):
         
         self.icon_volume = ft.IconButton(
             col = 6,
-            icon = self.definir_volume(1.0),
-            on_click = self._abrir_volume,
+            icon = self.set_volume(1.0),
+            on_click = self.open_volume,
 
             style = ft.ButtonStyle(
                 bgcolor = {
@@ -82,7 +82,7 @@ class PlayerCommands(ft.Container):
             )
         )
         
-        self.icon_expandir = ft.IconButton(
+        self.expand_icon = ft.IconButton(
             col = 6,
             icon = ft.Icons.FULLSCREEN,
             on_click = self.expandir,
@@ -104,34 +104,34 @@ class PlayerCommands(ft.Container):
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
 
             controls = [
-                self.volume, self.icon_volume, self.icon_expandir       
+                self.volume, self.icon_volume, self.expand_icon       
             ]
         )
 
-        ReproductionManager.register_callback('volume', self.att_volume)
+        ReproductionManager.register_callback('volume', self.actualization_volume)
 
-    def _abrir_volume(self, e):
+    def open_volume(self, e):
         if not self.player.expandido.visible:
             if self.volume_overlay.visible:
                 self.volume_overlay.visible = False
             else:
-                self.player.fechar_overlay()
+                self.player.close_overlay()
                 self.volume_overlay.visible = True
         elif self.player.expandido.visible and not self.volume.visible:
-            self.icon_expandir.col = 2
+            self.expand_icon.col = 2
             self.icon_volume.col = 2
         elif self.player.expandido.visible and self.volume.visible:
-            self.icon_expandir.col = 6
+            self.expand_icon.col = 6
             self.icon_volume.col = 6
         
         self.volume.visible = not self.volume.visible if self.player.expandido.visible else False
         self.page.update()
     
-    def _fechar_volume(self, e):
-        self.player.fechar_overlay()
+    def close_overlay(self, e):
+        self.player.close_overlay()
         self.page.update()
     
-    def definir_volume(self, volume : float) -> ft.Icons:
+    def set_volume(self, volume: float) -> ft.Icons:
         if volume >= 0.75:
             return ft.Icons.VOLUME_UP_ROUNDED
         elif 0.75 > volume >= 0.45:
@@ -141,8 +141,8 @@ class PlayerCommands(ft.Container):
         elif volume == 0.0:
             return ft.Icons.VOLUME_OFF_ROUNDED
     
-    def att_volume(self, dados = None):
+    def actualization_volume(self, *_):
         self.slider_volume.value  = ReproductionManager.state.volume * 100
         self.slider_volume_overlay.value  = ReproductionManager.state.volume * 100
-        self.icon_volume.icon = self.definir_volume(ReproductionManager.state.volume)
+        self.icon_volume.icon = self.set_volume(ReproductionManager.state.volume)
         self.update()

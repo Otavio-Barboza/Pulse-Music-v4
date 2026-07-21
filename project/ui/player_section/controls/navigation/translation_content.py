@@ -9,15 +9,16 @@ import flet as ft
 
 
 class TranslationContent(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             padding = ft.padding.only(right = 30, left = 10),
             margin = ft.margin.only(bottom = 10),
             expand = True,
             alignment = ft.alignment.center
         )
+        self.page = page
 
-        self.infos = ft.PopupMenuButton(
+        self.information = ft.PopupMenuButton(
             icon = ft.Icons.G_TRANSLATE,
             icon_color = color.preto3,
             surface_tint_color = color.branco,
@@ -43,12 +44,12 @@ class TranslationContent(ft.Container):
                         'uf' : uf,
                         'language' : language
                     },                                        
-                    on_click = self.selecionar_idioma
+                    on_click = self.select_language
                 ) for language, uf in LyricsServices.AVAILABLE_LANGUAGES.items()
             ]
         )
 
-        self.letra = ft.Container(
+        self.lyric = ft.Container(
             alignment = ft.alignment.center,
             expand = True,
             
@@ -56,7 +57,7 @@ class TranslationContent(ft.Container):
                 size = 18,
                 weight = ft.FontWeight.W_500,
 
-                value = self.carregar_letra()
+                value = self.load_lyric()
             )
         )
 
@@ -77,26 +78,26 @@ class TranslationContent(ft.Container):
                             size = 26,
                             weight = ft.FontWeight.BOLD
                         ),
-                        self.infos
+                        self.information
                     ]
                 ),
-                self.letra
+                self.lyric
             ]
         )
 
-    def carregar_letra(self):
+    def load_lyric(self):
         from project.core.lyrics.cache.cache_lyrics import CacheLyrics
 
         if CacheLyrics.cache_lyrics is None:
-            return 'Nenhuma letra carregada para tradução'
+            return 'Nenhuma lyric carregada para tradução'
         else:
             return LyricsServices.start_translation(CacheLyrics.cache_lyrics)
 
-    def selecionar_idioma(self, e):
+    def select_language(self, e):
         from project.core.lyrics.cache.cache_lyrics import CacheLyrics
 
         CacheLyrics.update_cache(e.control.data.get('language'))
         LyricsServices.translator.target = e.control.data.get('uf')
         
-        self.letra.content.value = LyricsServices.start_translation(e.control.data.get('language'))
+        self.lyric.content.value = LyricsServices.start_translation(e.control.data.get('language'))
         self.update()

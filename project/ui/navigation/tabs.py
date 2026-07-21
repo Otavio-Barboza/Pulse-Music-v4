@@ -3,7 +3,7 @@ from ui.others.colors import color
 from ui.others.music_search import MusicSearch
 from ui.playlist.base.base_playlists import ColumnCards
 from ui.grid_view.grid import GridImages
-from ui.favorite.favoritas import Favorite
+from project.ui.favorite.favorite import Favorite
 
 # imports de back-end
 from core.services.account_manager import AccountManager
@@ -140,7 +140,7 @@ class TabsNavigation(ft.Tabs):
 
         return row, icone
 
-    def _ajustar_tabs(self, e = None):
+    def _adjust_tabs(self, *_):
         compact: float | int = self.page.width < 576
         
         for icon in self._icones_tabs:
@@ -154,7 +154,7 @@ class TabsNavigation(ft.Tabs):
     #     )
     #     self.tabs[1].update()
     
-    def carregar_favoritas(self):
+    def load_favorites(self):
         from core.song.model.song import Song
         from core.favorite.controller.favoritas_controller import FavoriteState
         from core.song.model.reproduction import Reproduction

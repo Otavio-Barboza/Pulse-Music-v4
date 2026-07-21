@@ -3,17 +3,18 @@ import flet as ft
 
 
 class ContentInformation(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__(
             content = ft.Column(
                 scroll = ft.ScrollMode.AUTO,
                 controls = []
             )
         )
+        self.page = page
 
-    def trocar(self, novo):
+    def to_replace(self, new):
         self.content.controls.clear()
-        self.content.controls.append(novo)
+        self.content.controls.append(new)
         
         if self.page:
             self.update()

@@ -45,13 +45,12 @@ class PlaylistRepository:
         Returns:
             list[PlaylistCard]: Lista com objetos PlaylistCard()
         """
-        usuario = AccountManager.accounts_cache
         playlists = cls.load_itens()
         cards = []
 
         for pl in playlists:
             cfg = Utils.sync_load_json(
-                cam = f'Assets/Data/Contas/{usuario["current_account"]}/Playlists/{pl.id}/config_play.json'
+                cam = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / pl.id / "config_play.json"
             )
             
             caminho = cfg['musicas']['pasta']
@@ -79,7 +78,7 @@ class PlaylistRepository:
         return cls.load_cards()
     
     @classmethod
-    def count_number_of_songs(cls, path: Path) -> int:
+    def count_number_of_songs(cls, path: str) -> int:
         """
             Intermédio para EstadoPlaylist e outras chamadas do contador da quantidade de músicas da playlist.
         Args:
@@ -88,7 +87,7 @@ class PlaylistRepository:
         Returns:
             int: N° int da quantidade de músicas da playlist
         """
-        return CreatePlaylist.count_number_of_songs(path)
+        return CreatePlaylist.count_number_of_songs(Path(path))
 
     @classmethod
     def create_playlist(
@@ -116,19 +115,21 @@ class PlaylistRepository:
         """
 
         usuario = AccountManager.accounts_cache
-        CAMINHO_JSON_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/playlists.json'
-        dados = Utils.sync_load_json(CAMINHO_JSON_PLAYLIST)
+        # CAMINHO_JSON_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/playlists.json'
 
-        novo_id, id_num = CreatePlaylist.generate_id(dados = dados)
+        dados = Utils.sync_load_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists.json"
+        )
+
+        new_id, id_num = CreatePlaylist.generate_id(data = dados)
         dados['ultimo_id'] = id_num
         
-        PASTA_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/Playlists/{novo_id}'
-        JSON_CONFIG_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/Playlists/{novo_id}/config_play.json'
-        JSON_MUSICAS_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/Music/musicas.json'
-        qtde = CreatePlaylist.count_number_of_songs(music_path)
+        PASTA_PLAYLIST = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / new_id
+        JSON_MUSICAS_PLAYLIST = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "music" / "songs.json"
+        qtde = CreatePlaylist.count_number_of_songs(Path(music_path))
 
         json_config = CreatePlaylist.return_content_data_playlits(
-            id = novo_id,
+            id = new_id,
             music_path = music_path,
             image_path = image_path,
             color = color,
@@ -136,12 +137,12 @@ class PlaylistRepository:
             name = name,
             number_of_songs = qtde
         )
-        dados['playlists'][novo_id] = CreatePlaylist.return_name_playlist_json(name)
+        dados['playlists'][new_id] = CreatePlaylist.return_name_playlist_json(name)
         dados['latest_aztualization'] = CreatePlaylist.generate_date()
 
         Utils.create_path(PASTA_PLAYLIST)
         Utils.sync_update_json(
-            path = JSON_CONFIG_PLAYLIST,
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / new_id / "config_play.json",
             data = json_config
         )
 
@@ -152,7 +153,7 @@ class PlaylistRepository:
             )
          
         return Playlist(
-            id = novo_id,
+            id = new_id,
             name = name,
             path = PASTA_PLAYLIST
         )
@@ -303,7 +304,7 @@ class PlaylistRepository:
                 AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist / "config_play.json"
             )
 
-            caminho_pasta = config_play_json['musicas'].get('pasta')
+            caminho_pasta = config_play_json['music'].get('music_path')
 
             if caminho_pasta not in pastas_existentes:
                 pastas_existentes.append(caminho_pasta)

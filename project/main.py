@@ -204,7 +204,7 @@ async def main(page: ft.Page):
 
     """  Inicializações gerais  """
 
-    tabs.playlist.load()
+    tabs.playlist.load_playlists()
     tabs.pesquisa_musica.start_animation()
     tabs.load_favorites()
     

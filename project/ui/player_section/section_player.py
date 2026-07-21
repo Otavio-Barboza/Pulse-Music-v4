@@ -130,14 +130,14 @@ class PlayerSection:
     
     def _expanded(self, e):
         self.expanded.visible = not self.expanded.visible
-        self.information_expanded.imagem.visible = False
+        self.information_expanded.image_cover.visible = False
 
         if not self.expanded.visible:
-            self.commands_expanded.icon_expandir.icon = ft.Icons.FULLSCREEN
-            self.commands_compact.icon_expandir.icon = ft.Icons.FULLSCREEN
+            self.commands_expanded.expand_icon.icon = ft.Icons.FULLSCREEN
+            self.commands_compact.expand_icon.icon = ft.Icons.FULLSCREEN
         else:
-            self.commands_compact.icon_expandir.icon = ft.Icons.FULLSCREEN_EXIT
-            self.commands_expanded.icon_expandir.icon = ft.Icons.FULLSCREEN_EXIT
+            self.commands_compact.expand_icon.icon = ft.Icons.FULLSCREEN_EXIT
+            self.commands_expanded.expand_icon.icon = ft.Icons.FULLSCREEN_EXIT
             
         self._alter_view('lyric')
         self.page.update()
@@ -156,9 +156,9 @@ class PlayerSection:
     
     def _alter_view(self, view):
         if view == 'lyric':
-            self.information_content.trocar(LyricsContainer(page = self.page))
+            self.information_content.to_replace(LyricsContainer(page = self.page))
         elif view == 'translation':
-            self.information_content.trocar(TranslationContent(page = self.page))
+            self.information_content.to_replace(TranslationContent(page = self.page))
         
         StateSection.alter_view('view', view)
         self.page.update()

@@ -17,7 +17,7 @@ class PlayerInformation(ft.Container):
         )
         self.page = page
         
-        self._image = ft.Container(
+        self.image_cover = ft.Container(
             height = 64,
             width = 128,
             col = {'xs' : 0, 'sm' : 3},
@@ -31,7 +31,7 @@ class PlayerInformation(ft.Container):
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
             
             controls = [
-                self._image,
+                self.image_cover,
 
                 ft.Column(
                     col = 9,
@@ -68,5 +68,5 @@ class PlayerInformation(ft.Container):
     def actualization_information(self, *_):
         self.artist_name.value = ReproductionManager.get_artist()
         self.song_name.value = ReproductionManager.state.current_song.name
-        self._image.content.src = ReproductionManager.get_cover()
+        self.image_cover.content.src = ReproductionManager.get_cover()
         self.update()

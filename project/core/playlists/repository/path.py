@@ -13,16 +13,16 @@ import os, datetime, shutil
 class CreatePlaylist:
 
     @classmethod
-    def generate_id(cls, dados: dict) -> str:
+    def generate_id(cls, data: dict) -> str:
         """
             Gera o ID novo com base no último salvo, funciona acrescentando +1 em sequencia.
         Args:
-            dados (dict): dados do playlist.json
+            data (dict): data do playlist.json
 
         Returns:
             str: Novo ID em string
         """
-        id =  dados.get('ultimo_id') + 1
+        id =  data.get('latest_id') + 1
 
         if id < 10:
             return f'pl_00{id}', id

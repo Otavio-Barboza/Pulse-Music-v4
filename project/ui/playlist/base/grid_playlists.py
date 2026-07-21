@@ -14,13 +14,14 @@ class GridPlaylists(ft.GridView):
             run_spacing = 12,
             clip_behavior = ft.ClipBehavior.NONE
         )
+        # self.page = page
 
         self.on_open = on_open
         self.on_remove = on_remove
         self.load_songs = load_songs
         self.cards = {}
     
-    def adicionar_playlist(
+    def add_playlist(
         self, 
         playlist_id : str, 
         name : str, 

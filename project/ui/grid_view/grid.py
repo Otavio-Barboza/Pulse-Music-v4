@@ -48,9 +48,10 @@ class GridImages(ft.GridView):
             image_key = img.removesuffix('.jpg')
             
             if self.mode == GridMode.ARTIST:
-                nome = cache_metadata.artists.to_dict().get(image_key).get('nome_artistas')
+                # name = cache_metadata.artists.to_dict().get(image_key).get('artist_name')
+                name = image_key
             else:
-                nome = image_key
+                name = image_key
                 
             self.controls.extend([
                 ft.Container(
@@ -67,7 +68,7 @@ class GridImages(ft.GridView):
                                 mode = self.mode
                             ),
                             ft.Text(
-                                value = nome,
+                                value = name,
                                 text_align = ft.TextAlign.CENTER,
                                 size = 16,
                                 weight = ft.FontWeight.W_300,
@@ -123,7 +124,7 @@ class GridImages(ft.GridView):
                 caminho_arquivo = path, 
                 tipo = 'artist'
             )
-            nome = dados.get(e.control.data).get('nome_artistas')
+            name = dados.get(e.control.data).get('artist_name')
         else:
             modo_playlist = ReproductionMode.ALBUM
             dados = cache_metadata.albums.to_dict()
@@ -155,7 +156,7 @@ class GridImages(ft.GridView):
                 caminho_arquivo = path, 
                 tipo = 'album'
             )
-            nome = e.control.data
+            name = e.control.data
 
         self.page.overlay.clear()
         self.page.overlay.append(
@@ -163,7 +164,7 @@ class GridImages(ft.GridView):
                 image_big = img,
                 music = song_list,
                 mode = self.mode,
-                name = nome,
+                name = name,
                 playlist_mode = modo_playlist
             )
         )

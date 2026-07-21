@@ -110,6 +110,7 @@ class ColumnCards(ft.Column):
     def load(self):
         self._create_components()
         self._build_class()
+        # self.load_playlists()
         # self.update()
 
     def connect(self):
@@ -164,6 +165,7 @@ class ColumnCards(ft.Column):
         """
         self.update_buttons()
         self.column_content.load()
+        self.update()
     
     def open_function(self):
         self.state.modo = PlaylistMode.LIST

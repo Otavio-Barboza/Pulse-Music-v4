@@ -41,7 +41,7 @@ class PlaylistManager:
             number_of_songs = PlaylistRepository.count_number_of_songs(self.path),
             color = self.color,
             img = self.image,
-            path = self.path
+            path = self.path,
         )
         
         return playlist.id
@@ -80,9 +80,9 @@ class PlaylistManager:
         """
 
         self.list_playlist = PlaylistRepository.list_playlists()
-
+        print(self.list_playlist)
         for playlist in self.list_playlist:
-            self.grid.adicionar_playlist(
+            self.grid.add_playlist(
                 playlist_id = playlist.id,
                 name = playlist.name,
                 color = playlist.color,

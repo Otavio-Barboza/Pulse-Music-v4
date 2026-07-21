@@ -183,11 +183,11 @@ async def main(page: ft.Page):
 
                         controls = [
                             tabs,
-                            player.compacto
+                            player.compact
                         ]
                     ),
 
-                    player.expandido
+                    player.expanded
                 ]
             )
         )
@@ -204,9 +204,9 @@ async def main(page: ft.Page):
 
     """  Inicializações gerais  """
 
-    tabs.playlist.carregar()
-    tabs.pesquisa_musica.iniciar_animacao()
-    tabs.carregar_favoritas()
+    tabs.playlist.load()
+    tabs.pesquisa_musica.start_animation()
+    tabs.load_favorites()
     
     page.on_resized = ResizeManager.to_execute
    

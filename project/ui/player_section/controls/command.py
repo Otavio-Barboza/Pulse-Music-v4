@@ -9,13 +9,13 @@ import flet as ft
 
 
 class PlayerCommands(ft.Container):
-    def __init__(self, expandir, player, page: ft.Page):
+    def __init__(self, expanded, player, page: ft.Page):
         super().__init__(
             col = {'sm' : 12, 'md' : 4},
             alignment = ft.alignment.center
         )
         self.page = page
-        self.expandir = expandir
+        self.expanded = expanded
         self.player = player
 
         self.slider_volume_overlay = ft.Slider(
@@ -85,7 +85,7 @@ class PlayerCommands(ft.Container):
         self.expand_icon = ft.IconButton(
             col = 6,
             icon = ft.Icons.FULLSCREEN,
-            on_click = self.expandir,
+            on_click = self.expanded,
 
             style = ft.ButtonStyle(
                 bgcolor = {

@@ -63,15 +63,15 @@ class PlayerSection:
         self.icons_expanded = PlayerIcons(page = self.page)
 
         # comandos do compact
-        self.commands_compact = PlayerCommands(page = self.page, expanded = self.expanded, player = self)
-        self.commands_expanded = PlayerCommands(page = self.page, expanded = self.expanded, player = self)
+        self.commands_compact = PlayerCommands(page = self.page, expanded = self._expanded, player = self)
+        self.commands_expanded = PlayerCommands(page = self.page, expanded = self._expanded, player = self)
 
         # compact
         self.compact = self._create_compact(expanded = False)
         self.compact_expanded = self._create_compact(expanded = True)
 
         self.expanded_information = ExpandedInformation(self.page)
-        self.menu_information = InformationMenu(page = self.page, trocar_view = self._alter_view)
+        self.menu_information = InformationMenu(page = self.page, alter_view = self._alter_view)
 
         self.expanded = ft.Container(
             bgcolor = color.preto2,
@@ -128,7 +128,7 @@ class PlayerSection:
             )
         )
     
-    def expanded(self, e):
+    def _expanded(self, e):
         self.expanded.visible = not self.expanded.visible
         self.information_expanded.imagem.visible = False
 
@@ -201,8 +201,8 @@ class PlayerSection:
             ]
         )
     
-    def content_information_menu_scrolavel(self, columns : int) -> ft.Column:
-        self.information_content = ContentInformation()
+    def content_information_menu_scrolavel(self, columns: int) -> ft.Column:
+        self.information_content = ContentInformation(page = self.page)
         return ft.Container(
             col = columns,
             expand = True,

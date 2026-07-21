@@ -130,7 +130,7 @@ class ScreenSettings(ft.Container):
         button = ft.TextButton(
             text = text,
             width = 200,
-            on_click = lambda e: self._selecionar(section_id),
+            on_click = lambda e: self._select(section_id),
         
             style = ft.ButtonStyle(
                 bgcolor = {

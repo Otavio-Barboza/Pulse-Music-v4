@@ -25,8 +25,8 @@ class ContentPlaylist(ft.Container):
         self.open_function = open_function
 
         self.grid: ft.GridView = GridPlaylists(
-            on_abrir = self.abrir_config_playlist,
-            on_remover = self._remover_playlist,
+            on_open = self.abrir_config_playlist,
+            on_remove = self._remove_playlist,
             load_songs = self.open_playlist
         )
         self.state = PlaylistManager(self.grid)
@@ -52,7 +52,7 @@ class ContentPlaylist(ft.Container):
         )
         self.page.update()
     
-    def _remover_playlist(self, playlist_id : str):        
+    def _remove_playlist(self, playlist_id : str):        
         """
             Ordem: PlaylistManager -> Grid & Repositorio -> CreatePlaylist
         Args:

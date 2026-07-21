@@ -158,7 +158,7 @@ class ColumnCards(ft.Column):
 
         self.update()
 
-    def load(self):
+    def load_playlists(self):
         """
             Intermedio ao ContentPlaylist para o carregamento dos cards ao inicializar o player
         """

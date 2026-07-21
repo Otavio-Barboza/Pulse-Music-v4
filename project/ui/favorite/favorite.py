@@ -12,6 +12,7 @@ import flet as ft
 class Favorite(ft.Container):
     def __init__(
         self,
+        page: ft.Page,
         list_music_object: list[Song],
         favorite_mode: ReproductionMode
     ):
@@ -19,11 +20,13 @@ class Favorite(ft.Container):
             expand = True,
             padding = ft.padding.all(10)
         )
+        self.page = page
         
         self.list_music_object = list_music_object
         self.favorite_mode = favorite_mode
         
         self.content = ListViewMusic(
-            musicas = self.list_music_object,
-            modo_favorita = favorite_mode
+            page = self.page,
+            musics = self.list_music_object,
+            favorite_mode = favorite_mode
         )

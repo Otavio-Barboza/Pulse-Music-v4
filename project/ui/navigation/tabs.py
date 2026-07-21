@@ -3,7 +3,7 @@ from ui.others.colors import color
 from ui.others.music_search import MusicSearch
 from ui.playlist.base.base_playlists import ColumnCards
 from ui.grid_view.grid import GridImages
-from project.ui.favorite.favorite import Favorite
+from ui.favorite.favorite import Favorite
 
 # imports de back-end
 from core.services.account_manager import AccountManager
@@ -103,7 +103,7 @@ class TabsNavigation(ft.Tabs):
 
     def connect(self):
         # registrando callbacks
-        ResizeManager.register(self._ajustar_tabs)
+        ResizeManager.register(self._adjust_tabs)
         self.playlist.connect()
         self.artistas.connect()
         self.albuns.connect()
@@ -163,6 +163,7 @@ class TabsNavigation(ft.Tabs):
         list_musics: list[Song] = FavoriteState.list_favorited_objects()
         
         self.tabs[3].content = Favorite(
+            page = self.page,
             list_music_object = list_musics,
             favorite_mode = ReproductionMode.FAVORITE
         )

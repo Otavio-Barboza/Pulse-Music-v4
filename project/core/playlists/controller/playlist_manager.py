@@ -16,7 +16,7 @@ class PlaylistManager:
         self.playlist_config = None
         self.mode = PlaylistMode.GRID
 
-        self.image = r'Assets\Global\Images\Padrao\capa_playlist_padrao.png'
+        self.image = r'assets\images\placeholders\capa_playlist_padrao.png'
         self.name = None
         self.color = '#3d3d3d'
         self.opacity = 1.0

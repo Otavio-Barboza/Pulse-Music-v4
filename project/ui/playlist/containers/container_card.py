@@ -14,6 +14,7 @@ class PlaylistCard(ft.Container):
             on_open, 
             on_remove, 
             load_playlist,
+            page: ft.Page,
             playlist_id: str, 
             name: str, 
             number_of_songs: int,
@@ -31,7 +32,7 @@ class PlaylistCard(ft.Container):
             animate = ft.Animation(200, ft.AnimationCurve.SLOW_MIDDLE),
             on_hover = self._hover,
         )
-
+        self.page = page
         self.playlist_name = name
         self.number_of_songs = str(number_of_songs)
         self.playlist_id = playlist_id

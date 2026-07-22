@@ -31,7 +31,7 @@ class ColumnCards(ft.Column):
     def _create_components(self):
         self.column_content = ContentPlaylist(open_function = self.open_function)
 
-        self.state = PlaylistManager(grid = self.column_content.grid)
+        self.state = self.column_content.state
  
         self.button_add_play = ft.TextButton(
             col = 4,

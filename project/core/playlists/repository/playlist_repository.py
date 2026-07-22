@@ -22,21 +22,17 @@ class PlaylistRepository:
             list[Playlist]: lista com objetos Playlist().
         """
         
-        lista_plays = []
+        set_playlists: set = set()
         playlists = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json")
 
-        for p in playlists['playlists']:
-            if p != 'favorites':
-                id_play = playlists['playlists'].get(p)
-                nome_play = id_play.get('name')
-                tipo_play = id_play.get('type')
-
-                lista_plays.append(Playlist(
-                    id = p,
-                    nome = nome_play
-                ))
+        for key, value in playlists.get("playlists").items():
+            set_playlists.add(Playlist(
+                id = key,
+                name = value.get("name"),
+                path = value.get("path")
+            ))
         
-        return lista_plays
+        return list(set_playlists)
     
     @classmethod
     def load_cards(cls) -> list[PlaylistCard]:
@@ -45,28 +41,28 @@ class PlaylistRepository:
         Returns:
             list[PlaylistCard]: Lista com objetos PlaylistCard()
         """
-        playlists = cls.load_itens()
-        cards = []
+        playlists: list[Playlist] = cls.load_itens()
+        cards: set[PlaylistCard] = set()
 
-        for pl in playlists:
-            cfg = Utils.sync_load_json(
-                cam = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / pl.id / "config_play.json"
+        for playlist in playlists:
+            playlist_config = Utils.sync_load_json(
+                AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / playlist.id / "config_play.json"
             )
             
-            caminho = cfg['musicas']['pasta']
-            qtde = CreatePlaylist.count_number_of_songs(caminho)
+            path = playlist_config["music"].get("music_path")
+            qtde = CreatePlaylist.count_number_of_songs(Path(path))
 
-            cards.append(PlaylistCard(
-                id = pl.id,
-                name = cfg['nome'],
-                image_path = cfg['style']['pasta'],
-                color = cfg['style']['cor'],
-                opacity = cfg['style']['opacidade'],
-                playlist_path = caminho,
+            cards.add(PlaylistCard(
+                id = playlist.id,
+                name = playlist_config["name"],
+                image_path = playlist_config["style"]["image_path"],
+                color = playlist_config["style"]["color"],
+                opacity = playlist_config["style"]["opacity"],
+                playlist_path = path,
                 number_of_songs = qtde
             ))
         
-        return cards
+        return list(cards)
     
     @classmethod
     def list_playlists(cls) -> list[PlaylistCard]:
@@ -114,18 +110,32 @@ class PlaylistRepository:
             Playlist: Objeto Playlist()
         """
 
-        usuario = AccountManager.accounts_cache
-        # CAMINHO_JSON_PLAYLIST = f'Assets/Data/Contas/{usuario["current_account"]}/playlists.json'
-
+        
+        # Salvando dados do playlists.json
         dados = Utils.sync_load_json(
             path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists.json"
         )
 
         new_id, id_num = CreatePlaylist.generate_id(data = dados)
-        dados['ultimo_id'] = id_num
-        
+
         PASTA_PLAYLIST = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / new_id
-        JSON_MUSICAS_PLAYLIST = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "music" / "songs.json"
+        Utils.create_path(PASTA_PLAYLIST)
+
+        dados["latest_id"] = id_num
+
+        dados["playlists"][new_id] = {
+            "name" : name,
+            "path" : str(PASTA_PLAYLIST)
+        }
+        dados["latest_aztualization"] = CreatePlaylist.generate_date()
+
+        Utils.sync_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists.json",
+            data = dados
+        )
+
+
+        # salvando os dados do config_json
         qtde = CreatePlaylist.count_number_of_songs(Path(music_path))
 
         json_config = CreatePlaylist.return_content_data_playlits(
@@ -137,21 +147,12 @@ class PlaylistRepository:
             name = name,
             number_of_songs = qtde
         )
-        dados['playlists'][new_id] = CreatePlaylist.return_name_playlist_json(name)
-        dados['latest_aztualization'] = CreatePlaylist.generate_date()
 
-        Utils.create_path(PASTA_PLAYLIST)
         Utils.sync_update_json(
             path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists" / new_id / "config_play.json",
             data = json_config
         )
 
-        if not Path(JSON_MUSICAS_PLAYLIST).exists():
-            Utils.sync_update_json(
-                path = JSON_MUSICAS_PLAYLIST,
-                data = {}
-            )
-         
         return Playlist(
             id = new_id,
             name = name,
@@ -274,21 +275,16 @@ class PlaylistRepository:
 
     @classmethod
     def check_playlist_names(cls) -> list[str]:
-        nomes_playlists_existentes = list()
+        nomes_playlists_existentes: set[str] = set()
+        
+        playlists_json = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json"
+        )
+        
+        for key, value in playlists_json.get("playlists").items():
+            nomes_playlists_existentes.add(value.get("name"))
 
-        for account in os.listdir(
-            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists"
-        ):
-            config_play_json = Utils.sync_load_json(
-                AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / account / "config_play.json"
-            )
-
-            nome = config_play_json.get('nome')
-
-            if nome not in nomes_playlists_existentes:
-                nomes_playlists_existentes.append(nome)
-
-        return nomes_playlists_existentes
+        return list(nomes_playlists_existentes)
     
     @classmethod
     def check_existing_folders(cls) -> list[str]:

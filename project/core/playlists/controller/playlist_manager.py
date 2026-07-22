@@ -27,6 +27,7 @@ class PlaylistManager:
         """
             Cria a playlist no back (JSONs e path) e no front (card)
         """
+        # vai criar o objeto playlist e realizar as operações de jsons
         playlist = PlaylistRepository.create_playlist(
             name = self.name, 
             music_path = self.path,
@@ -35,10 +36,10 @@ class PlaylistManager:
             opacity = self.opacity
         )
 
-        self.grid.adicionar_playlist(
+        self.grid.add_playlist(
             playlist_id = playlist.id, 
             name = self.name, 
-            number_of_songs = PlaylistRepository.count_number_of_songs(self.path),
+            qtde_mus = PlaylistRepository.count_number_of_songs(self.path),
             color = self.color,
             img = self.image,
             path = self.path,
@@ -88,7 +89,7 @@ class PlaylistManager:
                 color = playlist.color,
                 img = playlist.image_path,
                 path = playlist.playlist_path,
-                number_of_songs = playlist.number_of_songs
+                qtde_mus = playlist.number_of_songs
             )
 
     def open_config_playlist(self, playlist_id: str):

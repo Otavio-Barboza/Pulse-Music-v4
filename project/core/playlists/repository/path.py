@@ -109,18 +109,6 @@ class CreatePlaylist:
         }
 
     @classmethod
-    def return_name_playlist_json(cls, name : str) -> str:
-        """
-            Retorna a instancia da nova playlist para adicionar ao playlist.json
-        Args:
-            name (str): Nome da Playlist
-
-        Returns:
-            str: nome.
-        """
-        return name
-
-    @classmethod
     def return_selection_images(cls) -> list[str] | list[str] | tuple[str, str]:
         """
             Função para retornar as imagens dos Álbuns e Capas de Músicas para os métodos CREATE e UPDATE das playlists.

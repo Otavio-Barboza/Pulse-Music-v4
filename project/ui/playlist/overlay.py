@@ -508,9 +508,9 @@ class ContainerOverlay(ft.Container):
             )
         else:
             id = self.state.create_playlist()
-            self.page.run_task(
-                self.start_pipeline,
-                self.state.path,
-                id
-            )
+            # self.page.run_task(
+            #     self.start_pipeline,
+            #     self.state.path,
+            #     id
+            # )
             self.close_overlay(e = None)

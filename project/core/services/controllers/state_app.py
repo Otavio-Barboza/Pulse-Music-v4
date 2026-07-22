@@ -20,21 +20,31 @@ class StateApp:
         """
             Notifica todos os ouvintes; suporta funções sync e async.
         """
-
+        print(f"notificando: {event}")
         if event not in cls._callbacks:
+            print('evento não adicionado')
             return
+        
         for func in cls._callbacks[event]:
             try:
                 if inspect.iscoroutinefunction(func):
                     # listener async
-                    asyncio.create_task(func(data))
+                    if data is None:
+                        asyncio.create_task(func())
+                    else:
+                        asyncio.create_task(func(data))
                 else:
                     # pode retornar coroutine (função normal que retorna coroutine)
-                    res = func(data)
+                    if data is None:
+                        res = func()
+                    else:
+                        res = func(data)
+
                     if inspect.isawaitable(res):
                         asyncio.create_task(res)
-            except Exception:
+            except Exception as e:
                 # nunca quebrar a notificação inteira por um erro de listener
+                print(e)
                 pass
 
     @classmethod

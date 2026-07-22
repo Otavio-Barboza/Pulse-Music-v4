@@ -73,13 +73,13 @@ class PlaylistCard(ft.Container):
             items = [
                 ft.PopupMenuItem(
                     text = "Configurações Playlist",
-                    data = name,
+                    data = {"name" : self.playlist_name, "path" : self.path},
                     on_click = self.on_open
                 ),
 
                 ft.PopupMenuItem(
                     text = "Excluir Playlist",
-                    data = name,                                        
+                    data = {"name" : self.playlist_name, "path" : self.path},                                        
                     on_click = self.on_remove
                 )
             ]

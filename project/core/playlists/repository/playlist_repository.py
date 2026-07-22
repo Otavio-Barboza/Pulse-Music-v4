@@ -127,7 +127,7 @@ class PlaylistRepository:
             "name" : name,
             "path" : str(PASTA_PLAYLIST)
         }
-        dados["latest_aztualization"] = CreatePlaylist.generate_date()
+        dados["latest_actualization"] = CreatePlaylist.generate_date()
 
         Utils.sync_update_json(
             path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists.json",
@@ -175,26 +175,27 @@ class PlaylistRepository:
         Args:
             playlist (PlaylistConfig): Objeto PlaylistConfig para uso na inserção dos dados
         """
-        usuario = AccountManager.accounts_cache
-        caminho_config_json = f'Assets/Data/Contas/{usuario["current_account"]}/Playlists/{playlist.id}/config_play.json'
-        caminho_play_json = f'Assets/Data/Contas/{usuario["current_account"]}/playlists.json'
+        config_play_json_destination = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist.id / "config_play.json"
+        playlist_json_destination = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json"
  
-        json_config = Utils.sync_load_json(caminho_config_json)
-        json_play = Utils.sync_load_json(caminho_play_json)
+        json_config = Utils.sync_load_json(config_play_json_destination)
+        json_play = Utils.sync_load_json(playlist_json_destination)
 
-        json_play['playlists'][playlist.id]['name'] = playlist.name
-        json_play['latest_aztualization'] = CreatePlaylist.generate_date()
+        json_play["playlists"][playlist.id]["name"] = playlist.name
+        json_play["latest_actualization"] = CreatePlaylist.generate_date()
 
-        json_config['name'] = playlist.name
-        json_config['style']['pasta'] = playlist.style['path']
-        json_config['style']['color'] = playlist.style['color']
-        json_config['style']['opacity'] = playlist.style["opacity"]
-        json_config['music']['path'] = playlist.music['path']
-        json_config['music']['number_of_songs'] = CreatePlaylist.count_number_of_songs(playlist.music['pasta'])
-        json_config['date']['latest_aztualization'] = CreatePlaylist.generate_date()
+        json_config["name"] = playlist.name
+        json_config["style"]["image_path"] = playlist.style["image_path"]
+        json_config["style"]["color"] = playlist.style["color"]
+        json_config["style"]["opacity"] = playlist.style["opacity"]
+        json_config["music"]["path"] = playlist.music["music_path"]
+        json_config["music"]["number_of_songs"] = CreatePlaylist.count_number_of_songs(
+            Path(playlist.music["music_path"])
+        )
+        json_config["date"]["latest_actualization"] = CreatePlaylist.generate_date()
 
-        Utils.sync_update_json(path = caminho_play_json, data = json_play)
-        Utils.sync_update_json(path = caminho_config_json, data = json_config)
+        Utils.sync_update_json(path = playlist_json_destination, data = json_play)
+        Utils.sync_update_json(path = config_play_json_destination, data = json_config)
     
     @classmethod
     def remove_playlist_json(cls, id: str):
@@ -203,15 +204,14 @@ class PlaylistRepository:
         Args:
             id (str): ID da playlist
         """
-        usuario = AccountManager.accounts_cache
-        caminho = f'Assets/Data/Contas/{usuario["current_account"]}/playlists.json'
-        dados = Utils.sync_load_json(caminho)
         
-        if id in dados['playlists']:
-            dados['playlists'].pop(id)
-            dados['latest_aztualization'] = CreatePlaylist.generate_date()
-        
-        Utils.sync_update_json(path = caminho, data = dados)
+        path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json"
+        data: dict[str, int | dict[str, dict[str, str]]] = Utils.sync_load_json(path)
+
+        data["playlists"].pop(id, None)
+        data["latest_actualization"] = CreatePlaylist.generate_date()
+
+        Utils.sync_update_json(path = path, data = data)
         
 
     @classmethod
@@ -223,20 +223,21 @@ class PlaylistRepository:
         """
         from core.meta.scanner.scanner import Scanner
         
-        caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists/{id}'
-        leitura_json = Utils.sync_load_json(f'{caminho}/config_play.json')
+        path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / id
+        config_play_json = Utils.sync_load_json(path / "config_play.json")
 
-        pasta = leitura_json.get('musicas').get('pasta')
+        # pasta = config_play_json.get('music').get('music_path')
         
-        chaves_para_remover = cls.recognize_song_keys(id)
+        # scanner
+        # keys_to_remove = cls.recognize_song_keys(id)
 
-        asyncio.run(
-            Scanner.reconhecer_artistas_albuns_inexistentes(
-                chaves_remover = chaves_para_remover
-            )
-        )
+        # asyncio.run(
+        #     Scanner.reconhecer_artistas_albuns_inexistentes(
+        #         chaves_remover = keys_to_remove
+        #     )
+        # )
 
-        CreatePlaylist.remove_path(caminho)
+        CreatePlaylist.remove_path(path)
         cls.remove_playlist_json(id = id)
         
     @classmethod
@@ -308,22 +309,22 @@ class PlaylistRepository:
         return pastas_existentes
     
     @classmethod
-    def identify_music_artist(cls, id_musica: str) -> str:
+    def identify_music_artist(cls, song_id: str) -> str:
         json_musicas = Utils.sync_load_json(
-            f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Music/musicas.json'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
 
         for chave, conteudo in json_musicas.items():
-            if chave == id_musica:
-                return conteudo.get('artista_final', 'Artista Desconhecido')
+            if chave == song_id:
+                return conteudo.get('defined_artist', 'Artista Desconhecido')
             
     @classmethod
     def return_cover(cls, music_name: str) -> Path:
         lista_capas = os.listdir(
-            f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Capa Musica'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
         )
 
         for capa in lista_capas:
             if capa == music_name + '.jpg':
-                return f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Capa Musica/{capa}'
-        return r'Assets\Global\Images\Padrao\capa_musicas_desconhecidas.png'
+                return AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers" / capa
+        return r'assets\images\placeholders\capa_musicas_desconhecidas.png'

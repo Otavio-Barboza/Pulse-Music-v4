@@ -20,7 +20,11 @@ class GridPlaylists(ft.GridView):
         self.on_remove = on_remove
         self.load_songs = load_songs
         self.cards = {}
-    
+
+    def clear_cards(self):
+        self.cards = {}
+        self.controls.clear()
+
     def add_playlist(
         self, 
         playlist_id : str, 

@@ -14,19 +14,19 @@ class PlaylistConfig:
         self.name = name
 
     # setters para atualização de informações na "memória" da classe (facilitando a att depois no JSON).
-    def set_nome(self, name):
+    def set_name(self, name):
         if not name:
             raise ValueError("Nome inválido")
         self.name = name
 
-    def set_cor(self, cor):
-        self.style["cor"] = cor
+    def set_color(self, color):
+        self.style["color"] = color
 
-    def set_opacidade(self, opacidade):
-        self.style["opacidade"] = opacidade
+    def set_opacity(self, opacity):
+        self.style["opacity"] = opacity
 
-    def set_imagem(self, imagem):
-        self.style["pasta"] = imagem
+    def set_image_path(self, image_path):
+        self.style["image_path"] = image_path
 
-    def set_pasta_musicas(self, pasta):
-        self.music["pasta"] = pasta
+    def set_music_path(self, pasta):
+        self.music["music_path"] = pasta

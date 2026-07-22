@@ -51,9 +51,9 @@ class TabsNavigation(ft.Tabs):
         ]
 
         self.playlist = ColumnCards(self.page)
-        self.pesquisa_musica = MusicSearch(self.page)
-        self.artistas = GridImages(mode = GridMode.ARTIST, page = self.page)
-        self.albuns = GridImages(mode = GridMode.ALBUM, page = self.page)
+        self.search_music = MusicSearch(self.page)
+        self.artists = GridImages(mode = GridMode.ARTIST, page = self.page)
+        self.albums = GridImages(mode = GridMode.ALBUM, page = self.page)
         
         self._create_tabs()
 
@@ -72,12 +72,12 @@ class TabsNavigation(ft.Tabs):
 
             ft.Tab(
                 tab_content = self._labels_tabs[1],
-                content = self.artistas
+                content = self.artists
             ),
 
             ft.Tab(
                 tab_content = self._labels_tabs[2],
-                content = self.albuns
+                content = self.albums
             ),
 
             ft.Tab(
@@ -87,7 +87,7 @@ class TabsNavigation(ft.Tabs):
 
             ft.Tab(
                 tab_content = self._labels_tabs[4],
-                content = self.pesquisa_musica
+                content = self.search_music
             ),
         ]
 
@@ -97,16 +97,24 @@ class TabsNavigation(ft.Tabs):
         # criando e carregando componentes
         self._build_class()
         self.playlist.load()
-        self.pesquisa_musica.load()
-        self.artistas.load()
-        self.albuns.load()
+        self.search_music.load()
+        self.artists.load()
+        self.albums.load()
+
+    def reload(self):
+        self.playlist.reload_playlists()
+        self.artists.load()
+        self.albums.load()
+
+        self.artists.update()
+        self.albums.update()
 
     def connect(self):
         # registrando callbacks
         ResizeManager.register(self._adjust_tabs)
         self.playlist.connect()
-        self.artistas.connect()
-        self.albuns.connect()
+        self.artists.connect()
+        self.albums.connect()
 
 
     # CRIAÇÃO DOS ITENS

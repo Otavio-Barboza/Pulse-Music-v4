@@ -21,7 +21,7 @@ class MusicSearch(ft.Container):
             'Ex: Queen - Bohemian Rhapsody',
             'Ex: Linkin Park - Numb'
         ]
-
+        self._stop = False
         self.text_field = None
         self.container_text = None
         self.content = None
@@ -147,7 +147,7 @@ class MusicSearch(ft.Container):
     async def example_animation(self):
         anterior = ''
 
-        while True:
+        while self._stop != True:
             for letra in self.example_list:
                 for i in range(len(letra)):
                     atual = letra[i]
@@ -161,7 +161,10 @@ class MusicSearch(ft.Container):
                     self.container_text.update()
                         
                     await asyncio.sleep(0.4)
-            
+
+    def stop_animation(self):
+        self._stop = True
+
     def start_animation(self):
         self.page.run_task(self.example_animation)
 

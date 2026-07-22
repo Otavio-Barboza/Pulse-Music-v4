@@ -17,6 +17,7 @@ from core.meta.models.scanner_model import ScannerModel
 from core.meta.cache.global_cache import cache_metadata
 from core.meta.cache.cache_artists import CacheArtists
 from core.lyrics.cache.cache_lyrics import CacheLyrics
+from core.services.controllers.state_app import StateApp
 
 # imports de bibliotecas  gerais
 from pathlib import Path
@@ -137,7 +138,11 @@ async def main(page: ft.Page):
 
         page.overlay.remove(_overlay)
         page.update()
-    
+
+    # alteração de conta
+    def when_alter_account():
+        tabs.reload()
+
     
     """  Validar login  """
 
@@ -197,7 +202,11 @@ async def main(page: ft.Page):
     """  Registrando callbacks dos componentes  """
 
     # callbacks individuais dos componentes
-    
+    StateApp.register_callback(
+        event = 'actualization_components_when_alter_account',
+        func = when_alter_account
+    )
+
     tabs.connect()
     player.connect()
 
@@ -205,7 +214,7 @@ async def main(page: ft.Page):
     """  Inicializações gerais  """
 
     tabs.playlist.load_playlists()
-    tabs.pesquisa_musica.start_animation()
+    tabs.search_music.start_animation()
     tabs.load_favorites()
     
     page.on_resized = ResizeManager.to_execute

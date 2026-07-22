@@ -40,14 +40,19 @@ class ContentPlaylist(ft.Container):
         self.state.load_playlists()
         self.update()
 
-    def abrir_config_playlist(self, e):
-        self.state.open_config_playlist(e)
+    def reload(self):
+        self.grid.clear_cards()    
+        self.state.reload_playlists()
+        self.update()
+
+    def abrir_config_playlist(self, id: str):
+        self.state.open_config_playlist(id)
         self.page.overlay.clear()
         self.page.overlay.append(
             ContainerOverlay(
                 page = self.page,
                 state = self.state,
-                modo = PlalistOverlayMode.UPDATE
+                mode = PlalistOverlayMode.UPDATE
             ) 
         )
         self.page.update()
@@ -78,14 +83,14 @@ class ContentPlaylist(ft.Container):
         card = self.grid.cards[id]
 
         fonte = PlaylistFont(
-            path = card.pasta,
+            path = card.path,
             mode = ReproductionMode.PLAYLIST
         )
         
         list_music = fonte.load()
         
         fonte.load_playlist(
-            lista_musicas = list_music
+            song_list = list_music
         )
 
         self.open_function()
@@ -100,7 +105,7 @@ class ContentPlaylist(ft.Container):
         self.update()
 
         PlaylistState.open_playlist(
-            id = card.data['id'],
+            id = card.data["id"],
             status = PlaylistLoaded.OPEN
         )
         

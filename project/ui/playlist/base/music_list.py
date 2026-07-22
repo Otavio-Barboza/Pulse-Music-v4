@@ -91,7 +91,7 @@ class ListViewMusic(ft.ListView):
             container = RowContainer(
                 page = self.page,
                 song = song,
-                status_favoritada = status
+                favorited_status = status
             )
             
             self.controls.append(container)

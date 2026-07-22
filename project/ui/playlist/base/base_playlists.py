@@ -112,6 +112,10 @@ class ColumnCards(ft.Column):
         self._build_class()
         # self.load_playlists()
         # self.update()
+    
+    def reload_playlists(self):
+        self.column_content.reload()
+        self.update()
 
     def connect(self):
         StateApp.register_callback(event = "overlay_tips", func = ServiceSettings.save_overlay_tips)
@@ -157,7 +161,8 @@ class ColumnCards(ft.Column):
             self.button_add_play.visible = False
             self.button_return_play.visible = True
 
-        self.update()
+        self.page.update()
+        print("buttons carregados")
 
     def load_playlists(self):
         """
@@ -165,14 +170,14 @@ class ColumnCards(ft.Column):
         """
         self.update_buttons()
         self.column_content.load()
-        self.update()
+        self.page.update()
     
     def open_function(self):
-        self.state.modo = PlaylistMode.LIST
+        self.state.mode = PlaylistMode.LIST
         self.update_buttons()
 
     def previous(self, e):
-        self.state.modo = PlaylistMode.GRID
+        self.state.mode = PlaylistMode.GRID
         self.update_buttons()
         self.column_content.close_playlist()
         self.column_content.load()

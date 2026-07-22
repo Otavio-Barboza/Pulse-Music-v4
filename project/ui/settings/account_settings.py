@@ -388,12 +388,19 @@ class AccountSettings(ft.Container):
         else:
             await AccountManager.delete_account(
                 page = self.page,
-                account_id = self.data)
+                account_id = self.data
+            )
 
             self._create_selections()
             self.update_fields()
             self.update()
-        
+
+            print("chegou")
+
+            StateApp.notify(
+                event = "actualization_components_when_alter_account"
+            )
+
     async def _toggle_switch_account(self):
         self.account_selection.visible = not self.account_selection.visible
         self.update()
@@ -405,6 +412,10 @@ class AccountSettings(ft.Container):
             self.update_fields()
             self._create_selections()
             self.update()
+
+            StateApp.notify(
+                event = "actualization_components_when_alter_account"
+            )
         elif e.control.data.get('action') == 'alter':
             await self._toggle_switch_account()
         elif e.control.data.get('action') == 'select':
@@ -414,6 +425,10 @@ class AccountSettings(ft.Container):
             self._create_selections()
             self.update_fields()
             self.update()
+
+            StateApp.notify(
+                event = "actualization_components_when_alter_account"
+            )
         elif e.control.data.get('action') == 'delete':
             await self.delete_current_account()
         else:
@@ -474,6 +489,10 @@ class SelectAccountRequired(ft.Container):
         await self.function(e.control.data)
         self.page.overlay.remove(self)
         self.page.update()
+
+        StateApp.notify(
+            event = "actualization_components_when_alter_account"
+        )
     
     def close_overlay(self, e):
         self.page.overlay.remove(self)

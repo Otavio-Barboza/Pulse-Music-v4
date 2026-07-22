@@ -280,13 +280,13 @@ class ContainerOverlay(ft.Container):
         self.state.name = playlist.name
         self.state.color = playlist.style["color"]
         self.state.opacity = playlist.style["opacity"]
-        self.state.image = playlist.style["path"]
-        self.state.path = playlist.musicas["path"]
+        self.state.image = playlist.style["image_path"]
+        self.state.path = playlist.music["music_path"]
 
         self.container_color_opacity.bgcolor = playlist.style["color"]
         self.container_color_opacity.opacity = playlist.style["opacity"]
         self.text_name.value = f"Nome da playlist: {playlist.name}"
-        self.path_text.value = f"Pasta: {playlist.musicas['path']}"
+        self.path_text.value = f"Pasta: {playlist.music['music_path']}"
 
     def _create_image_card(self, image):
         card = ft.Container(

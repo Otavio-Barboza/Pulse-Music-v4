@@ -32,6 +32,7 @@ class RowContainer(ft.Container):
         )
         self.page = page
         self._is_favorited = favorited_status
+        self.data = song
         self.src_cover = self.return_cover()
 
         self.icon = ft.IconButton(
@@ -177,7 +178,7 @@ class RowContainer(ft.Container):
         ReproductionManager.play()
 
     def return_artist(self) -> str:
-        return PlaylistState.return_music_artist(self.data.chave)
+        return PlaylistState.return_music_artist(self.data.key)
     
     def return_cover(self) -> str:
         return PlaylistState.return_cover(self.data.name)

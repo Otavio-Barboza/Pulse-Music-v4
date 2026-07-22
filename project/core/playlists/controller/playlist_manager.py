@@ -4,8 +4,10 @@ from core.services.account_manager import AccountManager
 from core.playlists.enum.playlist_enum import PlaylistMode
 from core.playlists.repository.playlist_repository import PlaylistRepository
 from core.playlists.models.playlist_config import PlaylistConfig
+from core.utils.path import AppPaths
 
 # import geral
+from pathlib import Path
 from flet import GridView
 
 
@@ -52,28 +54,28 @@ class PlaylistManager:
             Função para atualizar os dados da playlist no UPDATE
         """    
 
-        self.playlist_config.set_nome(self.name)
-        self.playlist_config.set_cor(self.color)
-        self.playlist_config.set_imagem(self.image)
-        self.playlist_config.set_pasta_musicas(self.path)
-        self.playlist_config.set_opacidade(self.opacity)
+        self.playlist_config.set_name(self.name)
+        self.playlist_config.set_color(self.color)
+        self.playlist_config.set_image_path(self.image)
+        self.playlist_config.set_music_path(self.path)
+        self.playlist_config.set_opacity(self.opacity)
 
         PlaylistRepository.save_config(self.playlist_config)
 
         # Atualiza o card no grid
-        self.grid.atualizar_playlist(
+        self.grid.update_playlist(
             playlist_id = self.playlist_config.id,
             name = self.name,
             color = self.color,
             img = self.image,
             path = self.path,
-            number_of_songs = PlaylistRepository._count_musicas(self.path)
+            qtde_mus = PlaylistRepository.count_number_of_songs(self.path)
         )
 
-        PlaylistRepository.remove_dead_content(
-            id = self.playlist_config.id,
-            path = self.path
-        )
+        # PlaylistRepository.remove_dead_content(
+        #     id = self.playlist_config.id,
+        #     path = self.path
+        # )
 
     def load_playlists(self):
         """
@@ -92,22 +94,37 @@ class PlaylistManager:
                 qtde_mus = playlist.number_of_songs
             )
 
-    def open_config_playlist(self, playlist_id: str):
+    def reload_playlists(self):
+        self.list_playlist.clear()
+        self.list_playlist = PlaylistRepository.list_playlists()
+        
+        for playlist in self.list_playlist:
+            self.grid.add_playlist(
+                playlist_id = playlist.id,
+                name = playlist.name,
+                color = playlist.color,
+                img = playlist.image_path,
+                path = playlist.playlist_path,
+                qtde_mus = playlist.number_of_songs
+            )
+
+    def open_config_playlist(self, playlist_id: dict):
         """
             Abertura da playlist para o UPDATE, salvando os dados em memória no objeto self.playlist_config : PlaylistConfig()
         "Args" :
-            playlist_id (str): ID da playlist 
+            playlist_id (dict): ID da playlist 
         """
-
-        caminho = f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Playlists/{playlist_id}/config_play.json'
-        data: dict = Utils.sync_load_json(caminho)
+        print(playlist_id)
+        data_config: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist_id / "config_play.json"
+        )
 
         self.playlist_config = PlaylistConfig(
-            id = data['id'],
-            style = data['style'],
-            music = data['musicas'],
-            date = data['datas'],
-            name = data['name']
+            id = data_config.get("id"),
+            style = data_config.get("style"),
+            music = data_config.get("music"),
+            date = data_config.get("date"),
+            name = data_config.get("name")
         )
 
     def remove_playlist(self, playlist_id: str):

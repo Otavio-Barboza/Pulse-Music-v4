@@ -1,6 +1,7 @@
 # mport de back-end
 from core.meta.models.song import SongMetadata
 from core.services.account_manager import AccountManager
+from core.utils.path import AppPaths
 
 # imports gerais
 from mutagen import File
@@ -26,14 +27,16 @@ class ExtractMetadata:
         """
 
         audio_path = Path(path)
-        cover_destination = Path(f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Imagens/Capa Musica')
-        cover_destination.mkdir(parents = True, exist_ok = True)
+        cover_destination = Path(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
+        )
+        # cover_destination.mkdir(parents = True, exist_ok = True)
 
         title = None
         artist = None
         cover_path = None
 
-        audio = File(audio_path, easy=True)
+        audio = File(audio_path, easy  = True)
 
         if audio:
             title = audio.get("title", [None])[0]
@@ -97,7 +100,7 @@ class ExtractMetadata:
         ) 
         # SongMetadata(
         #     id_playlist = id_playlist,
-        #     artista_id = id_artista,
+        #     artist_id = artist_id,
         #     arquivo_mp3_original = nome_arquivo_original,
 
         #     titulo_musica_original = titulo_filtrado['titulo_original'] if titulo_filtrado is not None else None,
@@ -250,16 +253,16 @@ class ExtractMetadata:
 
         if id_art:
             tags.add(TXXX(
-                encoding=3,
-                desc="PLAYER_ARTIST_ID",
-                text=str(id_art)
+                encoding = 3,
+                desc = "PLAYER_ARTIST_ID",
+                text = str(id_art)
             ))
 
         if id_alb:
             tags.add(TXXX(
-                encoding=3,
-                desc="PLAYER_ALBUM_ID",
-                text=str(id_alb)
+                encoding = 3,
+                desc = "PLAYER_ALBUM_ID",
+                text = str(id_alb)
             ))
 
         # campo validador
@@ -276,34 +279,33 @@ class ExtractMetadata:
         print(f'Música finalizada (registro de metadados): {file_path}')
 
     @classmethod
-    def music_already_processed(cls, caminho: str) -> bool:
+    def music_already_processed(cls, path: Path) -> bool:
         """
             Verifica se o campo validador adicionado pela def registrar_metadados_player já alterou essa música em algum momento.
 
         Args:
-            caminho (str): caminho completo do arquivo MP3
+            path (str): path completo do arquivo MP3
 
         Returns:
             bool: True | False
         """
         try:
-            tags = ID3(caminho)
+            tags = ID3(str(path))
 
             if "TXXX:PLAYER_PIPELINE" in tags:
                 return True
-
         except:
             pass
 
         return False
     
     @classmethod
-    def extract_metadata_playter(cls, file_path: str) -> dict:
+    def extract_metadata_playter(cls, file_path: Path) -> dict:
         """
             Função para extrair os dados (metadados) que forma atribuídos manualmente pelo player
 
         Args:
-            file_path (str): caminho completo do arquivo MP3
+            file_path (Path): caminho completo do arquivo MP3
 
         Returns:
             dict: dicionário contendo as informações extraídas do arquivo.
@@ -312,19 +314,19 @@ class ExtractMetadata:
             "title": None,
             "artist": None,
             "album": None,
-            "validador_pipeline": False,
-            "capa_original": None,
+            "validate_pipeline": False,
+            "cover": None,
             
-            "id_artista" : None,
-            "imagem_artista_medium": None,
-            "imagem_artista_big": None,
+            "artist_id" : None,
+            "image_medium_artist": None,
+            "image_big_artist": None,
 
-            "id_album" : None,
-            "imagem_album_player_medium": None,
-            "imagem_album_player_big": None
+            "album_id" : None,
+            "image_medium_album": None,
+            "image_big_album": None
         }
 
-        audio = MP3(file_path, ID3=ID3)
+        audio = MP3(str(file_path), ID3 = ID3)
         tags = audio.tags
 
         if not tags:
@@ -340,55 +342,55 @@ class ExtractMetadata:
             result["album"] = str(tags["TALB"])
 
         if "TXXX:PLAYER_PIPELINE" in tags:
-            result["validador_pipeline"] = True
+            result["validate_pipeline"] = True
 
         if "TXXX:PLAYER_ARTIST_ID" in tags:
             tag = tags["TXXX:PLAYER_ARTIST_ID"]
             if tag.text:
-                result["id_artista"] = tag.text[0]
+                result["artist_id"] = tag.text[0]
 
         if "TXXX:PLAYER_ALBUM_ID" in tags:
             tag = tags["TXXX:PLAYER_ALBUM_ID"]
             if tag.text:
-                result["id_album"] = tag.text[0]
+                result["album_id"] = tag.text[0]
         
         # percorre todas as imagens existentes.
         for tag in tags.values():
             if isinstance(tag, APIC):
                 if tag.type == 3:
-                    result["capa_original"] = {
+                    result["cover"] = {
                         "mime": tag.mime,
-                        "tamanho_bytes": len(tag.data)
+                        "bytes_size": len(tag.data)
                     }
                     
                 # _____ artist _____
                 elif tag.desc == 'PLAYER_ARTIST_MEDIUM':
-                    result["imagem_artista_medium"] = {
+                    result["image_medium_artist"] = {
                         "mime": tag.mime,
-                        "tamanho_bytes": len(tag.data)
+                        "bytes_size": len(tag.data)
                     }
                 elif tag.desc == 'PLAYER_ARTIST_BIG':
-                    result["imagem_artista_big"] = {
+                    result["image_big_artist"] = {
                         "mime": tag.mime,
-                        "tamanho_bytes": len(tag.data)
+                        "bytes_size": len(tag.data)
                     }
                 
                 # _____ album _____
                 elif tag.desc == 'PLAYER_ALBUM_MEDIUM':
-                    result["imagem_album_player_medium"] = {
+                    result["image_medium_album"] = {
                         "mime": tag.mime,
-                        "tamanho_bytes": len(tag.data)
+                        "bytes_size": len(tag.data)
                     }
                 elif tag.desc == 'PLAYER_ALBUM_BIG':
-                    result["imagem_album_player_big"] = {
+                    result["image_big_album"] = {
                         "mime": tag.mime,
-                        "tamanho_bytes": len(tag.data)
+                        "bytes_size": len(tag.data)
                     }
 
         return result
     
     @classmethod
-    def extact_images_mp3(cls, file_path: str, name : dict, nome_capa : str, artista_id : str | None = None):
+    def extact_images_mp3(cls, file_path: str, name : dict, cover_name : str, artist_id : str | None = None):
         """
             Extrai as imagens do arquivo MP3
 
@@ -413,10 +415,10 @@ class ExtractMetadata:
                 conta = AccountManager.contas_cache["conta_atual"]
 
                 if tag.type == 3:
-                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Capa Musica/{nome_capa}.jpg'
+                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Capa Musica/{cover_name}.jpg'
                     dic["capa"] = destination_path
                 elif tag.desc == 'PLAYER_ARTIST_MEDIUM':
-                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Artistas/{artista_id}.jpg'
+                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Artistas/{artist_id}.jpg'
                     dic["art"] = destination_path
                 elif tag.desc == 'PLAYER_ALBUM_MEDIUM':
                     destination_path = f'Assets/Data/Contas/{conta}/Imagens/Albuns/{name.get("album")}.jpg'

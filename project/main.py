@@ -226,7 +226,7 @@ async def main(page: ft.Page):
     """  Notificação e execução de eventos globais  """
     
     # page.run_task(
-    #     ScannerModel.async_start_scanner
+        # ScannerModel.async_start_scanner
     # )
 
 

@@ -91,7 +91,7 @@ class Pipeline:
         ScannerModel.set_status_prosesses(
             ScannerStatus.ON_PIPELINE_PLAYLIST
         )
-        Scanner.gerenciar_status()
+        Scanner.manager_status()
         ScannerController.notify(
             'icon_status_scanner',
             None
@@ -121,7 +121,7 @@ class Pipeline:
                     'progress_status_scanner',
                     None
                 )
-                Scanner.gerenciar_status()
+                Scanner.manager_status()
                 
     @classmethod
     async def _async_processar_musica(
@@ -134,17 +134,18 @@ class Pipeline:
         list_already_processed: list[SongMetadata] = []
         lista = []
         
-        music: SongMetadata | str
-        for music in os.listdir(path) if len(object_list) == 0 else object_list:
+        song: SongMetadata | str
+        for song in os.listdir(path) if len(object_list) == 0 else object_list:
             filtered_title = None
             filtered_artist = None
 
-            music = cls.normalize_song(music)
-            music = os.path.basename(music)
+            song = cls.normalize_song(song)
+            song = os.path.basename(song)
 
-            destination_file = os.path.normpath(
-                os.path.join(path, music)
-            )
+            destination_file = Path(path) / song
+            # destination_file = os.path.normpath(
+            #     os.path.join(path, song)
+            # )
 
             # FASE 0 - verificação da existencia de data já alterados pelo próprio player, assim carregamento dos data já imbutidos.
             if ExtractMetadata.music_already_processed(destination_file):
@@ -156,7 +157,7 @@ class Pipeline:
                     ExtractMetadata.extact_images_mp3,
                     destination_file, 
                     mus, 
-                    music.replace('.mp3', ''),
+                    song.replace('.mp3', ''),
                     artista_id
                 )
                 
@@ -166,7 +167,7 @@ class Pipeline:
                         artist_id = artista_id,
                         song_title_id3_filtered = mus.get('title'),
                         defined_artist = mus.get('artist'),
-                        mp3_file = music,
+                        mp3_file = song,
                         song_path = path,
                         mp3_file_title = None,
                         mp3_file_artist = None,
@@ -178,7 +179,7 @@ class Pipeline:
                         sim_2 = None,
                         list_of_potential_artists = [],
                         status = SongStatus.HIGH,
-                        original_song_title = music,
+                        original_song_title = song,
                         album_metadata = {
                             'id_deezer' : mus.get('id_album'), 
                             'nome' : mus.get('album'), 
@@ -211,13 +212,13 @@ class Pipeline:
                 
                     if filtered_artist is not None and filtered_title['artist'] is not None:
                         lista.append(await Phase1.phase_1(
-                            nome_arquivo_original = music,
+                            nome_arquivo_original = song,
                             filtered_title = filtered_title,
                             artista_meta_nativo = filtered_artist
                         ))
                     else:
                         lista.append(await ExtractMetadata.async_organiza_dados(
-                            nome_arquivo_original = music,
+                            nome_arquivo_original = song,
                             filtered_title = filtered_title,
                             artista_meta_nativo = filtered_artist,
                             id_artista = '',

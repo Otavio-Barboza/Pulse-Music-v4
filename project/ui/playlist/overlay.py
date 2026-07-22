@@ -7,13 +7,13 @@ from core.playlists.enum.playlist_enum import PlalistOverlayMode
 from core.meta.pipeline.pipeline import Pipeline
 
 # imports gerais
-from tkinter import filedialog, Tk
+from pathlib import Path
 import flet as ft
 import asyncio
 
 
 class ContainerOverlay(ft.Container):
-    def __init__(self, state, mode : PlalistOverlayMode, page: ft.Page):
+    def __init__(self, state, mode: PlalistOverlayMode, page: ft.Page):
         super().__init__(
             alignment = ft.alignment.center,
             expand = True
@@ -25,6 +25,12 @@ class ContainerOverlay(ft.Container):
         self.albums, self.covers, self.paths = self.state.return_images()
         self.cards = []
         self.colors = []
+
+        self.picker = ft.FilePicker(
+            on_result = self.on_directory_selected
+        )
+
+        self.page.overlay.append(self.picker)
 
         self.container_color_opacity = ft.Container(
             col = 4,
@@ -444,22 +450,19 @@ class ContainerOverlay(ft.Container):
         self.text_name.value = f"Nome da playlist: {self.text_field.value}"
         self.update()
 
-    def open_selector_path(self, e):
-        root = Tk()
-        root.withdraw()
-        path = filedialog.askdirectory()
-        root.destroy()
-        
-
-        if path in self.check_existing_paths():
+    def on_directory_selected(self, e: ft.FilePickerResultEvent):
+        if e.path in self.check_existing_paths():
             UtilsUi.snack_bar(
                 page = self.page,
                 text = "Já existe uma playlist com essa path de músicas, escolha outra!"
             )
         else:
-            self.state.path = path
-            self.path_text.value = f"Pasta selecionada: {path}"
+            self.state.path = e.path
+            self.path_text.value = f"Pasta selecionada: {e.path}"
             self.path_text.update()
+
+    def open_selector_path(self, e):
+        self.picker.get_directory_path()
     
     def close_overlay(self, e):
         self.state.image = r"assets\images\placeholders\capa_playlist_padrao.png"
@@ -471,7 +474,7 @@ class ContainerOverlay(ft.Container):
         self.page.overlay.clear()
         self.page.update()
 
-    async def start_pipeline(self, path: str, id: str):
+    async def start_pipeline(self, path: Path, id: str):
         await asyncio.to_thread(
             Pipeline.start_wrapper_sync,
             path,
@@ -508,9 +511,9 @@ class ContainerOverlay(ft.Container):
             )
         else:
             id = self.state.create_playlist()
-            # self.page.run_task(
-            #     self.start_pipeline,
-            #     self.state.path,
-            #     id
-            # )
+            self.page.run_task(
+                self.start_pipeline,
+                self.state.path,
+                id
+            )
             self.close_overlay(e = None)

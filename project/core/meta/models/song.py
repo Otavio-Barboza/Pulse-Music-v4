@@ -133,17 +133,17 @@ class SongMetadata:
     
     def set_artist_metadata(
         self, 
-        id: str | None,
+        id_deezer: str | None,
         img_m: Path, # path
         img_b: Path, # caminho_arquivo
         img_b_link: str | None
     ):
         self.artist_metadata = {
-            "id" : id,
-            "medium" : img_m,
+            "id" : id_deezer,
+            "medium" : str(img_m),
             "big" : {
                 "link" : img_b_link,
-                "path" : img_b
+                "path" : str(img_b)
             }
         }
 
@@ -158,10 +158,10 @@ class SongMetadata:
         self.album_metadata = {
             "id_deezer" : id_deezer,
             "name" : name,
-            "medium" : img_m,
+            "medium" : str(img_m),
             "big" : {
                 "link" : img_b_link,
-                "path" : img_b
+                "path" : str(img_b)
             }
         }
         

@@ -49,6 +49,13 @@ class Pipeline:
         await MetadataRepository.data_manager_songs_json(groups = groups)
         await CacheArtists.save()
         await MetadataRepository.load_cache()
+
+        from core.meta.cache.global_cache import cache_metadata
+
+        print(cache_metadata.artists.to_dict())
+        print(cache_metadata.albums.to_dict())
+        print(CacheArtists.cache_id)
+        
     
     @classmethod
     def to_execute_callbacks(cls, path: Path):
@@ -85,7 +92,7 @@ class Pipeline:
             )
 
     @classmethod
-    def start_wrapper_sync(cls, path: str, object_list: list = [], id_playlist: str | None = None) -> list[SongMetadata]:
+    def start_wrapper_sync(cls, path: str, object_list: list = [], playlist_id: str | None = None) -> list[SongMetadata]:
         
         ScannerModel.start_task()
         ScannerModel.set_status_prosesses(
@@ -99,10 +106,10 @@ class Pipeline:
 
         try:
             asyncio.run(
-                cls._async_processar_musica(
+                cls.async_process_musics(
                     path = path, 
                     object_list = object_list,
-                    id = id_playlist
+                    id = playlist_id
                 )
             )
         except Exception as e:
@@ -122,9 +129,11 @@ class Pipeline:
                     None
                 )
                 Scanner.manager_status()
-                
+
+            print("pipeline finalizado")
+            
     @classmethod
-    async def _async_processar_musica(
+    async def async_process_musics(
         cls, 
         path: Path, 
         object_list: list[SongMetadata] = [], 
@@ -132,7 +141,7 @@ class Pipeline:
     ) -> list[SongMetadata]:
 
         list_already_processed: list[SongMetadata] = []
-        lista = []
+        musics_list = []
         
         song: SongMetadata | str
         for song in os.listdir(path) if len(object_list) == 0 else object_list:
@@ -168,9 +177,10 @@ class Pipeline:
                         song_title_id3_filtered = mus.get('title'),
                         defined_artist = mus.get('artist'),
                         mp3_file = song,
-                        song_path = path,
+                        song_path = str(path),
                         mp3_file_title = None,
                         mp3_file_artist = None,
+                        original_artist_id3 = None,
                         song_artist_id3_filtered = None,
                         consensus = None,
                         gap = None,
@@ -182,51 +192,52 @@ class Pipeline:
                         original_song_title = song,
                         album_metadata = {
                             'id_deezer' : mus.get('id_album'), 
-                            'nome' : mus.get('album'), 
-                            'medium' : dic.get('alb'), 
+                            'name' : mus.get('album'), 
+                            'medium' : str(dic.get('alb')), 
                             'big' : {
                                 'link' : mus.get('imagem_album_player_big'),
-                                'path' : destination_file
+                                'path' : str(destination_file)
                             }
                         },
                         artist_metadata = {
-                            'id_deezer' : mus.get('id_artista'), 
-                            'medium' : dic.get('art'), 
+                            'id_deezer' : mus.get('artist_id'), 
+                            'medium' : str(dic.get('art')), 
                             'big' : {
                                 'link' : mus.get('imagem_album_player_medium'),
-                                'path' : destination_file
+                                'path' : str(destination_file)
                             }
                         }
                     )
                 )
             else:
                 # FASE 1 - extração de metadados e classificação + filtragem tradicional
-                data = await ExtractMetadata.async_extrair(destination_file)
-                
+                data = await ExtractMetadata.async_extract(destination_file)
+
                 if data is not None:
                     if data['title'] is not None:
-                        filtered_title = await Filtering.async_filter_title(nome = data['title'])
+                        filtered_title = await Filtering.async_filter_title(name = data['title'])
 
                     if data['artist'] is not None:
                         filtered_artist = await Filtering.async_filter_artist(artist = data['artist'])
                 
                     if filtered_artist is not None and filtered_title['artist'] is not None:
-                        lista.append(await Phase1.phase_1(
-                            nome_arquivo_original = song,
+                        musics_list.append(await Phase1.phase_1(
+                            mp3_file = song,
                             filtered_title = filtered_title,
-                            artista_meta_nativo = filtered_artist
+                            original_artist_id3 = filtered_artist
                         ))
                     else:
-                        lista.append(await ExtractMetadata.async_organiza_dados(
-                            nome_arquivo_original = song,
-                            filtered_title = filtered_title,
-                            artista_meta_nativo = filtered_artist,
-                            id_artista = '',
+                        musics_list.append(await ExtractMetadata.async_organize_data(
+                            mp3_file = song,
+                            song_metadata_id3 = filtered_title,
+                            original_artist_id3 = filtered_artist,
+                            artist_id = '',
                             status = await cls._async_classificar_presenca(
                                 filtered_title = filtered_title, 
                                 filtered_artist = filtered_artist    
                             ),
-                            id_playlist = id
+                            playlist_id = id,
+                            song_path = path
                         ))
         
         group_phase_0 = {SongStatus.PHASE_0 : list_already_processed}
@@ -234,7 +245,7 @@ class Pipeline:
         cls.to_execute_callbacks(path)
 
         groups = await Phase2.phase_2(
-            lista = lista, 
+            list_object = musics_list, 
             path = path
         )
         

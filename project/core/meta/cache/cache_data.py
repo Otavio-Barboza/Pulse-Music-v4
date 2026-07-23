@@ -3,6 +3,7 @@ from core.meta.models.artist import Artist
 from core.meta.models.album import Album
 
 # import geral
+from pathlib import Path
 import os
 
 
@@ -22,15 +23,17 @@ class CacheMetadata:
         self.albums = Album()
 
         for key, data in self.tracks.items():
+            print(data)
 
             self.artists.add_artist(
                 # Elementos da música
                 key_song = key,
-                path_of_song_key = os.path.normpath(
-                    os.path.join(
-                        data.get('song_path'), data.get('mp3_file')
-                    )
-                ),
+                path_of_song_key = Path(data.get("song_path")) / data.get("mp3_file"),
+                # path_of_song_key = os.path.normpath(
+                #     os.path.join(
+                #         data.get('song_path'), data.get('mp3_file')
+                #     )
+                # ),
                 
                 # Elementos do artista
                 artist_id = data.get('artist_id'),
@@ -38,11 +41,12 @@ class CacheMetadata:
             )
             
             # álbuns mantido nessa base ainda de operação
-            caminho_alb = os.path.join(data.get('song_path', ''), data.get('mp3_file', ''))
+            # caminho_alb = os.path.join(data.get('song_path', ''), data.get('mp3_file', ''))
+            song_path = data["album"]["big"].get("path")
             
             self.albums.add_album(
-                name = data.get('album').get('nome_album'),
-                song_path = data.get('album').get('img_big').get('song_path') or caminho_alb,
+                name = data.get("album").get("name"),
+                song_path = Path(data.get("song_path")) / data.get("mp3_file"),
                 song_key = key
             )
 

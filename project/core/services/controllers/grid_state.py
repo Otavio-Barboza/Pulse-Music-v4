@@ -18,16 +18,16 @@ class GridState:
         cls._callbacks[event].append(func)
         
     @classmethod
-    def notify(cls, event : str, dados = None):
+    def notify(cls, event: str, data = None):
         if event not in cls._callbacks:
-            raise(f'Evento de atualização não existente: {event}')
-        
+            print(f'Evento de atualização não existente: {event}')
+            return
         for func in cls._callbacks[event]:
             try:
                 if inspect.iscoroutinefunction(func):
-                    asyncio.create_task(func(dados) if dados is not None else func())
+                    asyncio.create_task(func(data) if data is not None else func())
                 else:
-                    res = func(dados) if dados is not None else func()
+                    res = func(data) if data is not None else func()
                     if inspect.isawaitable(res):
                         asyncio.create_task(res)
             except Exception as e:

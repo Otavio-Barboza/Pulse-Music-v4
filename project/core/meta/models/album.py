@@ -1,3 +1,7 @@
+# import geral
+from pathlib import Path
+
+
 class Album: 
 
     def __init__(self): 
@@ -5,17 +9,17 @@ class Album:
         
     def add_album(
         self, 
-        song_path : str, 
-        song_key : str, 
-        name : str
+        song_path: Path, 
+        song_key: str, 
+        name: str
     ):
         if name not in self.albums:
             self.albums[name] = {
                 'songs': []
             }
             self.albums[name]['songs'].append({
-                'chave_da_musica' : song_key,
-                'caminho_da_musica_completa' : song_path
+                'key_song' : song_key,
+                'destination_song' : song_path
             })
             
     def to_dict(self): 

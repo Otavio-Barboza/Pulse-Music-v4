@@ -52,5 +52,5 @@ class DeezerFont(MetadataSource):
     async def get_album(self, album_id : int):
         return await self._get(f'{BASE_URL}/album/{album_id}')
     
-    async def get_artista(self, artist_id : int):
+    async def get_artist(self, artist_id : int):
         return await self._get(f'{BASE_URL}/artist/{artist_id}')

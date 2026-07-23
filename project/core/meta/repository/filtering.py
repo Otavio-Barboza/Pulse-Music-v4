@@ -67,20 +67,20 @@ class Filtering:
         if '.' in name.split()[-1]:
             name.removeprefix('.')
 
-        name = await cls._async_normalizar_separadores(name)
+        name = await cls.async_normalize_separators(name)
         qtde_hifen = name.count(cls.SEPARATOR)
 
         if qtde_hifen == 0:
             return {
-                'titulo_original' : original_name,
-                'titulo_filtrado' : name,
+                'original_title' : original_name,
+                'filtered_title' : name,
                 'artist' : None
             }
         elif qtde_hifen == 1:
             artist, title = name.split(cls.SEPARATOR, 1)
             return {
-                'titulo_original' : original_name,
-                'titulo_filtrado' : title.strip(),
+                'original_title' : original_name,
+                'filtered_title' : title.strip(),
                 'artist' : artist.strip()
             }
         elif qtde_hifen > 1:

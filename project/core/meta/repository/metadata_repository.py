@@ -3,6 +3,7 @@ from core.services.account_manager import AccountManager
 from core.meta.repository.tasks import Task
 from core.utils.utils import Utils
 from core.meta.models.song import SongMetadata
+from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
@@ -14,14 +15,22 @@ class MetadataRepository:
     @classmethod
     async def data_manager_songs_json(cls, groups: dict):
         current_song_json: dict = await Utils.async_load_json(
-            f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Music/musicas.json'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
+
+        print()
+        # print(current_song_json)
+        print()
         
         object_list = [
             musica
             for grupo in groups.values()
             for musica in grupo
         ]
+
+        print()
+        # print(object_list)
+        print()
         
         final_data = {}
         
@@ -43,47 +52,53 @@ class MetadataRepository:
             if id not in final_data:
                 final_data[id] = data
         
-        await Utils.async_update_json(path = cls.CAMINHO_CONTA_ATUAL, data = final_data)
+        print()
+        # print(final_data)
+        print()
+
+        await Utils.async_update_json(path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json", data = final_data)
     
     @classmethod
     async def load_cache(cls):
         from core.meta.cache.cache_artists import CacheArtists
         from core.meta.cache.global_cache import cache_metadata
 
-        dados = await cls.ler_json(f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/musicas.json')
+        dados = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        )
         cache_metadata.load(dados)
 
         await CacheArtists.load()
 
     @classmethod
-    def download_image(cls, url: str, destination_path: Path | str) -> str | None:
+    def download_image(cls, url: str, destination_path: Path | str) -> Path | None:
         """
-        Baixa uma imagem via URL e salva no caminho especificado.
+        Baixa uma imagem via URL e salva no path especificado.
 
         Args:
             url (str): URL da imagem
-            destination_path (str): caminho completo (sem extensão ou com)
+            destination_path (str): path completo (sem extensão ou com)
 
         Returns:
-            str | None: caminho final salvo ou None se falhar
+            str | None: path final salvo ou None se falhar
         """
 
         if not url:
             return None
 
         try:
-            caminho = Path(destination_path)
-            caminho.parent.mkdir(parents = True, exist_ok = True)
+            path = Path(destination_path)
+            path.parent.mkdir(parents = True, exist_ok = True)
 
-            response = requests.get(url, timeout=20)
+            response = requests.get(url, timeout = 20)
 
             if response.status_code != 200:
                 return None
 
-            with open(caminho, "wb") as f:
+            with open(path, "wb") as f:
                 f.write(response.content)
 
-            return str(caminho)
+            return path
         except Exception as e:
             print("falha na conexão:", e)
             return None
@@ -104,12 +119,12 @@ class MetadataRepository:
     @classmethod
     async def return_artists_json(cls) -> dict:
         return await Utils.async_load_json(
-            f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/artistas.json'
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json"
         )
     
     @classmethod
     async def save_artists_json(cls, data: dict):
         await Utils.async_update_json(
-            path = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/artistas.json',
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json",
             data = data
         )

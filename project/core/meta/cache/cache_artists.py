@@ -29,7 +29,7 @@ class CacheArtists:
     
     @classmethod
     async def save(cls):
-        await MetadataRepository.return_artists_json(cls.cache_id)
+        await MetadataRepository.save_artists_json(cls.cache_id)
 
     @classmethod
     def resolve_id(cls, name_org: str | None) -> str:

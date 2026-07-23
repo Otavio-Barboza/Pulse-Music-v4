@@ -64,19 +64,20 @@ class ExtractMetadata:
     @classmethod
     async def async_organize_data(
         cls, 
-        mp3_file : str, 
-        song_metadata_id3 : dict | None, 
-        original_artist_id3 : str | None, 
-        status : str, 
-        playlist_id : str | None = None, 
-        artist_id : str = ''
+        mp3_file: str, 
+        song_metadata_id3: dict | None, 
+        original_artist_id3: str | None, 
+        status: str, 
+        song_path: Path,
+        artist_id: str = "",
+        playlist_id: str | None = None
     ) -> SongMetadata:
         """
             Organiza os dados retornados das filtragens e extrações de metadados
         Args:
             mp3_file (str): Nome integral do arquivo .mp3
             titulo_filtrado (dict | None): Dicionario do title filtrado senão None
-            artista_meta_nativo (str | None): String do artist filtrado ou None
+            original_artist_id3 (str | None): String do artist filtrado ou None
             status (str): String para denominar as operações seguintes
 
         Returns:
@@ -85,10 +86,12 @@ class ExtractMetadata:
         return SongMetadata(
             playlist_id = playlist_id,
             artist_id = artist_id,
+
             mp3_file = mp3_file,
+            song_path = song_path,
 
             original_song_title = song_metadata_id3["original_title"] if song_metadata_id3 is not None else None,
-            song_title_id3_filtered = song_metadata_id3["title_filtered"] if song_metadata_id3 is not None else None,
+            song_title_id3_filtered = song_metadata_id3["filtered_title"] if song_metadata_id3 is not None else None,
             song_artist_id3_filtered = song_metadata_id3["artist"] if song_metadata_id3 is not None else None,
             original_artist_id3 = original_artist_id3,
 
@@ -103,10 +106,10 @@ class ExtractMetadata:
         #     artist_id = artist_id,
         #     arquivo_mp3_original = nome_arquivo_original,
 
-        #     titulo_musica_original = titulo_filtrado['titulo_original'] if titulo_filtrado is not None else None,
-        #     titulo_musica_filtrado = titulo_filtrado['titulo_filtrado'] if titulo_filtrado is not None else None,
-        #     artista_titulo_filtrado = titulo_filtrado['artist'] if titulo_filtrado is not None else None,
-        #     artista_meta_nativo = artista_meta_nativo,
+        #     titulo_musica_original = titulo_filtrado["titulo_original"] if titulo_filtrado is not None else None,
+        #     titulo_musica_filtrado = titulo_filtrado["titulo_filtrado"] if titulo_filtrado is not None else None,
+        #     artista_titulo_filtrado = titulo_filtrado["artist"] if titulo_filtrado is not None else None,
+        #     original_artist_id3 = original_artist_id3,
             
         #     status = status,
         #     arquivo_mp3_filtrado = None,
@@ -118,7 +121,7 @@ class ExtractMetadata:
     @classmethod
     async def async_extract(cls, path: Path):
         return await asyncio.to_thread(
-            cls._async_extrair_metadados,
+            cls.async_extract_metadata,
             path
         )
     
@@ -127,7 +130,7 @@ class ExtractMetadata:
     @classmethod
     def register_metadata_player(
         cls,
-        file_path: str,
+        file_path: Path,
         title: str,
         artist: str,
         album: str,
@@ -152,6 +155,8 @@ class ExtractMetadata:
             url_img_album_big (str | None, optional): imagem do álbum identificado, caso exista. Defaults to None.
         """
 
+        file_path = str(file_path)
+
         # abre o arquivo .mp3
         audio = MP3(file_path, ID3 = ID3)
 
@@ -174,13 +179,23 @@ class ExtractMetadata:
 
         # limpar imagens do player (matém capa original)
         for tag in list(tags.values()):
-            if isinstance(tag, APIC) and tag.desc.startswith('PLAYER_'):
+            if isinstance(tag, APIC) and tag.desc.startswith("PLAYER_"):
                 tags.delall(tag.HashKey)
-                
+
+        print(title, artist, album)
         # escrever novos metadados
-        tags.add(TIT2(encoding = 3, text = title))
-        tags.add(TPE1(encoding = 3, text = artist))
-        tags.add(TALB(encoding = 3, text = album))
+        if title is not None:
+            tags.add(TIT2(encoding = 3, text = title))
+        
+        if artist is None:
+            tags.add(TPE1(encoding = 3, text = "Artista Desconhecido"))
+        else:
+            tags.add(TPE1(encoding = 3, text = artist))
+
+        if album is None:
+            tags.add(TALB(encoding = 3, text = "Album Desconhecido"))
+        else:
+            tags.add(TALB(encoding = 3, text = album))
 
         # -------- função download --------
         def download(url):
@@ -207,9 +222,9 @@ class ExtractMetadata:
             if img:
                 tags.add(APIC(
                     encoding = 3,
-                    mime = 'image/jpeg',
+                    mime = "image/jpeg",
                     type = 7,
-                    desc = 'PLAYER_ARTIST_MEDIUM',
+                    desc = "PLAYER_ARTIST_MEDIUM",
                     data = img   
                 ))
         
@@ -219,9 +234,9 @@ class ExtractMetadata:
             if img:
                 tags.add(APIC(
                     encoding = 3,
-                    mime = 'image/jpeg',
+                    mime = "image/jpeg",
                     type = 7,
-                    desc = 'PLAYER_ARTIST_BIG',
+                    desc = "PLAYER_ARTIST_BIG",
                     data = img
                 ))
             
@@ -233,9 +248,9 @@ class ExtractMetadata:
             if img:
                 tags.add(APIC(
                     encoding = 3,
-                    mime = 'image/jpeg',
+                    mime = "image/jpeg",
                     type = 4,
-                    desc = 'PLAYER_ALBUM_MEDIUM',
+                    desc = "PLAYER_ALBUM_MEDIUM",
                     data = img
                 ))
                 
@@ -245,9 +260,9 @@ class ExtractMetadata:
             if img:
                 tags.add(APIC(
                     encoding = 3,
-                    mime = 'image/jpeg',
+                    mime = "image/jpeg",
                     type = 4,
-                    desc = 'PLAYER_ALBUM_BIG',
+                    desc = "PLAYER_ALBUM_BIG",
                     data = img
                 ))
 
@@ -276,7 +291,7 @@ class ExtractMetadata:
 
         audio.save()
 
-        print(f'Música finalizada (registro de metadados): {file_path}')
+        print(f"Música finalizada (registro de metadados): {file_path}")
 
     @classmethod
     def music_already_processed(cls, path: Path) -> bool:
@@ -364,24 +379,24 @@ class ExtractMetadata:
                     }
                     
                 # _____ artist _____
-                elif tag.desc == 'PLAYER_ARTIST_MEDIUM':
+                elif tag.desc == "PLAYER_ARTIST_MEDIUM":
                     result["image_medium_artist"] = {
                         "mime": tag.mime,
                         "bytes_size": len(tag.data)
                     }
-                elif tag.desc == 'PLAYER_ARTIST_BIG':
+                elif tag.desc == "PLAYER_ARTIST_BIG":
                     result["image_big_artist"] = {
                         "mime": tag.mime,
                         "bytes_size": len(tag.data)
                     }
                 
                 # _____ album _____
-                elif tag.desc == 'PLAYER_ALBUM_MEDIUM':
+                elif tag.desc == "PLAYER_ALBUM_MEDIUM":
                     result["image_medium_album"] = {
                         "mime": tag.mime,
                         "bytes_size": len(tag.data)
                     }
-                elif tag.desc == 'PLAYER_ALBUM_BIG':
+                elif tag.desc == "PLAYER_ALBUM_BIG":
                     result["image_big_album"] = {
                         "mime": tag.mime,
                         "bytes_size": len(tag.data)
@@ -412,17 +427,16 @@ class ExtractMetadata:
 
             if isinstance(tag, APIC):
                 # definir name do arquivo
-                conta = AccountManager.contas_cache["conta_atual"]
 
                 if tag.type == 3:
-                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Capa Musica/{cover_name}.jpg'
+                    destination_path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers" / f"{cover_name}.jpg"
                     dic["capa"] = destination_path
-                elif tag.desc == 'PLAYER_ARTIST_MEDIUM':
-                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Artistas/{artist_id}.jpg'
+                elif tag.desc == "PLAYER_ARTIST_MEDIUM":
+                    destination_path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "artists" / f"{artist_id}.jpg"
                     dic["art"] = destination_path
-                elif tag.desc == 'PLAYER_ALBUM_MEDIUM':
-                    destination_path = f'Assets/Data/Contas/{conta}/Imagens/Albuns/{name.get("album")}.jpg'
-                    dic['alb'] = destination_path
+                elif tag.desc == "PLAYER_ALBUM_MEDIUM":
+                    destination_path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "albums" / f"{name.get('album')}.jpg"
+                    dic["alb"] = destination_path
                 else:
                     continue
 
@@ -451,12 +465,12 @@ class ExtractMetadata:
             return None
         
         alvo = {
-            'artist' : 'PLAYER_ARTIST_BIG',
-            'album' : 'PLAYER_ALBUM_BIG'
+            "artist" : "PLAYER_ARTIST_BIG",
+            "album" : "PLAYER_ALBUM_BIG"
         }.get(type)
         
         for tag in tags.values():
             if isinstance(tag, APIC) and tag.desc == alvo:
-                base64_str = base64.b64encode(tag.data).decode('utf-8')
+                base64_str = base64.b64encode(tag.data).decode("utf-8")
                 return base64_str
         return None

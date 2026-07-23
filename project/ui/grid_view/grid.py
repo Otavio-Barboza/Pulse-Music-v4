@@ -48,7 +48,7 @@ class GridImages(ft.GridView):
             image_key = img.removesuffix('.jpg')
             
             if self.mode == GridMode.ARTIST:
-                # name = cache_metadata.artists.to_dict().get(image_key).get('artist_name')
+                # name = cache_metadata.artists.to_dict().get(image_key).get('defined_artist')
                 name = image_key
             else:
                 name = image_key
@@ -88,7 +88,7 @@ class GridImages(ft.GridView):
 
     def connect(self):
         GridState.register_callback(
-            event = 'att_grid',
+            event = 'actualization_grid',
             func = self._build_class
         )
 

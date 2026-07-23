@@ -12,7 +12,7 @@ class Task:
     @classmethod
     def return_song_json(cls, song: SongMetadata) -> dict:
         return {
-            "song_path" : song.song_path,
+            "song_path" : str(song.song_path),
             "playlist_id" : song.playlist_id,
             "artist_id" : song.artist_id,
 
@@ -21,7 +21,7 @@ class Task:
             "mp3_file_filtered" : song.mp3_file_filtered,
             "id3_data" : song.id3_data,
             
-            "artista_final" : song.artista_final,
+            "defined_artist" : song.defined_artist,
 
             "artist" : song.artist_metadata,
 
@@ -31,7 +31,7 @@ class Task:
                 "score" : song.score,
                 "status" : song.status,
                 "gap" : song.gap,
-                "consenso" : song.consenso,
+                "consensus" : song.consensus,
                 "sim_1" : song.sim_1,
                 "sim_2" : song.sim_2
             }

@@ -8,8 +8,10 @@ from core.meta.repository.metadata_repository import MetadataRepository
 from core.services.account_manager import AccountManager
 from core.meta.cache.cache_artists import CacheArtists
 from core.meta.repository.extract_metadata import ExtractMetadata
+from core.utils.path import AppPaths
 
 # imports gerais
+from pathlib import Path
 import aiohttp, os
 
 
@@ -118,8 +120,8 @@ class Phase3:
     async def phase_3(cls, incomplete_list: list[SongMetadata], path: str):
         from core.meta.pipeline.pipeline import Pipeline
 
-        CAMINHO_ARTISTAS = f"Assets/Data/Contas/{AccountManager.accounts_cache['current_account']}/Imagens/Artistas"
-        CAMINHO_ALBUNS = f"Assets/Data/Contas/{AccountManager.accounts_cache['current_account']}/Imagens/Albuns"
+        ARTISTS_PATH: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "artists"
+        ALBUMS_PATH: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "albums"
         
         async with aiohttp.ClientSession() as session:
             fonts = FontManager(session)
@@ -193,54 +195,29 @@ class Phase3:
                     
                     artist_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["artist"]["picture_medium"],
-                        caminho_destino = os.path.normpath(
-                            os.path.join(
-                                CAMINHO_ARTISTAS, 
-                                song.artist_id + ".jpg"
-                            )
-                        )
+                        caminho_destino = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
                         id_deezer = best_item["artist"]["id_deezer"] or None,
                         img_m = artist_image_medium_destination,
-                        img_b = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        img_b = song.song_path / song.mp3_file,
                         img_b_link = best_item["artist"]["picture_big"] or None
                     )
                     
                     album_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["album"]["cover_medium"],
-                        caminho_destino = os.path.normpath(
-                            os.path.join(
-                                CAMINHO_ALBUNS, 
-                                best_item["album"]["title"] + ".jpg"
-                            )
-                        )
+                        caminho_destino = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
                     )
                     song.set_album_metadata(
                         name = best_item["album"]["title"] or None,
                         id_deezer = best_item["album"]["id_deezer"] or None,
                         img_m = album_image_medium_destination or None,
-                        img_b = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        img_b = song.song_path / song.mp3_file,
                         img_b_link = best_item["album"]["cover_big"] or None
                     )
 
                     ExtractMetadata.register_metadata_player(
-                        file_path = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        file_path = song.song_path / song.mp3_file,
                         title = song.id3_data["filtered_data"].get("title") if song.id3_data is not None else song.mp3_file_filtered.get("title"),
                         artist = song.defined_artist,
                         album = song.album_metadata.get("name"),
@@ -285,54 +262,29 @@ class Phase3:
 
                     artist_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["artist"]["picture_medium"],
-                        caminho_destino = os.path.normpath(
-                            os.path.join(
-                                CAMINHO_ARTISTAS, 
-                                song.artist_id + ".jpg"
-                            )
-                        )
+                        caminho_destino = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
                         id_deezer = best_item["artist"]["id_deezer"] or None,
                         img_m = artist_image_medium_destination,
-                        img_b = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        img_b = song.song_path / song.mp3_file,
                         img_b_link = best_item["artist"]["picture_big"] or None
                     )
                     
                     album_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["album"]["cover_medium"],
-                        caminho_destino = os.path.normpath(
-                            os.path.join(
-                                CAMINHO_ALBUNS, 
-                                best_item["album"]["title"] + ".jpg"
-                            )
-                        )
+                        caminho_destino = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
                     )
                     song.set_imagem_album(
                         name = best_item["album"]["title"] or None,
                         id_deezer = best_item["album"]["id_deezer"] or None,
                         img_m = album_image_medium_destination or None,
-                        img_b = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        img_b = song.song_path / song.mp3_file,
                         img_b_link = best_item["album"]["cover_big"] or None
                     )
 
                     ExtractMetadata.register_metadata_player(
-                        file_path = os.path.normpath(
-                            os.path.join(
-                                song.song_path, 
-                                song.mp3_file
-                            )
-                        ),
+                        file_path = song.song_path / song.mp3_file,
                         title = song.id3_data["filtered_data"].get("title") if song.id3_data is not None else song.mp3_file_filtered.get("title"),
                         artist = song.defined_artist,
                         album = song.album_metadata.get("name"),

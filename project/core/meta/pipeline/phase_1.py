@@ -10,33 +10,33 @@ class Phase1:
     @classmethod
     async def phase_1(
         cls, 
-        nome_arquivo_original : str, 
-        titulo_filtrado : dict | None, 
-        artista_meta_nativo : str | None
+        mp3_file : str, 
+        filtered_title : dict | None, 
+        original_artist_id3 : str | None
     ) -> SongMetadata:
         score = Task.similarity(
-            b = artista_meta_nativo.strip().lower(),
-            a = titulo_filtrado["artist"].strip().lower()
+            b = original_artist_id3.strip().lower(),
+            a = filtered_title["artist"].strip().lower()
         )
 
         if score >= 0.85:
             return await ExtractMetadata.async_organize_data(
-                nome_arquivo_original = nome_arquivo_original,
-                titulo_filtrado = titulo_filtrado,
-                artista_meta_nativo = artista_meta_nativo,
+                mp3_file = mp3_file,
+                filtered_title = filtered_title,
+                original_artist_id3 = original_artist_id3,
                 status = SongStatus.BOTH
             )
         elif 0.65 <= score < 0.85:
             return await ExtractMetadata.async_organize_data(
-                nome_arquivo_original = nome_arquivo_original,
-                titulo_filtrado = titulo_filtrado,
-                artista_meta_nativo = artista_meta_nativo,
+                mp3_file = mp3_file,
+                filtered_title = filtered_title,
+                original_artist_id3 = original_artist_id3,
                 status = SongStatus.MEDIUM
             )
         else:
             return await ExtractMetadata.async_organize_data(
-                nome_arquivo_original = nome_arquivo_original,
-                titulo_filtrado = titulo_filtrado,
-                artista_meta_nativo = artista_meta_nativo,
+                mp3_file = mp3_file,
+                filtered_title = filtered_title,
+                original_artist_id3 = original_artist_id3,
                 status = SongStatus.INCONSISTENT    
             )

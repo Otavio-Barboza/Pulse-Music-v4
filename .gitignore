@@ -11,7 +11,6 @@ Assets/Data/Contas/*
 !Assets/Data/Contas/EXEMPLO/
 !Assets/Data/Contas/EXEMPLO/**
 
-project\data\contas\*
-!project\data\contas\EXEMPLO\**
+project\storage\*
 # Instaladores
 release\windows\**

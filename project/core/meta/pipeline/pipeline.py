@@ -2,7 +2,7 @@
 from core.meta.enum.status import SongStatus, ScannerStatus
 from core.meta.models.song import SongMetadata
 from core.meta.pipeline.phase_1 import Phase1
-from core.meta.pipeline.phase_2 import Phase2
+from project.core.meta.pipeline.phase2.phase_2 import Phase2
 from core.meta.pipeline.phase_3 import Phase3
 from core.meta.repository.filtering import Filtering
 from core.meta.repository.extract_metadata import ExtractMetadata
@@ -152,10 +152,7 @@ class Pipeline:
             song = os.path.basename(song)
 
             destination_file = Path(path) / song
-            # destination_file = os.path.normpath(
-            #     os.path.join(path, song)
-            # )
-
+        
             # FASE 0 - verificação da existencia de data já alterados pelo próprio player, assim carregamento dos data já imbutidos.
             if ExtractMetadata.music_already_processed(destination_file):
                 mus = ExtractMetadata.extract_metadata_playter(destination_file)

@@ -9,6 +9,7 @@ from core.services.account_manager import AccountManager
 from core.meta.cache.cache_artists import CacheArtists
 from core.meta.repository.extract_metadata import ExtractMetadata
 from core.utils.path import AppPaths
+from core.meta.pipeline.helpers.analysis import analyze_consensus, choose_artist, _calculate_phase3_score_with_artist, _calculate_score_title_only_phase_3, _sort_artists_by_title_only
 
 # imports gerais
 from pathlib import Path
@@ -17,39 +18,7 @@ import aiohttp, os
 
 class Phase3:
 
-    @classmethod
-    def _calculate_phase3_score_with_artist(cls, filter: dict, item: dict) -> float:
-        return (
-            0.6 * Task.similarity(
-                filter["filtered_title"],
-                item["title"]
-            ) + 0.4 * Task.similarity(
-                Filtering.clean_feat(filter["artist"]),
-                item["artist"]["name"]
-            )
-        )
-    
-    @classmethod
-    def _calculate_score_title_only_phase_3(cls, filter: dict, item: dict):
-        title_similarity = Task.similarity(
-            filter["filtered_title"].lower().strip(),
-            item["title"].lower().strip()
-        )
-        polarity = item.get("rank", 0) / 1_000_000
-
-        return (0.75 * title_similarity + 0.15 * polarity)
-    
-    @classmethod
-    async def _sort_artists_by_title_only(cls, gap, sim_1, top5) -> str | SongStatus:
-        artist = top5[0]["artist"]["name"]
-
-        if sim_1 >= 0.85 and gap >= 0.05:
-            return artist, SongStatus.HIGH
-        elif sim_1 >= 0.80 and gap >= 0.02:
-            return artist, SongStatus.MEDIUM
-        else:
-            return artist, SongStatus.LOW
-        
+    """  RESOLUÇÃO  """
     @classmethod
     async def _resolve_phase_3(cls, fonts: FontManager, filter: dict):
         result = await fonts.deezer.get_song(
@@ -68,7 +37,7 @@ class Phase3:
             best_score = 0
 
             for item in itens:
-                score = cls._calculate_phase3_score_with_artist(filter, item)
+                score = _calculate_phase3_score_with_artist(filter, item)
 
                 if score > best_score:
                     best_score = score
@@ -78,12 +47,12 @@ class Phase3:
 
         # 🔹 CASO 2: APENAS TÍTULO
         else:
-            from core.meta.pipeline.phase_2 import Phase2
+            from project.core.meta.pipeline.phase2.phase_2 import Phase2
             
             processed_items = []
 
             for item in itens:
-                score = cls._calculate_score_title_only_phase_3(filter, item)
+                score = _calculate_score_title_only_phase_3(filter, item)
                 item["calculated_score"] = score
                 processed_items.append(item)
 
@@ -98,9 +67,9 @@ class Phase3:
             sim_1 = top5[0]["calculated_score"]
             sim_2 = top5[1]["calculated_score"] if len(top5) > 1 else 0
             gap = sim_1 - sim_2
-            consensus, artista_dominante = Phase2.analyze_consensus(top5)
+            consensus, artista_dominante = analyze_consensus(top5)
 
-            defined_artist, status = await cls._sort_artists_by_title_only(
+            defined_artist, status = await _sort_artists_by_title_only(
                 gap = gap,
                 sim_1 = sim_1,
                 consensus = consensus,
@@ -115,7 +84,9 @@ class Phase3:
                 "consensus": consensus,
                 "defined_artist": defined_artist
             }
-    
+
+
+    """  CHAMADA DA FASE 3  """
     @classmethod
     async def phase_3(cls, incomplete_list: list[SongMetadata], path: str):
         from core.meta.pipeline.pipeline import Pipeline
@@ -230,9 +201,8 @@ class Phase3:
                     )
                 # 🔹 CASO COM ARTISTA
                 else:
-                    from core.meta.pipeline.phase_2 import Phase2
 
-                    defined_artist = await Phase2.choose_artist(
+                    defined_artist = await choose_artist(
                         score = best_score,
                         best_item = best_item,
                         song = song
@@ -275,7 +245,7 @@ class Phase3:
                         url = best_item["album"]["cover_medium"],
                         caminho_destino = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
                     )
-                    song.set_imagem_album(
+                    song.set_album_metadata(
                         name = best_item["album"]["title"] or None,
                         id_deezer = best_item["album"]["id_deezer"] or None,
                         img_m = album_image_medium_destination or None,

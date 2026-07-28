@@ -1,5 +1,5 @@
 # OPERAÇÃO DO PIPELINE: ARQUIVOS, RESPONSABILIDADES E DEPEDÊNCIAS.
-
+#
 
 # Arquivos:
 
@@ -22,22 +22,22 @@
 
 # Dependências:
 
-    (project\core\meta\repository\filtering) : {
+    ( project\core\meta\repository\filtering ) : {
         Filtering
     }
 
-    (project\core\meta\repository\extract_metadata) : {
+    ( project\core\meta\repository\extract_metadata ) : {
         ExtractMetadata
     }
 
-    (project\core\meta\repository\metadata_repository.py) : {
+    ( project\core\meta\repository\metadata_repository.py ) : {
         MetadataRepository
     }
 
-    (project\core\meta\cache\cache_artists.py) : {
+    ( project\core\meta\cache\cache_artists.py ) : {
         CacheArtists
     } 
 
-    (project\core\meta\models\song.py) : {
+    ( project\core\meta\models\song.py ) : {
         SongMetadata
     }

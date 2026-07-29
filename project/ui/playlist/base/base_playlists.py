@@ -162,7 +162,6 @@ class ColumnCards(ft.Column):
             self.button_return_play.visible = True
 
         self.page.update()
-        print("buttons carregados")
 
     def load_playlists(self):
         """

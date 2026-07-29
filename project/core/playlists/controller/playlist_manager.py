@@ -114,7 +114,7 @@ class PlaylistManager:
         "Args" :
             playlist_id (dict): ID da playlist 
         """
-        print(playlist_id)
+
         data_config: dict = Utils.sync_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist_id / "config_play.json"
         )

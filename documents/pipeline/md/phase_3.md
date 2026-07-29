@@ -1,20 +1,19 @@
 # ESTRUTURA DA FASE 3
-#
 
 
-# Objetivos:
+## Objetivos:
 
 Resolver o restante das músicas com base no seu nome integral filtrado.
 
 
-# Arquivos:
+## Arquivos:
 
     ( project\core\meta\pipeline ) : {
         phase_3.py
     } 
 
 
-# Dependências Diretas:
+## Dependências Diretas:
 
     Repositório (repository):
     
@@ -104,7 +103,7 @@ Resolver o restante das músicas com base no seu nome integral filtrado.
         } 
 
 
-# Fluxo de Execução:
+## Fluxo de Execução:
 
     Filtra os dados com base no nome integral do arquivo .mp3.
 

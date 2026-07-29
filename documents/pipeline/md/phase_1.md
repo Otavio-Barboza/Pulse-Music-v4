@@ -1,20 +1,19 @@
 # ESTRUTURA DA FASE 1
-#
 
 
-# Objetivos:
+## Objetivos:
 
 Classificar as músicas com base em seus metadados.
 
 
-# Arquivos:
+## Arquivos:
 
     ( project\core\meta\pipeline ) : {
         phase_1.py
     } 
 
 
-# Dependências Diretas:
+## Dependências Diretas:
 
     Repositório (repository):
 
@@ -28,18 +27,20 @@ Classificar as músicas com base em seus metadados.
 
 
     Modelo (Model):
+
         ( project\core\meta\models\song.py ) : {
             SongMetadata [class]
         } 
 
 
     Enum:
+
         ( project\core\meta\enum\status.py ) : {
             SongStatus [class : enum]
         } 
 
 
-# Fluxo de Execução:
+## Fluxo de Execução:
 
     Calcula o score do artista id3 (metadado nativo) com o artista da filtragem (titulo id3).
 

@@ -1,7 +1,7 @@
 # OPERAÇÃO DO PIPELINE: ARQUIVOS, RESPONSABILIDADES E DEPEDÊNCIAS.
-#
 
-# Arquivos:
+
+## Arquivos:
 
     pipeline.md:
         - Fluxo geral do pipeline;
@@ -20,7 +20,7 @@
         - Resolução baseada no filename (nome integral do arquivo .mp3).
 
 
-# Dependências:
+## Dependências:
 
     Repositório (repository):
 

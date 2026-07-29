@@ -1,13 +1,12 @@
 # ESTRUTURA DA FASE 2
-#
 
 
-# Objetivo
+## Objetivo
 
 Resolver os metadados classificados pela Fase 1, encaminhando cada grupo para o resolver adequado.
 
 
-# Arquivos:
+## Arquivos:
 
     ( project\core\meta\pipeline\phase2 ) : {
         
@@ -22,7 +21,7 @@ Resolver os metadados classificados pela Fase 1, encaminhando cada grupo para o 
     }
 
 
-# Dependências Diretas:
+## Dependências Diretas:
 
     Repositório (repository):
 
@@ -85,7 +84,7 @@ Resolver os metadados classificados pela Fase 1, encaminhando cada grupo para o 
         }
 
 
-# Fluxo de Execução:
+## Fluxo de Execução:
 
     Criação do dicionário "groups", responsável por separar os objetos SongMetada conforme a classificação recebida da Fase 1.
     

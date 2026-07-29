@@ -1,20 +1,19 @@
 # ESTRUTURA DO PIPELINE
-#
 
 
-# Objetivos:
+## Objetivos:
 
 Orquestrar o processo de captação e gerenciamento de metadados divididos pelas fases 0, 1, 2 e 3.
 
 
-# Arquivos:
+## Arquivos:
     
     ( project\core\meta\pipeline ) : {   
         pipeline.py
     }
 
 
-# Dependências Diretas:
+## Dependências Diretas:
 
     Pipeline:
     
@@ -96,7 +95,7 @@ Orquestrar o processo de captação e gerenciamento de metadados divididos pelas
         }
 
 
-# Fluxo de Execução:
+## Fluxo de Execução:
 
     Realização de um loop for em uma lista de strings (os.listdir da pasta de músicas) ou na lista de objetos (SongMetadata).
 

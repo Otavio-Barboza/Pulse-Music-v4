@@ -22,22 +22,29 @@
 
 # Dependências:
 
-    ( project\core\meta\repository\filtering ) : {
-        Filtering
-    }
+    Repositório (repository):
 
-    ( project\core\meta\repository\extract_metadata ) : {
-        ExtractMetadata
-    }
+        ( project\core\meta\repository\filtering ) : {
+            Filtering
+        }
 
-    ( project\core\meta\repository\metadata_repository.py ) : {
-        MetadataRepository
-    }
+        ( project\core\meta\repository\extract_metadata ) : {
+            ExtractMetadata
+        }
 
-    ( project\core\meta\cache\cache_artists.py ) : {
-        CacheArtists
-    } 
+        ( project\core\meta\repository\metadata_repository.py ) : {
+            MetadataRepository
+        }
 
-    ( project\core\meta\models\song.py ) : {
-        SongMetadata
-    }
+
+    Cache:
+
+        ( project\core\meta\cache\cache_artists.py ) : {
+            CacheArtists
+        } 
+
+
+    Modelo (model):
+        ( project\core\meta\models\song.py ) : {
+            SongMetadata
+        }

@@ -26,11 +26,11 @@ Resolver os metadados classificados pela Fase 1, encaminhando cada grupo para o 
 
     Repositório (repository):
 
-        ( project\core\meta\repository\filtering ) : {
+        ( project\core\meta\repository\filtering.py ) : {
             Filtering [class]
         }
 
-        ( project\core\meta\repository\extract_metadata ) : {
+        ( project\core\meta\repository\extract_metadata.py ) : {
             ExtractMetadata [class]
         }
 

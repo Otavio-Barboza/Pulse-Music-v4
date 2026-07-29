@@ -2,7 +2,7 @@
 from core.meta.enum.status import SongStatus, ScannerStatus
 from core.meta.models.song import SongMetadata
 from core.meta.pipeline.phase_1 import Phase1
-from project.core.meta.pipeline.phase2.phase_2 import Phase2
+from core.meta.pipeline.phase2.phase_2 import Phase2
 from core.meta.pipeline.phase_3 import Phase3
 from core.meta.repository.filtering import Filtering
 from core.meta.repository.extract_metadata import ExtractMetadata
@@ -49,13 +49,6 @@ class Pipeline:
         await MetadataRepository.data_manager_songs_json(groups = groups)
         await CacheArtists.save()
         await MetadataRepository.load_cache()
-
-        from core.meta.cache.global_cache import cache_metadata
-
-        print(cache_metadata.artists.to_dict())
-        print(cache_metadata.albums.to_dict())
-        print(CacheArtists.cache_id)
-        
     
     @classmethod
     def to_execute_callbacks(cls, path: Path):

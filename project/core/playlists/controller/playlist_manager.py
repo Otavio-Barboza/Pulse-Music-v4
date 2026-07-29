@@ -83,7 +83,7 @@ class PlaylistManager:
         """
 
         self.list_playlist = PlaylistRepository.list_playlists()
-        print(self.list_playlist)
+
         for playlist in self.list_playlist:
             self.grid.add_playlist(
                 playlist_id = playlist.id,

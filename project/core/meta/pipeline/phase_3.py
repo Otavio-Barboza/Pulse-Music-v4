@@ -1,6 +1,6 @@
 # imports de back-end
 from core.meta.repository.filtering import Filtering
-from core.meta.repository.tasks import Task
+# from core.meta.repository.tasks import Task
 from core.meta.enum.status import SongStatus
 from core.meta.provider.deezer import FontManager
 from core.meta.models.song import SongMetadata
@@ -9,7 +9,7 @@ from core.services.account_manager import AccountManager
 from core.meta.cache.cache_artists import CacheArtists
 from core.meta.repository.extract_metadata import ExtractMetadata
 from core.utils.path import AppPaths
-from core.meta.pipeline.helpers.analysis import analyze_consensus, choose_artist, _calculate_phase3_score_with_artist, _calculate_score_title_only_phase_3, _sort_artists_by_title_only
+from core.meta.pipeline.helpers.analysis import analyze_consensus, choose_artist, calculate_phase3_score_with_artist, calculate_score_title_only_phase_3, sort_artists_by_title_only
 
 # imports gerais
 from pathlib import Path
@@ -37,7 +37,7 @@ class Phase3:
             best_score = 0
 
             for item in itens:
-                score = _calculate_phase3_score_with_artist(filter, item)
+                score = calculate_phase3_score_with_artist(filter, item)
 
                 if score > best_score:
                     best_score = score
@@ -52,7 +52,7 @@ class Phase3:
             processed_items = []
 
             for item in itens:
-                score = _calculate_score_title_only_phase_3(filter, item)
+                score = calculate_score_title_only_phase_3(filter, item)
                 item["calculated_score"] = score
                 processed_items.append(item)
 
@@ -69,7 +69,7 @@ class Phase3:
             gap = sim_1 - sim_2
             consensus, artista_dominante = analyze_consensus(top5)
 
-            defined_artist, status = await _sort_artists_by_title_only(
+            defined_artist, status = await sort_artists_by_title_only(
                 gap = gap,
                 sim_1 = sim_1,
                 consensus = consensus,

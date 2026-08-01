@@ -18,6 +18,7 @@ from core.meta.cache.global_cache import cache_metadata
 from core.meta.cache.cache_artists import CacheArtists
 from core.lyrics.cache.cache_lyrics import CacheLyrics
 from core.services.controllers.state_app import StateApp
+from core.network.connection import Connection
 
 # imports de bibliotecas  gerais
 from pathlib import Path
@@ -143,11 +144,15 @@ async def main(page: ft.Page):
     def when_alter_account():
         tabs.reload()
 
+    # validar conexão
+    async def start_connection():
+        await Connection.start_loop_connection(page)
+
     
     """  Validar login  """
 
+    # carrega uma overlay dinâmivo para o usuário fazer o login via google, quando terminar acontece uma animação fade out e carrega o restante de todo o app.
     if not await validate_login():
-        # carrega uma overlay dinâmivo para o usuário fazer o login via google, quando terminar acontece uma animação fade out e carrega o restante de todo o app.
         await abrir_overlay()
 
 
@@ -225,9 +230,8 @@ async def main(page: ft.Page):
 
     """  Notificação e execução de eventos globais  """
     
-    # page.run_task(
-        # ScannerModel.async_start_scanner
-    # )
+    # page.run_task(ScannerModel.async_start_scanner)
+    page.run_task(start_connection)
 
 
 if __name__ == "__main__":

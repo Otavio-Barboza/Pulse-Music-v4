@@ -46,14 +46,22 @@ class AppBar(ft.AppBar):
         
         self.config_btn = ft.IconButton(
             icon = ft.Icons.SETTINGS,
-            on_click =  lambda e: self.open_configurations()
+            on_click =  lambda e: self.open_configurations(),
+            data = "config"
         )
         
         self.icon_status = ft.Container(
+            data = "status",
             content = ft.Icon(
                 name = ft.Icons.SYNC_ROUNDED
             ),
             on_click = self.open_content_icon_status
+        )
+
+        self.connection_button = ft.IconButton(
+            icon = ft.Icons.WIFI_OFF_OUTLINED,
+            data = "connection",
+            on_click = self.open_information_connection
         )
         
         self.drawer_text = self._create_text(
@@ -138,3 +146,61 @@ class AppBar(ft.AppBar):
             name = ft.Icons.SYNC_ROUNDED
         )
         self.icon_status.update()
+
+    def open_information_connection(self, event):
+        self.page.open(
+            ft.NavigationDrawer(
+                bgcolor = ft.Colors.TRANSPARENT,
+                position = ft.NavigationDrawerPosition.END,
+
+                controls = [
+                    ft.Container(
+                        height = 400,
+                        alignment = ft.alignment.center,
+                        bgcolor = color.preto2,
+                        margin = ft.margin.all(20),
+
+                        padding = ft.padding.only(
+                            bottom = 10,
+                            top = 10,
+                            left = 20,
+                            right = 20    
+                        ),
+                        border_radius = ft.border_radius.only(
+                            top_left = 10,
+                            bottom_left = 10,
+                            bottom_right = 10
+                        ),
+
+                        content = ft.Column(
+                            horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                            alignment = ft.MainAxisAlignment.CENTER,
+                            spacing = 15,
+
+                            controls=[
+                                ft.Icon(
+                                    ft.Icons.WIFI_OFF_ROUNDED,
+                                    size = 50,
+                                    color = ft.Colors.ORANGE,
+                                ),
+
+                                ft.Text(
+                                    "Sem conexão com a internet",
+                                    size = 20,
+                                    weight = ft.FontWeight.BOLD,
+                                    text_align = ft.TextAlign.CENTER,
+                                ),
+
+                                ft.Text(
+                                    "Alguns recursos online, como letras, downloads e sincronização, "
+                                    "podem não estar disponíveis no momento.\n\n"
+                                    "Verifique sua conexão para restaurar o acesso.",
+                                    size = 14,
+                                    text_align = ft.TextAlign.CENTER,
+                                )
+                            ]
+                        )
+                    )
+                ]
+            )
+        )

@@ -1,10 +1,17 @@
+# import de back-end
+from core.network.connection import Connection
+
 # import de interface
 from ui.others.colors import color
 from ui.utils.utils_ui import UtilsUi
 
 # imports gerais
-import asyncio, pywhatkit
+import asyncio
 import flet as ft
+
+
+# variáveis globais
+_pywhatkit = None
 
 
 class MusicSearch(ft.Container):
@@ -22,6 +29,8 @@ class MusicSearch(ft.Container):
             'Ex: Linkin Park - Numb'
         ]
         self._stop = False
+        self._pywhatkit = None
+
         self.text_field = None
         self.container_text = None
         self.content = None
@@ -168,28 +177,43 @@ class MusicSearch(ft.Container):
     def start_animation(self):
         self.page.run_task(self.example_animation)
 
-    def search(self, musica):
+    def search(self, musica) -> bool | None:
+        global _pywhatkit
+
+        if not Connection.is_connected():
+            UtilsUi.snack_bar(
+                text = "Esta funcionalidade exige conexão com a internet. Conecte-se novamente para usá-la!",
+                page = self.page
+            )
+            return None
+
         try:
-            pywhatkit.playonyt(musica)
+            if _pywhatkit is None:
+                import pywhatkit
+                _pywhatkit = pywhatkit
+
+            _pywhatkit.playonyt(musica)
             return True
         except Exception as erro:
-            print(erro)
             return False
 
     def _submit_music_name(self, e):
         name = self.text_field.value
         result = self.search(name)
         
-        if result:
+        if result == True:
             UtilsUi.snack_bar(
                 text = f"Música {name} encontrada com sucesso!",
                 page = self.page
             )
+            
             self.text_field.value = ''
             self.text_field.update()
             self.text_field.update()
-        else:
+        elif result == False:
             UtilsUi.snack_bar(
                 text = f"Música {name} não encontrada, tente novamente!",
                 page = self.page
             )
+        else:
+            return

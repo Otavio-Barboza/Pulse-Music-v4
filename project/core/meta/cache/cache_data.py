@@ -25,7 +25,7 @@ class CacheMetadata:
         self.albums = Album()
 
         for key, data in self.tracks.items():
-            print(data)
+            # print(data)
 
             self.artists.add_artist(
                 # Elementos da música
@@ -43,26 +43,3 @@ class CacheMetadata:
                 song_path = Path(data.get("song_path")) / data.get("mp3_file"),
                 song_key = key
             )
-
-    # def update_artists(
-    #     self,
-    #     track_id: str,
-    #     new_artist_id: str,
-    #     new_name: str,
-    #     new_image: str
-    # ):
-    #     track = self.tracks[track_id]
-
-    #     previous_artist = track["artist_metadata"]["id_deezer"]
-
-    #     track["artist_metadata"]["id_deezer"] = new_artist_id
-    #     track["defined_artist"] = new_name
-    #     track["artist_metadata"]["big"] = new_image
-
-    #     self.artists.remove(track_id, previous_artist)
-    #     self.artists.add_artist(
-    #         track_id,
-    #         new_artist_id,
-    #         new_name,
-    #         new_image
-    #     )

@@ -1,6 +1,5 @@
 # imports de back-end
 from core.meta.repository.filtering import Filtering
-# from core.meta.repository.tasks import Task
 from core.meta.enum.status import SongStatus
 from core.meta.provider.deezer import FontManager
 from core.meta.models.song import SongMetadata
@@ -47,7 +46,7 @@ class Phase3:
 
         # 🔹 CASO 2: APENAS TÍTULO
         else:
-            from project.core.meta.pipeline.phase2.phase_2 import Phase2
+            from core.meta.pipeline.phase2.phase_2 import Phase2
             
             processed_items = []
 
@@ -72,7 +71,6 @@ class Phase3:
             defined_artist, status = await sort_artists_by_title_only(
                 gap = gap,
                 sim_1 = sim_1,
-                consensus = consensus,
                 top5 = top5
             )
 
@@ -169,9 +167,9 @@ class Phase3:
                         destination_path = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
-                        id_deezer = best_item["artist"]["id_deezer"] or None,
+                        id_deezer = best_item["artist"]["id"] or None,
                         img_m = artist_image_medium_destination,
-                        img_b = song.song_path / song.mp3_file,
+                        img_b = Path(song.song_path) / song.mp3_file,
                         img_b_link = best_item["artist"]["picture_big"] or None
                     )
                     
@@ -181,14 +179,14 @@ class Phase3:
                     )
                     song.set_album_metadata(
                         name = best_item["album"]["title"] or None,
-                        id_deezer = best_item["album"]["id_deezer"] or None,
+                        id_deezer = best_item["album"]["id"] or None,
                         img_m = album_image_medium_destination or None,
-                        img_b = song.song_path / song.mp3_file,
+                        img_b = Path(song.song_path) / song.mp3_file,
                         img_b_link = best_item["album"]["cover_big"] or None
                     )
 
                     ExtractMetadata.register_metadata_player(
-                        file_path = song.song_path / song.mp3_file,
+                        file_path = Path(song.song_path) / song.mp3_file,
                         title = song.id3_data["filtered_data"].get("title") if song.id3_data is not None else song.mp3_file_filtered.get("title"),
                         artist = song.defined_artist,
                         album = song.album_metadata.get("name"),
@@ -229,9 +227,9 @@ class Phase3:
                         destination_path = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
-                        id_deezer = best_item["artist"]["id_deezer"] or None,
+                        id_deezer = best_item["artist"]["id"] or None,
                         img_m = artist_image_medium_destination,
-                        img_b = song.song_path / song.mp3_file,
+                        img_b = Path(song.song_path) / song.mp3_file,
                         img_b_link = best_item["artist"]["picture_big"] or None
                     )
                     
@@ -241,14 +239,14 @@ class Phase3:
                     )
                     song.set_album_metadata(
                         name = best_item["album"]["title"] or None,
-                        id_deezer = best_item["album"]["id_deezer"] or None,
+                        id_deezer = best_item["album"]["id"] or None,
                         img_m = album_image_medium_destination or None,
-                        img_b = song.song_path / song.mp3_file,
+                        img_b = Path(song.song_path) / song.mp3_file,
                         img_b_link = best_item["album"]["cover_big"] or None
                     )
 
                     ExtractMetadata.register_metadata_player(
-                        file_path = song.song_path / song.mp3_file,
+                        file_path = Path(song.song_path) / song.mp3_file,
                         title = song.id3_data["filtered_data"].get("title") if song.id3_data is not None else song.mp3_file_filtered.get("title"),
                         artist = song.defined_artist,
                         album = song.album_metadata.get("name"),

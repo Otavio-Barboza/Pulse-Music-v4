@@ -45,46 +45,54 @@ class GridImages(ft.GridView):
         self.controls.clear()
         
         for img in os.listdir(path):
-            image_key = img.removesuffix('.jpg')
-            
-            if self.mode == GridMode.ARTIST:
-                # name = cache_metadata.artists.to_dict().get(image_key).get('defined_artist')
-                name = image_key
-            else:
-                name = image_key
-                
-            self.controls.extend([
-                ft.Container(
-                    data = image_key,
-                    on_click = self.click,
 
-                    content = ft.Column(
-                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                        alignment = ft.MainAxisAlignment.START,
+            if img.endswith((".jpg", ".jpeg", ".png")):
 
-                        controls = [
-                            Imagem(
-                                src = f'{path}/{img}', 
-                                mode = self.mode
-                            ),
-                            ft.Text(
-                                value = name,
-                                text_align = ft.TextAlign.CENTER,
-                                size = 16,
-                                weight = ft.FontWeight.W_300,
-                                max_lines = 2,
-                                overflow = ft.TextOverflow.FADE
+                image_key = img.removesuffix(".jpg")
+
+    
+                if self.mode == GridMode.ARTIST:
+                    name = cache_metadata.artists.to_dict()[image_key]["defined_artist"]
+                elif self.mode == GridMode.ALBUM:
+                    name = image_key
+                else:
+                    name = None
+
+
+                if name is not None:  
+                    self.controls.extend([
+                        ft.Container(
+                            data = image_key,
+                            on_click = self.click,
+
+                            content = ft.Column(
+                                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                                alignment = ft.MainAxisAlignment.START,
+
+                                controls = [
+                                    Imagem(
+                                        src = f'{path}/{img}', 
+                                        mode = self.mode
+                                    ),
+                                    ft.Text(
+                                        value = name,
+                                        text_align = ft.TextAlign.CENTER,
+                                        size = 16,
+                                        weight = ft.FontWeight.W_300,
+                                        max_lines = 2,
+                                        overflow = ft.TextOverflow.FADE
+                                    )
+                                ]
                             )
-                        ]
-                    )
-                )
-            ])
-
+                        )
+                    ])
+            else:
+                print(f"CARREGAMENTO DA GRID {self.mode.value}; imagem inválida: {img}")
 
     # INICIALIZAÇÃO DA CLASSE
     def load(self):
         self._build_class(self.mode)
-        # self.update()
+        self.update()
 
     def connect(self):
         GridState.register_callback(
@@ -109,20 +117,16 @@ class GridImages(ft.GridView):
                         song_list.append(
                             Song(
                                 mode = modo_playlist,
-                                name = os.path.basename(
-                                    music.get('caminho_completo')
-                                ).replace(
-                                    '.mp3', ''
-                                ),
-                                path = music.get('caminho_completo'),
+                                name = str(music.get("artist_path")),
+                                path = str(music.get('artist_path')),
                                 key = music.get('key')
                             )
                         )
                 
-            path = dados.get(e.control.data).get('songs')[0].get('caminho_completo')
+            path = dados.get(e.control.data).get('songs')[0].get('artist_path')
             img = ExtractMetadata.load_image_big_base64(
-                caminho_arquivo = path, 
-                tipo = 'artist'
+                file_path = path, 
+                type = 'artist'
             )
             name = dados.get(e.control.data).get('artist_name')
         else:
@@ -136,14 +140,14 @@ class GridImages(ft.GridView):
                             mode = ReproductionMode.ALBUM,
                             
                             name = os.path.basename(
-                                song_path.get('caminho_da_musica_completa')
-                            ).replace('.mp3', ''),
-                            
-                            path = os.path.normpath(
-                                song_path.get('caminho_da_musica_completa')
+                                str(
+                                    song_path.get('destination_song')
+                                ).replace('.mp3', '')
                             ),
                             
-                            key = song_path.get('chave_da_musica')
+                            path = str(song_path.get('destination_song')),
+                            
+                            key = song_path.get('key_song')
                         ) 
                     )                
 
@@ -153,8 +157,8 @@ class GridImages(ft.GridView):
                     break
                 
             img = ExtractMetadata.load_image_big_base64(
-                caminho_arquivo = path, 
-                tipo = 'album'
+                file_path = path, 
+                type = 'album'
             )
             name = e.control.data
 
@@ -165,14 +169,15 @@ class GridImages(ft.GridView):
                 music = song_list,
                 mode = self.mode,
                 name = name,
-                playlist_mode = modo_playlist
+                playlist_mode = modo_playlist,
+                page = self.page
             )
         )
         self.page.update()
         
         Reproduction.load_songs_from_mode(
             mode = modo_playlist,
-            lista = song_list
+            list = song_list
         )
 
 

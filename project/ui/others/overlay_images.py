@@ -51,7 +51,7 @@ class OverlayImages(ft.Container):
                         controls = [
                             ft.Image(
                                 src_base64 = image_big,
-                                border_radius = ft.border_radius.all(10) if self.mode == GridMode.ARTISTA else ft.border_radius.all(10),
+                                border_radius = ft.border_radius.all(10) if self.mode == GridMode.ARTIST else ft.border_radius.all(10),
                                 fit = ft.ImageFit.COVER
                             ),
                             ft.Text(
@@ -73,7 +73,7 @@ class OverlayImages(ft.Container):
                         left = 10,
                         right = 10
                     ),
-                    border_radius = ft.border_radius.all(20) if self.mode == GridMode.ARTISTA else ft.border_radius.all(10),
+                    border_radius = ft.border_radius.all(20) if self.mode == GridMode.ARTIST else ft.border_radius.all(10),
                     alignment = ft.alignment.top_center,
 
                     content = ft.Column(
@@ -82,7 +82,7 @@ class OverlayImages(ft.Container):
 
                         controls = [
                             ft.Text(
-                                value = f'Músicas do{"(a)" if self.mode == GridMode.ARTISTA else ""} {"artista" if self.mode == GridMode.ARTISTA else "álbum"}',
+                                value = f'Músicas do{"(a)" if self.mode == GridMode.ARTIST else ""} {"artista" if self.mode == GridMode.ARTIST else "álbum"}',
                                 size = 18,
                                 weight = ft.FontWeight.W_500,
                                 text_align = ft.TextAlign.CENTER
@@ -91,8 +91,8 @@ class OverlayImages(ft.Container):
                             ft.Container(
                                 content = ListViewMusic(
                                     page = self.page,
-                                    music = self.music,
-                                    modo_favorita = None
+                                    musics = self.music,
+                                    favorite_mode = None
                                 )
                             )
                         ]

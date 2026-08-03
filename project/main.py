@@ -209,7 +209,8 @@ async def main(page: ft.Page):
     """  Carregamento de Caches  """
 
     await load_cache()
-
+    tabs.artists.load()
+    tabs.albums.load()
 
     """  Notificação e execução de eventos globais  """
     

@@ -98,8 +98,8 @@ class TabsNavigation(ft.Tabs):
         self._build_class()
         self.playlist.load()
         self.search_music.load()
-        self.artists.load()
-        self.albums.load()
+        # self.artists.load()
+        # self.albums.load()
 
     def reload(self):
         self.playlist.reload_playlists()

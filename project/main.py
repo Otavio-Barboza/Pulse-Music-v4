@@ -69,7 +69,7 @@ async def main(page: ft.Page):
 
     # carregamento de cache
     async def load_cache():
-        data: dict = await Utils.sync_load_json(
+        data: dict = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
         cache_metadata.load(data)
@@ -204,6 +204,11 @@ async def main(page: ft.Page):
    
     # AudioLoop.start()
     # ReproductionManager.start()
+
+
+    """  Carregamento de Caches  """
+
+    await load_cache()
 
 
     """  Notificação e execução de eventos globais  """

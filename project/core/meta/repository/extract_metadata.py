@@ -101,22 +101,6 @@ class ExtractMetadata:
             defined_artist = None,
             score = None
         ) 
-        # SongMetadata(
-        #     id_playlist = id_playlist,
-        #     artist_id = artist_id,
-        #     arquivo_mp3_original = nome_arquivo_original,
-
-        #     titulo_musica_original = titulo_filtrado["titulo_original"] if titulo_filtrado is not None else None,
-        #     titulo_musica_filtrado = titulo_filtrado["titulo_filtrado"] if titulo_filtrado is not None else None,
-        #     artista_titulo_filtrado = titulo_filtrado["artist"] if titulo_filtrado is not None else None,
-        #     original_artist_id3 = original_artist_id3,
-            
-        #     status = status,
-        #     arquivo_mp3_filtrado = None,
-        #     artista_arquivo_filtrado = None,
-        #     artista_final = None,
-        #     score = None
-        # )
 
     @classmethod
     async def async_extract(cls, path: Path):

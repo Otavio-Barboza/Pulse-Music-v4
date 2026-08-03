@@ -17,7 +17,7 @@ from pathlib import Path
 import aiohttp
 
 
-async def resolve_no_artist_filtered_or_no_id3(cls, id3_only_list : list[SongMetadata], filtered_only_list : list[SongMetadata], path : str):
+async def resolve_no_artist_filtered_or_no_id3(id3_only_list : list[SongMetadata], filtered_only_list : list[SongMetadata], path : str):
     from core.meta.pipeline.pipeline import Pipeline
 
     ARTISTS_PATH: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "artists"
@@ -53,7 +53,7 @@ async def resolve_no_artist_filtered_or_no_id3(cls, id3_only_list : list[SongMet
             song.set_potential_artists(
                 [
                     best_item['artist']['name'] if best_item is not None else 'Desconhecido', 
-                    song.id3_data["original_data"].get("original_artist_id3")
+                    song.id3_data["original_data"].get("artist_id3")
                 ]
             )  
             song.set_song_path(path)
@@ -140,7 +140,7 @@ async def resolve_no_artist_filtered_or_no_id3(cls, id3_only_list : list[SongMet
             song.set_potential_artists(
                 [
                     best_item['artist']['name'] if best_item is not None else 'Desconhecido', 
-                    song.id3_data["filtered_data"].get("song_artist_id3_filtered")
+                    song.id3_data["filtered_data"].get("artist_id3")
                 ]
             )  
             song.set_song_path(path)

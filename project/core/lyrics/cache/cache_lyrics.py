@@ -1,6 +1,7 @@
 # import de back-end
 from core.utils.utils import Utils
-
+from core.utils.path import AppPaths
+from core.services.account_manager import AccountManager
 
 class CacheLyrics:
     
@@ -10,7 +11,9 @@ class CacheLyrics:
 
     @classmethod
     def load_cache(cls):
-        cls.lyric = Utils.sync_load_json()
+        cls.lyric = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
 
     @classmethod
     def return_lyric(cls) -> str:        

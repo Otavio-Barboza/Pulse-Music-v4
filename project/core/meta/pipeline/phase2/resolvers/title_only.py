@@ -34,7 +34,7 @@ async def resolve_title_only(title_only_list: list[SongMetadata], path: Path):
 
             if not result or not result.get('track'):
                 song.set_status(SongStatus.LOW)
-                song.set_defined_artist(None)
+                song.set_defined_artist("Artista Desconhecido")
                 song.set_artist_id(None)
                 song.set_score(0)
                 continue
@@ -55,10 +55,10 @@ async def resolve_title_only(title_only_list: list[SongMetadata], path: Path):
                 reverse = True
             )
 
-
+            # itens da deezer
             possibilities = [
                 {
-                    'id_deezer' : item_ord['artist']['id_deezer'], 
+                    'id_deezer' : item_ord['artist']['id'], 
                     'name' : item_ord['artist']['name'], 
                     'score' : item_ord['score_calculado']
                 } for item_ord in ordered_itens

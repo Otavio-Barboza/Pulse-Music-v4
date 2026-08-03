@@ -115,7 +115,7 @@ class Phase3:
                             best_item["artist"]["name"]
                         ) if best_item else Filtering.clean_feat(
                             filter["artist"]
-                        ) or None
+                        ) or "Artista Desconhecido"
                     )  
                     song.set_artist_id(
                         CacheArtists.resolve_id(
@@ -134,7 +134,7 @@ class Phase3:
                             best_item["artist"]["name"]
                         ) if best_item else Filtering.clean_feat(
                             filter["artist"]
-                        ) or None
+                        ) or "Artista Desconhecido"
                     )  
                     song.set_artist_id(
                         CacheArtists.resolve_id(
@@ -150,7 +150,7 @@ class Phase3:
                             best_item["artist"]["name"]
                         ) if best_item else Filtering.clean_feat(
                             filter["artist"]
-                        ) or None
+                        ) or "Artista Desconhecido"
                     )  
                     song.set_artist_id(
                         CacheArtists.resolve_id(
@@ -166,7 +166,7 @@ class Phase3:
                     
                     artist_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["artist"]["picture_medium"],
-                        caminho_destino = ARTISTS_PATH / f"{song.artist_id}.jpg"
+                        destination_path = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
                         id_deezer = best_item["artist"]["id_deezer"] or None,
@@ -177,7 +177,7 @@ class Phase3:
                     
                     album_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["album"]["cover_medium"],
-                        caminho_destino = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
+                        destination_path = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
                     )
                     song.set_album_metadata(
                         name = best_item["album"]["title"] or None,
@@ -202,18 +202,12 @@ class Phase3:
                 # 🔹 CASO COM ARTISTA
                 else:
 
-                    defined_artist = await choose_artist(
-                        score = best_score,
-                        best_item = best_item,
-                        song = song
-                    )
-
                     song.set_defined_artist(
                         Filtering.clean_feat(
                             best_item["artist"]["name"]
                         ) if best_item else Filtering.clean_feat(
                             filter["artist"]
-                        ) or None
+                        ) or "Artista Desconhecido"
                     )  
                     song.set_artist_id(
                         CacheArtists.resolve_id(
@@ -232,7 +226,7 @@ class Phase3:
 
                     artist_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["artist"]["picture_medium"],
-                        caminho_destino = ARTISTS_PATH / f"{song.artist_id}.jpg"
+                        destination_path = ARTISTS_PATH / f"{song.artist_id}.jpg"
                     )
                     song.set_artist_metadata(
                         id_deezer = best_item["artist"]["id_deezer"] or None,
@@ -243,7 +237,7 @@ class Phase3:
                     
                     album_image_medium_destination = MetadataRepository.download_image(
                         url = best_item["album"]["cover_medium"],
-                        caminho_destino = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
+                        destination_path = ALBUMS_PATH / f"{best_item['album']['title']}.jpg"
                     )
                     song.set_album_metadata(
                         name = best_item["album"]["title"] or None,

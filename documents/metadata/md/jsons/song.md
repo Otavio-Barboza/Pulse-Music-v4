@@ -80,7 +80,7 @@
             Se nenhum identificado, considera-se como desconhecido
         ),
 
-        "artist" : dict[str, str or Path or None] = {
+        "artist_metadata " : dict[str, str or Path or None] = {
             "id_deezer" : str( 
                 ID retornado pela API da Deezer
             ),
@@ -109,7 +109,7 @@
             } 
         },
 
-        "album" : dict[str, str | Path] = {
+        "album_metadata" : dict[str, str | Path] = {
             "id_deezer" : str( 
                 ID retornado pela API da Deezer 
             ),

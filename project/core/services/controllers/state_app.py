@@ -22,7 +22,7 @@ class StateApp:
         """
 
         if event not in cls._callbacks:
-            print('evento não adicionado')
+            print('evento não adicionado: ', event)
             return
         
         for func in cls._callbacks[event]:

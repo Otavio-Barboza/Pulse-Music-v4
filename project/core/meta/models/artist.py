@@ -1,7 +1,7 @@
 class Artist:
 
     def __init__(self):
-        self.artist: dict[str, list[dict[str]]] = {}
+        self.artist: dict[str, str | list[dict[str, str]]] = {}
 
     def add_artist(
         self,
@@ -32,12 +32,12 @@ class Artist:
         if artist_id not in self.artist:
             return
 
-        lista = self.artist[artist_id]["songs"]
+        list_artists: list[dict[str, str]] = self.artist[artist_id]["songs"]
 
-        if track_id in lista:
-            lista.remove(track_id)
+        if track_id in list_artists:
+            list_artists.remove(track_id)
 
-        if not lista:
+        if not list_artists:
             del self.artist[artist_id]
 
     def to_dict(self):

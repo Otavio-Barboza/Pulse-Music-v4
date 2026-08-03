@@ -34,9 +34,9 @@ async def choose_artist(
     if score >= 0.85:
         return best_item['artist']['name']
     elif 0.85 > score > 0.65:
-        return song.id3_data["filtered_data"].get("song_artist_id3_filtered") or song.id3_data["original_data"].get("original_artist_id3")
+        return song.id3_data["filtered_data"].get("artist") or song.id3_data["original_data"].get("artist_id3")
     else:
-        return song.id3_data["original_data"].get("original_artist_id3") or song.id3_data["filtered_data"].get("song_artist_id3_filtered")
+        return song.id3_data["original_data"].get("artist_id3") or song.id3_data["filtered_data"].get("artist")
 
     
 """  ANÁLISES DA FASE 3  """

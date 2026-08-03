@@ -56,8 +56,8 @@ async def resolve_medium_and_inconsistent(
             song.set_score(best_score)
             song.set_potential_artists([
                 best_item['artist']['name'] if best_item is not None else 'Desconhecido', 
-                song.id3_data["filtered_data"].get("song_artist_id3_filtered"),
-                song.id3_data["original_data"].get("original_artist_id3")
+                song.id3_data["filtered_data"].get("artist"),
+                song.id3_data["original_data"].get("artist_id3")
             ])  
             song.set_song_path(path)
 
@@ -137,7 +137,7 @@ async def resolve_medium_and_inconsistent(
             )
             song.set_score(best_score)
             song.set_potential_artists([
-                best_item['artist']['name'] if best_item is not None else 'Desconhecido', song.id3_data["filtered_data"].get("song_artist_id3_filtered"), song.id3_data["original_data"].get("original_artist_id3")
+                best_item['artist']['name'] if best_item is not None else 'Desconhecido', song.id3_data["filtered_data"].get("artist"), song.id3_data["original_data"].get("artist_id3")
             ])
             song.set_song_path(path)
 

@@ -28,7 +28,7 @@ async def resolve_both(both_list : list[SongMetadata], path: str):
 
             song.set_defined_artist(
                 Filtering.clean_feat(
-                    song.id3_data["filtered_data"].get("song_artist_id3_filtered")
+                    song.id3_data["filtered_data"].get("title")
                 )
             )
             song.set_artist_id(

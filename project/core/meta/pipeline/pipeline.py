@@ -160,45 +160,43 @@ class Pipeline:
                     artista_id
                 )
                 
-                list_already_processed.append(
-                    SongMetadata(
-                        playlist_id = id,
-                        artist_id = artista_id,
-                        song_title_id3_filtered = mus.get('title'),
-                        defined_artist = mus.get('artist'),
-                        mp3_file = song,
-                        song_path = str(path),
-                        mp3_file_title = None,
-                        mp3_file_artist = None,
-                        original_artist_id3 = None,
-                        song_artist_id3_filtered = None,
-                        consensus = None,
-                        gap = None,
-                        score = None,
-                        sim_1 = None,
-                        sim_2 = None,
-                        list_of_potential_artists = [],
-                        status = SongStatus.HIGH,
-                        original_song_title = song,
-                        album_metadata = {
-                            'id_deezer' : mus.get('id_album'), 
-                            'name' : mus.get('album'), 
-                            'medium' : str(dic.get('alb')), 
-                            'big' : {
-                                'link' : mus.get('imagem_album_player_big'),
-                                'path' : str(destination_file)
-                            }
-                        },
-                        artist_metadata = {
-                            'id_deezer' : mus.get('artist_id'), 
-                            'medium' : str(dic.get('art')), 
-                            'big' : {
-                                'link' : mus.get('imagem_album_player_medium'),
-                                'path' : str(destination_file)
-                            }
+                list_already_processed.append(SongMetadata(
+                    playlist_id = id,
+                    artist_id = artista_id,
+                    song_title_id3_filtered = mus.get('title'),
+                    defined_artist = mus.get('artist'),
+                    mp3_file = song,
+                    song_path = str(path),
+                    mp3_file_title = None,
+                    mp3_file_artist = None,
+                    original_artist_id3 = None,
+                    song_artist_id3_filtered = None,
+                    consensus = None,
+                    gap = None,
+                    score = None,
+                    sim_1 = None,
+                    sim_2 = None,
+                    list_of_potential_artists = [],
+                    status = SongStatus.HIGH,
+                    original_song_title = song,
+                    album_metadata = {
+                        'id_deezer' : mus.get('id_album'), 
+                        'name' : mus.get('album'), 
+                        'medium' : str(dic.get('alb')), 
+                        'big' : {
+                            'link' : mus.get('imagem_album_player_big'),
+                            'path' : str(destination_file)
                         }
-                    )
-                )
+                    },
+                    artist_metadata = {
+                        'id_deezer' : mus.get('artist_id'), 
+                        'medium' : str(dic.get('art')), 
+                        'big' : {
+                            'link' : mus.get('imagem_album_player_medium'),
+                            'path' : str(destination_file)
+                        }
+                    }
+                ))
             else:
                 # FASE 1 - extração de metadados e classificação + filtragem tradicional
                 data = await ExtractMetadata.async_extract(destination_file)

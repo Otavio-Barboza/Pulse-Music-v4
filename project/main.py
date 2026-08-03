@@ -26,30 +26,6 @@ import asyncio
 import flet as ft
 
 
-"""
-    _summary_: ordem de execução do main()
-        ├── Configurar Page
-        │
-        ├── Declarar funções auxiliares
-        │
-        ├── Validar login
-        │
-        ├── Carregar cache
-        │
-        ├── Criar componentes principais
-        │
-        ├── Componentes.load()
-        │
-        ├── page.add(...)
-        │
-        ├── Registrar callbacks globais e componentes.connect()
-        │
-        ├── Inicializações finais
-        │
-        └── Disparar eventos globais
-"""
-
-
 def open_profile(current_id: str) -> dict:
     """
         Função para abrir o perfil.json e retornar os dados do perfil da atualc conta logada.
@@ -93,7 +69,9 @@ async def main(page: ft.Page):
 
     # carregamento de cache
     async def load_cache():
-        data: dict = await Utils.sync_load_json(f"Assets/Data/Contas/{AccountManager.contas_cache['conta_atual']}/Music/musicas.json")
+        data: dict = await Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        )
         cache_metadata.load(data)
         
         await CacheArtists.load()

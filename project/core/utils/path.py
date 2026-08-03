@@ -16,7 +16,7 @@ class AppPaths:
 
 
     # local app data do windows
-    LOCAL_APP_DATA: Path = Path(os.getenv("LOCALAPPDATA")) / "Pulse Music"
+    LOCAL_APP_DATA: Path = Path(os.getenv("LOCALAPPDATA")) / "Barboza Software" / "Pulse Music"
     
     # pastas
     ACCOUNT: Path = LOCAL_APP_DATA / "account"

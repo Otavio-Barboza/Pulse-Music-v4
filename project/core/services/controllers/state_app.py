@@ -20,7 +20,7 @@ class StateApp:
         """
             Notifica todos os ouvintes; suporta funções sync e async.
         """
-        print(f"notificando: {event}")
+
         if event not in cls._callbacks:
             print('evento não adicionado')
             return

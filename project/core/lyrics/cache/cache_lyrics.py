@@ -7,6 +7,7 @@ class CacheLyrics:
     lyric = {}
     cache_lyrics = None
 
+
     @classmethod
     def load_cache(cls):
         cls.lyric = Utils.sync_load_json()

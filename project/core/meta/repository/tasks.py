@@ -23,9 +23,9 @@ class Task:
             
             "defined_artist" : song.defined_artist,
 
-            "artist" : song.artist_metadata,
+            "artist_metadata" : song.artist_metadata,
 
-            "album" : song.album_metadata,
+            "album_metadata" : song.album_metadata,
 
             "metrics" : {
                 "score" : song.score,

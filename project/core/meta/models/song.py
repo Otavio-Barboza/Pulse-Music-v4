@@ -4,7 +4,7 @@ from core.meta.enum.status import SongStatus
 # import geral
 from pathlib import Path
 
-teste = None
+
 class SongMetadata:
     
     def __init__(
@@ -42,7 +42,7 @@ class SongMetadata:
         list_of_potential_artists: list[dict] = [],
 
         # Dados artist
-        artist_metadata: dict[str, str | Path] = {
+        artist_metadata: dict[str, str | Path | None] = {
             "id_deezer" : None,
             "medium" : None, # str do path da img medium salva
             "big" : {
@@ -69,11 +69,11 @@ class SongMetadata:
         # name do .mp3
         self.mp3_file = mp3_file
 
-        # titulo extraído (ID3)
-        self.mp3_file_filtered: dict[str, str] = {
+        self.mp3_file_filtered: dict[str, str | None] = {
             "title" : mp3_file_title,
             "artist" : mp3_file_artist
         }
+        # titulo extraído (ID3)
         self.id3_data: dict[str, dict[str, str | None]] = {
             "original_data" : {
                 "title" : original_song_title,
@@ -125,7 +125,7 @@ class SongMetadata:
     def set_potential_artists(self, artistas: list):
         self.list_of_potential_artists.extend(artistas)
     
-    def set_mp3_file_filtered(self, title: str, artist: str):
+    def set_mp3_file_filtered(self, title: str | None, artist: str | None):
         self.mp3_file_filtered = {
             "title" : title,
             "artist" : artist

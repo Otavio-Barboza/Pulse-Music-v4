@@ -12,6 +12,7 @@ class CacheArtists:
     cache_id = {}
     index_name = {}
 
+
     @classmethod
     async def load(cls):
         data = await MetadataRepository.return_artists_json()

@@ -34,23 +34,26 @@ class GridImages(ft.GridView):
     def _build_class(self, mode: GridMode):    
         if mode != self.mode:
             return
-        
+
+        # Definindo a pasta de listagem das imagens conforme o modo definido na grid.
         if mode == GridMode.ARTIST:
             path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "artists"
         elif mode == GridMode.ALBUM:
             path: Path = AppPaths.ACCOUNT / str(AccountManager.accounts_cache.get("current_account")) / "images" / "albums"
         else:
-            ...
+            print(f"ERRO: {self.mode} ; {mode}")
             
         self.controls.clear()
         
         for img in os.listdir(path):
 
+            # validação do arquivo de imagem, se realmente é uma imagem, se não for, automaticamente é descartado.
             if img.endswith((".jpg", ".jpeg", ".png")):
 
+                # remoção do sufixo de imagem
                 image_key = img.removesuffix(".jpg")
 
-    
+                # organização do nome de acordo com o modo da grid.
                 if self.mode == GridMode.ARTIST:
                     name = cache_metadata.artists.to_dict()[image_key]["defined_artist"]
                 elif self.mode == GridMode.ALBUM:
@@ -58,7 +61,7 @@ class GridImages(ft.GridView):
                 else:
                     name = None
 
-
+                # Caso ocorra algum erro inesperado em alguma imagem, o name recebe None se caído no else da organização. Se for None é automaticamente descatado também.
                 if name is not None:  
                     self.controls.extend([
                         ft.Container(
@@ -89,6 +92,7 @@ class GridImages(ft.GridView):
             else:
                 print(f"CARREGAMENTO DA GRID {self.mode.value}; imagem inválida: {img}")
 
+
     # INICIALIZAÇÃO DA CLASSE
     def load(self):
         self._build_class(self.mode)
@@ -117,7 +121,9 @@ class GridImages(ft.GridView):
                         song_list.append(
                             Song(
                                 mode = modo_playlist,
-                                name = str(music.get("artist_path")),
+                                name = os.path.basename(str(
+                                    music.get("artist_path")
+                                )),
                                 path = str(music.get('artist_path')),
                                 key = music.get('key')
                             )

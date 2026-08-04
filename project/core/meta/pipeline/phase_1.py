@@ -10,33 +10,37 @@ class Phase1:
     @classmethod
     async def phase_1(
         cls, 
-        mp3_file : str, 
-        filtered_title : dict | None, 
-        original_artist_id3 : str | None
+        song_path,
+        mp3_file: str, 
+        song_metadata_id3: dict | None, 
+        original_artist_id3: str | None
     ) -> SongMetadata:
         score = Task.similarity(
             b = original_artist_id3.strip().lower(),
-            a = filtered_title["artist"].strip().lower()
+            a = song_metadata_id3["artist"].strip().lower()
         )
 
         if score >= 0.85:
             return await ExtractMetadata.async_organize_data(
                 mp3_file = mp3_file,
-                filtered_title = filtered_title,
+                song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
-                status = SongStatus.BOTH
+                status = SongStatus.BOTH,
+                song_path = song_path
             )
         elif 0.65 <= score < 0.85:
             return await ExtractMetadata.async_organize_data(
                 mp3_file = mp3_file,
-                filtered_title = filtered_title,
+                song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
-                status = SongStatus.MEDIUM
+                status = SongStatus.MEDIUM,
+                song_path = song_path
             )
         else:
             return await ExtractMetadata.async_organize_data(
                 mp3_file = mp3_file,
-                filtered_title = filtered_title,
+                song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
-                status = SongStatus.INCONSISTENT    
+                status = SongStatus.INCONSISTENT,    
+                song_path = song_path
             )

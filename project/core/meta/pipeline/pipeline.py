@@ -211,8 +211,9 @@ class Pipeline:
                     if filtered_artist is not None and filtered_title['artist'] is not None:
                         musics_list.append(await Phase1.phase_1(
                             mp3_file = song,
-                            filtered_title = filtered_title,
-                            original_artist_id3 = filtered_artist
+                            song_metadata_id3 = filtered_title,
+                            original_artist_id3 = filtered_artist,
+                            song_path = path
                         ))
                     else:
                         musics_list.append(await ExtractMetadata.async_organize_data(

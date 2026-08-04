@@ -28,7 +28,7 @@ async def resolve_both(both_list : list[SongMetadata], path: str):
 
             song.set_defined_artist(
                 Filtering.clean_feat(
-                    song.id3_data["filtered_data"].get("title")
+                    song.id3_data["filtered_data"].get("artist")
                 )
             )
             song.set_artist_id(
@@ -36,16 +36,27 @@ async def resolve_both(both_list : list[SongMetadata], path: str):
                     song.defined_artist
                 ) if song.defined_artist is not None else None
             )
-            song.set_potential_artists([song.id3_data["original_data"].get("original_artist_id3")])
+            song.set_potential_artists([song.id3_data["original_data"].get("artist_id3")])
             song.set_status(SongStatus.HIGH)
             song.set_score(1.5)
             song.set_song_path(path)
             
 
+            print(song.defined_artist)
+            print(song.id3_data)
+
+
+
+
             deezer_data = await fonts.deezer.get_song(
                 title = song.id3_data["filtered_data"].get("title"), artist = song.defined_artist
             )
-            
+            print(deezer_data)
+
+            # validando caso a lista (track) retornado pela API da Deezer seja nula ou vazia.
+            if len(deezer_data.get("track")) == 0:
+                deezer_data = None
+
             image_medium_artist_destination = MetadataRepository.download_image(
                 url = deezer_data['track'][0]['artist']['picture_medium'],
                 destination_path = ARTISTS_PATH / f"{song.artist_id}.jpg"
@@ -53,7 +64,7 @@ async def resolve_both(both_list : list[SongMetadata], path: str):
 
 
             song.set_artist_metadata(
-                id_deezer = deezer_data['track'][0]['artist']['id_deezer'] or None,
+                id_deezer = deezer_data['track'][0]['artist']['id'] or None,
                 img_m = image_medium_artist_destination,
                 img_b = Path(song.song_path) / song.mp3_file,
                 img_b_link = deezer_data['track'][0]['artist']['picture_big'] or None

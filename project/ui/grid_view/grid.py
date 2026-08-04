@@ -56,6 +56,7 @@ class GridImages(ft.GridView):
                 # organização do nome de acordo com o modo da grid.
                 if self.mode == GridMode.ARTIST:
                     name = cache_metadata.artists.to_dict()[image_key]["defined_artist"]
+                    # name = image_key
                 elif self.mode == GridMode.ALBUM:
                     name = image_key
                 else:
@@ -96,7 +97,7 @@ class GridImages(ft.GridView):
     # INICIALIZAÇÃO DA CLASSE
     def load(self):
         self._build_class(self.mode)
-        self.update()
+        # self.update()
 
     def connect(self):
         GridState.register_callback(

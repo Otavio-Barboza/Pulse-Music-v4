@@ -1,21 +1,21 @@
-# Ordem de execução do main()
+# Ordem de execução do main():
 
-    ├── Configurar Page
+    ├── Configurações da Page
     │
-    ├── Declarar funções auxiliares
+    ├── Declaração de funções auxiliares (caches, login, configurações, conexão...)
     │
-    ├── Validar login
+    ├── Validação do login
     │
-    ├── Carregar cache
+    ├── Carregamento de cache
     │
-    ├── Criar componentes principais
+    ├── Criação dos componentes principais
     │
-    ├── Componentes.load()
+    ├── Carregamento de conteúdo dos componentes
     │
-    ├── page.add(...)
+    ├── Adicionando os componentes a page
     │
-    ├── Registrar callbacks globais e componentes.connect()
+    ├── Registrando callbacks dos componentes
     │
-    ├── Inicializações finais
+    ├── Inicializações gerais
     │
-    └── Disparar eventos globais
+    └── Notificação e execução de eventos globais

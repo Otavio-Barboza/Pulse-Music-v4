@@ -102,7 +102,7 @@ async def main(page: ft.Page):
         return True
         
     # overlay do primeiro login
-    async def abrir_overlay():
+    async def open_overlay():
         _overlay = OverlayLogin(page)
 
         page.overlay.append(_overlay)
@@ -131,12 +131,12 @@ async def main(page: ft.Page):
 
     # carrega uma overlay dinâmivo para o usuário fazer o login via google, quando terminar acontece uma animação fade out e carrega o restante de todo o app.
     if not await validate_login():
-        await abrir_overlay()
+        await open_overlay()
 
 
     """  Carregar cache  """
 
-    # await load_cache()
+    await load_cache()
     
 
     """  Criar componentes principais  """
@@ -204,13 +204,6 @@ async def main(page: ft.Page):
    
     # AudioLoop.start()
     # ReproductionManager.start()
-
-
-    """  Carregamento de Caches  """
-
-    await load_cache()
-    tabs.artists.load()
-    tabs.albums.load()
 
 
     """  Notificação e execução de eventos globais  """

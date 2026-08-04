@@ -29,7 +29,7 @@ class ColumnCards(ft.Column):
 
     # FUNÇÕES PARA CRIAÇÃO DOS COMPONENTES
     def _create_components(self):
-        self.column_content = ContentPlaylist(open_function = self.open_function)
+        self.column_content = ContentPlaylist(page = self.page, open_function = self.open_function)
 
         self.state = self.column_content.state
  

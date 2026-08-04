@@ -1,6 +1,9 @@
 # imports de back-end
 from core.meta.repository.filtering import Filtering
 from core.meta.repository.metadata_repository import MetadataRepository
+from core.utils.utils import Utils
+from core.utils.path import AppPaths
+from core.services.account_manager import AccountManager
 
 # imports gerais
 from uuid import uuid4
@@ -15,7 +18,10 @@ class CacheArtists:
 
     @classmethod
     async def load(cls):
-        data = await MetadataRepository.return_artists_json()
+
+        data = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json"
+        )
 
         cls.cache_id = data
         cls.index_name = {}
@@ -30,7 +36,10 @@ class CacheArtists:
     
     @classmethod
     async def save(cls):
-        await MetadataRepository.save_artists_json(cls.cache_id)
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json",
+            data = cls.cache_id
+        )
 
     @classmethod
     def resolve_id(cls, name_org: str | None) -> str:

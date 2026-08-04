@@ -9,6 +9,7 @@ from core.meta.controller.scanner_controller import ScannerController
 from core.services.controllers.grid_state import GridMode
 from core.meta.repository.filtering import Filtering
 from core.utils.path import AppPaths
+from core.utils.utils import Utils
 
 # imports gerais
 from pathlib import Path
@@ -173,88 +174,124 @@ class Scanner:
     async def identify_artists_albums_existings(cls, keys_to_remove: set[str]):
         """
             1 - Acessar o JSON songs.
-            2 - Pegar as Imagens das músicas em referência e atribuir em list() ou set().
+            2 - Pegar as Imagens das músicas em referência e atribuir em set().
             3 - Analisar o JSON songs inteiro e analisar se em alguma música existe aquele artist ou álbum.
                 3.1 - SE EXISTIR: Não excluir a imagem do artist/álbum;
                 3.2 - SENÃO: Excluir a imagem.
             4 - Excluir a música em si do músicas.json            
         """
-        
-        song_json = await MetadataRepository.return_artists_json()
-            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/songs.json'
-       
+
+        """  parte 0  """
+
+        # imagens de referência para exlusão
+        # dicionário cuja chave é o nome do artista (defined_artist), e seus valores são um conjunto de chaves da música (key / chave da música de songs.json)
         artists = defaultdict(set)        
+
+        # dicionário cuja chave é o nome do álbum (album_metadata - name), e seus valores são um conjunto de chaves da música (key / chave da música de songs.json)
         albums = defaultdict(set)
+
+        # set final de músicas para remover
         keys_for_remove = set()
-        
+
+
+        """  parte 1  """
+
+        # songs.json
+        song_json: dict = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        )
+        lyrics_json = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
+
+        """  parte 2  """
+
+        key: str 
+        value: dict
         # pegar as imagens
         for key, value in song_json.items():
-            # artist
-            artist = Filtering.clean_feat(
-                value.get("artista_final")
-            )
+
+            # artist + chaves da música
+            artist = value.get("defined_artist")
             artists[artist].add(key)           
            
-            # albums
-            album = value.get('album').get('name')            
+            # albums + chaves da música
+            album = value.get("album_metadata").get("name")            
             albums[album].add(key)
-                            
-        for key, value in song_json.items():
-            artist = Filtering.clean_feat(
-                value.get("defined_artist")
-            )
-            album = value.get('album').get('name')
 
-            caminho_art = value.get('artist').get('img_medium')
-            caminho_alb = value.get('album').get('img_medium')
+                            
+        """  parte 3  """
+
+        key: str 
+        value: dict
+        for key, value in song_json.items():
+
+            # Nome do artista e álbum
+            artist: str = value.get("defined_artist")
+            album: str = value.get("album_metadata").get("name")
+
+            # Caminho da imagem medium para exclusão do artista e álbum
+            destination_path_artist: str = value.get("artist_metadata").get("medium")
+            destination_path_album: str = value.get("album_metadata").get("medium")
             
-            # album
+            # verificando se a chave atual do for está no set de chaves para remover repassado como argumento
             if key in keys_to_remove:
+
+                # remaining_alb/art são variáveis auxiliares para pegar a diferença de do set se chaves, ou seja, as chaves restantes, remanescentes da diferença
                 remaining_alb = albums[album] - keys_to_remove
                 remaining_art = artists[artist] - keys_to_remove
 
                 cover_name, _ = os.path.splitext(
-                    value.get('arquivo_original')
+                    value.get('mp3_file')
                 )
-                cover_path = os.path.normpath(
-                    f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Imagens/Capa Musica/{cover_name}.jpg'
-                )
-                
+                cover_path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers" / f"{cover_name}.jpg"
+
+                """  parte 3.1 - exclusão de imagens  """
+
+                # Se a quantidade de albuns restantes for igual a 0, considera-se que não existem músicas com aquele álbum mais. Assim excluindo sua imagem.
                 if len(remaining_alb) == 0:
-                    MetadataRepository.delete_image(caminho_alb)
+                    """  parte 3.2  """
+                    MetadataRepository.delete_image(destination_path_album)
                 
+                # Se a quantidade de artistas restantes for igual a 0, considera-se que não existem músicas com aquele artista mais. Assim excluindo sua imagem.
                 if len(remaining_art) == 0:
-                    MetadataRepository.delete_image(caminho_art)
-                    
+                    """  parte 3.2  """
+                    MetadataRepository.delete_image(destination_path_artist)
+
+                # Capas de música por serem únicas de cada música, são todas excluídas sem restrições
                 if os.path.isfile(cover_path):
                     MetadataRepository.delete_image(cover_path)
                     
                 keys_for_remove.add(key)
-            
-        lyrics_json = await MetadataRepository.return_artists_json()
-            # path = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/letras.json'
+
+
+        """  parte 4  """
 
         for key in keys_for_remove:
             del song_json[key]
-            del lyrics_json[key]
-        
-        await MetadataRepository.save_artists_json(
-            # path = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/songs.json',
+            # del lyrics_json[key]
+
+
+        """  Restante da execução  """
+
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json",
             data = song_json
         )            
-        await MetadataRepository.save_artists_json(
-            path = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/letras.json',
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json",
             data = lyrics_json
         )            
 
         GridState.notify(
-            event = 'att_grid', 
+            event = 'actualization_grid', 
             data = GridMode.ARTIST
         )
         GridState.notify(
-            event = 'att_grid',
+            event = 'actualization_grid',
             data = GridMode.ALBUM
         )
+
         
     @classmethod
     async def new_song(cls, path: str, list: list):

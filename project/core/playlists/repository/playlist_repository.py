@@ -206,7 +206,7 @@ class PlaylistRepository:
         """
         
         path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json"
-        data: dict[str, int | dict[str, dict[str, str]]] = Utils.sync_load_json(path)
+        data: dict[str, str | int | dict[str, dict[str, str]]] = Utils.sync_load_json(path)
 
         data["playlists"].pop(id, None)
         data["latest_actualization"] = CreatePlaylist.generate_date()
@@ -224,31 +224,40 @@ class PlaylistRepository:
         from core.meta.scanner.scanner import Scanner
         
         path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / id
-        config_play_json = Utils.sync_load_json(path / "config_play.json")
-
-        # pasta = config_play_json.get('music').get('music_path')
+        # config_play_json: dict = Utils.sync_load_json(path / "config_play.json")
         
-        # scanner
-        # keys_to_remove = cls.recognize_song_keys(id)
+        # obtendo as chaves para remover
+        keys_to_remove: set[str] = cls.recognize_song_keys(id)
 
-        # asyncio.run(
-        #     Scanner.reconhecer_artistas_albuns_inexistentes(
-        #         chaves_remover = keys_to_remove
-        #     )
-        # )
+        # chamada ao scanner para remover os conteúdos
+        asyncio.run(
+            Scanner.identify_artists_albums_existings(
+                keys_to_remove = keys_to_remove
+            )
+        )
 
         CreatePlaylist.remove_path(path)
         cls.remove_playlist_json(id = id)
         
     @classmethod
-    def recognize_song_keys(cls, id: str):
-        json_musicas = Utils.sync_load_json(
-            f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Music/musicas.json'
+    def recognize_song_keys(cls, id: str) -> set[str]:
+        """
+        _summary_: Função para selecionar as músicas conforme o ID da playlist salva.
+
+        Args:
+            id (str): ID da playlist para remover.
+
+        Returns:
+            set[str]: Conjunto (set) com as strings (IDs das músicas da respectiva playlist).
+        """
+
+        songs_json: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
         
         return {
-            chave for chave, valor in json_musicas.items()
-            if valor.get('id_playlist') == id
+            key for key, value in songs_json.items()
+            if value.get('playlist_id') == id
         }
     
     @classmethod

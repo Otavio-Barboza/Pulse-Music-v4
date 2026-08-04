@@ -131,6 +131,7 @@ class CreatePlaylist:
         Args:
             path (Path): caminho da path da playlist
         """
+        
         path: Path = Path(path)
 
         if path.exists() and path.is_dir():

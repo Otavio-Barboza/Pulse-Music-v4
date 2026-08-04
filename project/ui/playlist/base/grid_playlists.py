@@ -7,14 +7,14 @@ import flet as ft
 
 
 class GridPlaylists(ft.GridView):
-    def __init__(self, on_open, on_remove, load_songs):
+    def __init__(self, page, on_open, on_remove, load_songs):
         super().__init__(
             max_extent = 270,
             spacing = 12,
             run_spacing = 12,
             clip_behavior = ft.ClipBehavior.NONE
         )
-        # self.page = page
+        self.page = page
 
         self.on_open = on_open
         self.on_remove = on_remove

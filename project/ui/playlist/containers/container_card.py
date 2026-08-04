@@ -141,24 +141,22 @@ class PlaylistCard(ft.Container):
             print(ase)
             return
             
-    def _create_text(self, texto : str) -> ft.Text:
+    def _create_text(self, text: str) -> ft.Text:
         return ft.Text(
-            value = texto,
+            value = text,
             size = 16,
             overflow = ft.TextOverflow.FADE,
-            color = '#ffffff',
+            color = "#ffffff",
             max_lines = 1
         )
     
     def _hover(self, e: ft.HoverEvent):
-        self.scale = 1.075 if e.data == 'true' else 1.0
-        self.opacity = 0.8 if e.data == 'true' else 1.0
+        self.scale = 1.075 if e.data == "true" else 1.0
+        self.opacity = 0.8 if e.data == "true" else 1.0
         self.update()
 
     def dispose(self):
-        callbacks = StateApp._callbacks.get('actualization_number_songs_of_playlist', [])
+        callbacks: list[callable] = StateApp.get_callback("actualization_number_songs_of_playlist")
         
         if self.change_number_of_songs_in_playlist in callbacks:
-            callbacks.remove(
-                self.change_number_of_songs_in_playlist
-            )
+            callbacks.remove(self.change_number_of_songs_in_playlist)

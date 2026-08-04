@@ -104,27 +104,15 @@ class MetadataRepository:
             return None
     
     @classmethod
-    def delete_image(cls, path: Path):
+    def delete_image(cls, path: str | Path):
+        if isinstance(path, str):
+            path: Path = Path(path)
+
         try:
-            if path and os.path.exists(path):
-                os.remove(path)
-                # print(f'Imagem removida: {path}')
+            if path.exists():
+                path.unlink()
+                print(f'Imagem removida: {path}')
             else:
                 print(f'Imagem não encontrada: {path}')
         except Exception as erro:
             print(f'Erro ao remover a imagem: {erro}')
-
-    
-    # artistas
-    @classmethod
-    async def return_artists_json(cls) -> dict:
-        return await Utils.async_load_json(
-            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json"
-        )
-    
-    @classmethod
-    async def save_artists_json(cls, data: dict):
-        await Utils.async_update_json(
-            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "artists.json",
-            data = data
-        )

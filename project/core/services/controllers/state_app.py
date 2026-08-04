@@ -9,6 +9,11 @@ class StateApp:
     overlay_tips = True
     _callbacks = {}
 
+
+    @classmethod
+    def get_callback(cls, event: str) -> list[callable]:
+        return cls._callbacks.get(event, [])
+    
     @classmethod
     def register_callback(cls, event: str, func : callable):
         if event not in cls._callbacks:

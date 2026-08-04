@@ -16,15 +16,16 @@ import flet as ft
 
 
 class ContentPlaylist(ft.Container):
-    def __init__(self, open_function):
+    def __init__(self, page, open_function):
         super().__init__(
             padding = ft.padding.all(10),
             expand = True
         )
-
+        self.page = page
         self.open_function = open_function
 
         self.grid: ft.GridView = GridPlaylists(
+            page = self.page,
             on_open = self.abrir_config_playlist,
             on_remove = self._remove_playlist,
             load_songs = self.open_playlist

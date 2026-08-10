@@ -97,12 +97,15 @@ class GridImages(ft.GridView):
     # INICIALIZAÇÃO DA CLASSE
     def load(self):
         self._build_class(self.mode)
-        # self.update()
+
+    def reload(self, mode: GridMode):
+        self._build_class(mode)
+        self.update()
 
     def connect(self):
         GridState.register_callback(
             event = 'actualization_grid',
-            func = self._build_class
+            func = self.reload
         )
 
 

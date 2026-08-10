@@ -94,22 +94,6 @@ class RowContainer(ft.Container):
             ]
         )
 
-        self._callback_artists = self.update_artists
-        self._callback_covers = self.update_covers
-
-        PlaylistState.register_callback(
-            event = 'actualization_artist',
-            function = self.update_artists
-        )
-        PlaylistState.register_callback(
-            event = 'actualization_cover',
-            function = self.update_covers
-        )
-
-    def will_unmount(self):
-        PlaylistState._callbacks['actualization_artist'].remove(self._callback_artists)
-        PlaylistState._callbacks['actualization_cover'].remove(self._callback_covers)
-
     def _create_text(self, name: str, size: int):
         return ft.Text(
             value = name,
@@ -178,27 +162,9 @@ class RowContainer(ft.Container):
         ReproductionManager.play()
 
     def return_artist(self) -> str:
+        print(self.data.key)
         return PlaylistState.return_music_artist(self.data.key)
     
     def return_cover(self) -> str:
+        print(self.data.name)
         return PlaylistState.return_cover(self.data.name)
-    
-    def update_artists(self, _):
-        name = self.return_artist()
-        self.artist_name.value = name
-        
-        try:
-            if self.page:
-                self.artist_name.update()
-        except Exception as e:
-            print(f'CALLBACK ARTISTAS ATT ERROR: {e}')
-
-    def update_covers(self, _):
-        cover_destination = self.return_cover()
-        self.cover_image.src = cover_destination
-        
-        try:
-            if self.page:
-                self.cover_image.update()
-        except Exception as e:
-            print(f'CALLBACK CAPAS ATT ERROR: {e}')

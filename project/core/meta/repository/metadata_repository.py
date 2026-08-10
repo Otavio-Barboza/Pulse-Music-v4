@@ -107,6 +107,7 @@ class MetadataRepository:
     def delete_image(cls, path: str | Path):
         if path is None:
             print(f'Arquivo de imagem inválido: {path}')
+            return
 
         if isinstance(path, str):
             path: Path = Path(path)

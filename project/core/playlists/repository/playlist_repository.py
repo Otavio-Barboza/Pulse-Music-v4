@@ -319,21 +319,21 @@ class PlaylistRepository:
     
     @classmethod
     def identify_music_artist(cls, song_id: str) -> str:
-        json_musicas = Utils.sync_load_json(
+        songs_json: dict = Utils.sync_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
 
-        for chave, conteudo in json_musicas.items():
-            if chave == song_id:
-                return conteudo.get('defined_artist', 'Artista Desconhecido')
+        for key, value in songs_json.items():
+            if key == song_id:
+                return value.get("defined_artist", "Artista Desconhecido")
             
     @classmethod
     def return_cover(cls, music_name: str) -> Path:
-        lista_capas = os.listdir(
+        covers_list: list[str] = os.listdir(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
         )
 
-        for capa in lista_capas:
-            if capa == music_name + '.jpg':
-                return AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers" / capa
+        for cover in covers_list:
+            if cover == music_name + '.jpg':
+                return AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers" / cover
         return r'assets\images\placeholders\capa_musicas_desconhecidas.png'

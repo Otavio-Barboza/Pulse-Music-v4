@@ -137,7 +137,6 @@ class PlaylistManager:
         card = self.grid.cards.pop(playlist_id, None)
 
         if card:
-            card.dispose()
             self.grid.controls.remove(card)
             self.grid.update()
 

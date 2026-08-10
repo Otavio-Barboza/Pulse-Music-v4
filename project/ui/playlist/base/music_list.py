@@ -34,6 +34,7 @@ class ListViewMusic(ft.ListView):
         self._callback_qtde = self.reload
         self._callback_favoritas = self.actualization_unfavorited
         self._callback_favorita = self.actualization_favorited
+        self._callback_update_containers = self.update_images_and_names
         self._load()
         
         ReproductionManager.register_callback(
@@ -52,6 +53,10 @@ class ListViewMusic(ft.ListView):
             event = 'actualization_favorited',
             function = self.actualization_favorited
         )
+        PlaylistState.register_callback(
+            event = "update_covers_and_names",
+            function = self.update_images_and_names
+        )
 
         if self.favorite_mode is not None:            
             self._callback_favoritar = self.add_favorite
@@ -67,14 +72,15 @@ class ListViewMusic(ft.ListView):
             )
 
     def will_unmount(self):        
-        ReproductionManager._callbacks['actualization_container'].remove(self._callback)
-        PlaylistState._callbacks['update_displayed_musics'].remove(self._callback_qtde)
-        PlaylistState._callbacks['actualization_not_favorited'].remove(self._callback_favoritas)
-        PlaylistState._callbacks['actualization_favorited'].remove(self._callback_favorita)
+        ReproductionManager._callbacks["actualization_container"].remove(self._callback)
+        PlaylistState._callbacks["update_displayed_musics"].remove(self._callback_qtde)
+        PlaylistState._callbacks["actualization_not_favorited"].remove(self._callback_favoritas)
+        PlaylistState._callbacks["actualization_favorited"].remove(self._callback_favorita)
+        PlaylistState._callbacks["update_covers_and_names"].remove(self._callback_update_containers)
         
         if self.favorite_mode is not None:
-            FavoriteState._callbacks['add_to_favorites'].remove(self._callback_favoritar)
-            FavoriteState._callbacks['unfavorite'].remove(self._callback_desfavoritar)
+            FavoriteState._callbacks["add_to_favorites"].remove(self._callback_favoritar)
+            FavoriteState._callbacks["unfavorite"].remove(self._callback_desfavoritar)
     
     def _load(self):
         if self.musics is None:
@@ -86,6 +92,7 @@ class ListViewMusic(ft.ListView):
             
         favorites_key = FavoriteState.list_favorite()
 
+        # song: Song (models de songs)
         for song in self.musics:
 
             if song.key in favorites_key:
@@ -187,4 +194,18 @@ class ListViewMusic(ft.ListView):
             else:
                 container.bgcolor = color.preto9
 
+            container.update()
+
+    def return_artist(self, key: str) -> str:
+        print(key)
+        return PlaylistState.return_music_artist(key)
+    
+    def return_cover(self, name: str) -> str:
+        print(name)
+        return PlaylistState.return_cover(name)
+
+    def update_images_and_names(self, *_):
+        for container in self.controls:
+            container.cover_image.src = self.return_cover(container.data.name)
+            container.artist_name.value = self.return_artist(container.data.key)
             container.update()

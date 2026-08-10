@@ -70,11 +70,7 @@ class Pipeline:
             _added_to_page = True
 
             PlaylistState.notify(
-                event = 'actualization_artist',
-                data = None
-            )
-            PlaylistState.notify(
-                event = 'actualization_cover',
+                event = 'update_covers_and_names',
                 data = None
             )
 

@@ -34,6 +34,11 @@ class ContentPlaylist(ft.Container):
         
         self.content = self.grid
 
+        PlaylistState.register_callback(
+            event = "actualization_card_open_playlist",
+            function = self.actualization_card_grid
+        )
+
     def load(self):
         """
             Carrega os Cards na tela na inicialização do player
@@ -115,3 +120,13 @@ class ContentPlaylist(ft.Container):
         self.update()
 
         PlaylistState.close_playlist()
+
+    def actualization_card_grid(self, data: str):
+        for card in self.grid.controls:
+            if card.data.get("id") == data.get("id"):
+                card.qtde.value = data.get("qtde")
+
+                if data.get("added_to_page", False) and card.page is not None:
+                    card.update()
+
+                break

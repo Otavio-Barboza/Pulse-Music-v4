@@ -97,18 +97,18 @@ class RowContainer(ft.Container):
         self._callback_artists = self.update_artists
         self._callback_covers = self.update_covers
 
-        StateApp.register_callback(
+        PlaylistState.register_callback(
             event = 'actualization_artist',
-            func = self.update_artists
+            function = self.update_artists
         )
-        StateApp.register_callback(
+        PlaylistState.register_callback(
             event = 'actualization_cover',
-            func = self.update_covers
+            function = self.update_covers
         )
 
     def will_unmount(self):
-        StateApp._callbacks['actualization_artist'].remove(self._callback_artists)
-        StateApp._callbacks['actualization_cover'].remove(self._callback_covers)
+        PlaylistState._callbacks['actualization_artist'].remove(self._callback_artists)
+        PlaylistState._callbacks['actualization_cover'].remove(self._callback_covers)
 
     def _create_text(self, name: str, size: int):
         return ft.Text(

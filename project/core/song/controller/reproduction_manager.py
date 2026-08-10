@@ -81,25 +81,34 @@ class ReproductionManager:
 
     @classmethod
     def update_queue_scanner(cls, *_):
-        cls._queue.clear()
-        cls._queue.extend(
-            Reproduction.return_songs_for_mode()[:]
-        )
+        try:
+            # print(f"_queue: {cls._queue}")
 
-        cls._random_queue.clear()
-        cls._random_queue.extend(cls._queue[:])
-        
-        if cls.state.current_song is None:
-            return
-
-        index: int
-        song: Song
-
-        for index, song in enumerate(cls._queue):
-            if song.key == cls.state.current_song.key:
-                cls._current_index = index
+            cls._queue.clear()
+                
+            if _songs_for_mode := Reproduction.return_songs_for_mode()[:] is None:
+                # print(f"Músicas como None: {_songs_for_mode}")
                 return
-    
+            
+            cls._queue.extend(Reproduction.return_songs_for_mode()[:])
+
+            # print(f"_random_queue: {cls._random_queue}")
+            cls._random_queue.clear()
+            cls._random_queue.extend(cls._queue[:])
+
+            # print(cls.state.current_song)
+            if cls.state.current_song is None:
+                return
+
+            index: int
+            song: Song
+            for index, song in enumerate(cls._queue):
+                # print(song.key, cls.state.current_song.key)
+                if song.key == cls.state.current_song.key:
+                    cls._current_index = index
+                    break
+        except Exception as error:
+            print(f"(update_queue_scanner): {error}")
 
     # MÚSICA
     @classmethod

@@ -10,6 +10,11 @@ class PlaylistState:
     playlist_loaded = PlaylistLoaded.CLOSE
     _callbacks = {}
 
+
+    @classmethod
+    def get_callback(cls, event: str) -> list[callable]:
+        return cls._callbacks[event]
+    
     @classmethod
     def register_callback(cls, event: str, function: callable):
         if event not in cls._callbacks:
@@ -17,8 +22,9 @@ class PlaylistState:
         cls._callbacks[event].append(function)
         
     @classmethod
-    def notify(cls, event: str, data = None):        
+    def notify(cls, event: str, data = None):
         if event not in cls._callbacks:
+            print(f"evento não está nos callbacks: {event}")
             return
         
         for func in cls._callbacks[event]:

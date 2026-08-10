@@ -2,7 +2,7 @@
 from ui.others.colors import color
 
 # import de back-end
-from core.services.controllers.state_app import StateApp
+from core.playlists.controller.playlist_state import PlaylistState
 
 # import geral
 import flet as ft
@@ -123,24 +123,6 @@ class PlaylistCard(ft.Container):
             ]
         )
 
-        StateApp.register_callback(
-            event = 'actualization_number_songs_of_playlist',
-            func = self.change_number_of_songs_in_playlist
-        )
-
-    def change_number_of_songs_in_playlist(self, number: dict):
-        if not self.page:
-            return
-        
-        if number["id"] == self.data["id"]:
-            self.qtde.value = f'{number["qtde"]} músicas'
-            
-        try:
-            self.update()
-        except AssertionError as ase:
-            print(ase)
-            return
-            
     def _create_text(self, text: str) -> ft.Text:
         return ft.Text(
             value = text,
@@ -154,9 +136,3 @@ class PlaylistCard(ft.Container):
         self.scale = 1.075 if e.data == "true" else 1.0
         self.opacity = 0.8 if e.data == "true" else 1.0
         self.update()
-
-    def dispose(self):
-        callbacks: list[callable] = StateApp.get_callback("actualization_number_songs_of_playlist")
-        
-        if self.change_number_of_songs_in_playlist in callbacks:
-            callbacks.remove(self.change_number_of_songs_in_playlist)

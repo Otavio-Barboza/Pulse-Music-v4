@@ -72,10 +72,10 @@ class PlaylistManager:
             qtde_mus = PlaylistRepository.count_number_of_songs(self.path)
         )
 
-        # PlaylistRepository.remove_dead_content(
-        #     id = self.playlist_config.id,
-        #     path = self.path
-        # )
+        PlaylistRepository.remove_dead_content(
+            id = self.playlist_config.id,
+            path = self.path
+        )
 
     def load_playlists(self):
         """

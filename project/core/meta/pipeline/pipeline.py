@@ -52,6 +52,8 @@ class Pipeline:
     
     @classmethod
     def to_execute_callbacks(cls, path: Path):
+        _added_to_page: bool = False
+
         GridState.notify(
             event = 'actualization_grid', 
             data = GridMode.ARTIST
@@ -60,21 +62,13 @@ class Pipeline:
             event = 'actualization_grid',
             data = GridMode.ALBUM
         )
-        
-        PlaylistState.notify(
-            event = 'actualization_number_songs_of_playlist',
-            data = {
-                'id' : id,
-                'qtde' : len(
-                    os.listdir(path)
-                )
-            }
-        )
 
         if (
             isinstance(PlaylistState.playlist_loaded, dict) and 
-            PlaylistState.playlist_loaded['open'] == PlaylistLoaded.OPEN
+            PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
         ):
+            _added_to_page = True
+
             PlaylistState.notify(
                 event = 'actualization_artist',
                 data = None
@@ -83,6 +77,15 @@ class Pipeline:
                 event = 'actualization_cover',
                 data = None
             )
+
+        PlaylistState.notify(
+            event = 'actualization_card_open_playlist',
+            data = {
+                'id' : id,
+                'qtde' : len(os.listdir(path)),
+                "added_to_page" : _added_to_page
+            }
+        )
 
     @classmethod
     def start_wrapper_sync(

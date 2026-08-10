@@ -7,6 +7,7 @@ from core.song.model.song import Song
 from core.song.enum.song_enum import ReproductionMode
 from core.song.font_reproduction.font_playlist import PlaylistFont
 from core.song.controller.reproduction_manager import ReproductionManager
+from core.song.model.reproduction import Reproduction
 from core.playlists.enum.playlist_enum import PlaylistLoaded
 from core.playlists.controller.playlist_state import PlaylistState
 from core.favorite.enum.favorite_enum import Favorited
@@ -75,10 +76,14 @@ class ListViewMusic(ft.ListView):
             FavoriteState._callbacks['add_to_favorites'].remove(self._callback_favoritar)
             FavoriteState._callbacks['unfavorite'].remove(self._callback_desfavoritar)
     
-    def _load(self):        
+    def _load(self):
         if self.musics is None:
+            print(f"self.musics == None")
             return
-        
+
+        if Reproduction.current_reproduction == ReproductionMode.NOT_REPRODUCE:
+            Reproduction.set_current_reproduction(ReproductionMode.PLAYLIST)
+            
         favorites_key = FavoriteState.list_favorite()
 
         for song in self.musics:
@@ -95,22 +100,23 @@ class ListViewMusic(ft.ListView):
             )
             
             self.controls.append(container)
+
+        
             
     def reload(self, path):        
         if (
-            isinstance(PlaylistState._playlist_aberta, dict) and
-            PlaylistState._playlist_aberta['open_or_close'] == PlaylistLoaded.OPEN
+            isinstance(PlaylistState.playlist_loaded, dict) and
+            PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
         ):
-            try:                
-                if self.favorite_mode is None:
-                    font = PlaylistFont(
-                        path = path,
-                        mode = ReproductionMode.PLAYLIST
-                    )
+            try:        
+                # if self.favorite_mode is None:
+                font = PlaylistFont(
+                    path = path,
+                    mode = ReproductionMode.PLAYLIST
+                )
 
-                    self.musics = font.load()
-                    font.load_playlist(self.musics)
-
+                self.musics = font.load()
+                font.load_playlist(self.musics)
                 ReproductionManager.update_queue_scanner()
 
                 self.controls.clear()

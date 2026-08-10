@@ -10,6 +10,7 @@ from core.services.controllers.grid_state import GridMode
 from core.meta.repository.filtering import Filtering
 from core.utils.path import AppPaths
 from core.utils.utils import Utils
+from core.playlists.repository.path import CreatePlaylist
 
 # imports gerais
 from pathlib import Path
@@ -33,6 +34,7 @@ class Scanner:
 
         from core.meta.models.scanner_model import ScannerModel
 
+        _changed: bool = False
 
         # pasta da playlist com as músicas
         path: str = data.get('music').get('music_path')
@@ -53,6 +55,8 @@ class Scanner:
         # remoção de músicas e tarefas
         if removed_songs is not None:
 
+            _changed = True
+
             # chaves para remover
             keys: set[str] = await cls.get_key_for_path(removed_songs)
 
@@ -68,19 +72,14 @@ class Scanner:
             
             await asyncio.sleep(1)
 
-            # callback caso a playlist esteja aberta será executada.
-            if (
-                isinstance(PlaylistState.playlist_loaded, dict) and
-                PlaylistState.playlist_loaded['open'] == PlaylistLoaded.ABERTA
-            ):
-                PlaylistState.notify(
-                    event = 'update_displayed_musics',
-                    data = path
-                )
+            
 
 
         # adição de músicas e tarefas
         if new_songs is not None:   
+
+            _changed = True
+
             # validando a quantidade de palavras
             if ScannerModel.return_is_busy():
                 return
@@ -94,35 +93,40 @@ class Scanner:
             
             await asyncio.sleep(1)
 
-            # Notificação de callback caso a playlist esteja aberta.
+
+        if _changed:
+            data["date"]["latest_actualization"] = CreatePlaylist.generate_date()
+
+            # Atualizando dados do config_play.json
+            await Utils.async_update_json(
+                path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / data.get("id") / "config_play.json",
+                data = data
+            )
+
+            # callback caso a playlist esteja aberta será executada.
             if (
                 isinstance(PlaylistState.playlist_loaded, dict) and
-                PlaylistState.playlist_loaded["open"] == PlaylistLoaded.OPEN 
+                PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
             ):
                 PlaylistState.notify(
-                    event = "update_displayed_musics",
+                    event = 'update_displayed_musics',
                     data = path
                 )
 
+            # Callback da quantidade de músicas da playlist
+            if data.get("id") is not None:
+                print("atualizando card único diretamente")
 
-        # Atualizando dados do config_play.json
-        await Utils.async_update_json(
-            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / data.get("id") / "config_play.json",
-            data = data
-        )
+                PlaylistState.notify(
+                    event = "actualization_card_open_playlist",
+                    data = {
+                        "id": data.get("id"), 
+                        "qtde": len_path,
+                        "added_to_page" : True
+                    }
+                )
 
-        # Callback da quantidade de músicas da playlist
-        if (
-            len_path is not None
-            or data.get("id") is not None
-        ):
-            PlaylistState.notify(
-                event = "att_qtde_play",
-                data = {
-                    "id": data.get("id"), 
-                    "qtde": len_path
-                }
-            )            
+            _changed = False
 
         await asyncio.sleep(1)
 

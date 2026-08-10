@@ -30,9 +30,11 @@ class Reproduction:
         cls._lists_modes_playbacks[mode].extend(list)
 
     @classmethod
-    def return_songs_for_mode(cls) -> list[Song]:
+    def return_songs_for_mode(cls) -> list[Song] | None:
         if cls.current_reproduction != ReproductionMode.NOT_REPRODUCE:
+            # print(f"Retornando lista de músicas do modo: {cls.current_reproduction}")
             return cls._lists_modes_playbacks[cls.current_reproduction]
+        # print(f"Retornando none para as músicas do modo: {cls.current_reproduction}")
         return None
 
     # FUNÇÕES APENAS PARA AS FAVORITAS

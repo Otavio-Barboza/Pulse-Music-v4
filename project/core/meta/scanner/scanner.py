@@ -21,28 +21,46 @@ class Scanner:
 
     _is_running = False
 
+
     @classmethod
-    async def validar_dados_json(cls, data : dict):
+    async def validate_data_json(cls, data: dict):
+        """
+        _summary_: Função base e linear do fluxo de execução para identificação de novas músicas ou músicas removidas + execução de recarregamento de cache e notificação de callbacks.
+
+        Args:
+            data (dict): dados do config_play.json
+        """
+
         from core.meta.models.scanner_model import ScannerModel
 
-        path = data.get('songs').get('path')
-        len_path = len(os.listdir(path))
 
-        data['songs']['quantidade_de_musicas'] = len_path
-       
-        new_songs = await cls.identify_songs(
+        # pasta da playlist com as músicas
+        path: str = data.get('music').get('music_path')
+        len_path: int = len(os.listdir(path))
+
+        # atualizando quantidade de músicas na playlist
+        data['music']['number_of_songs'] = len_path
+
+        # verificando músicas adicionadas e removidas
+        new_songs: list[str] | None = await cls.identify_songs(
             path = path, validate = True
         )
-        removed_songs = await cls.identify_songs(
+        removed_songs: list[str] | None = await cls.identify_songs(
             path = path, validate = False
         )
-       
+
+
+        # remoção de músicas e tarefas
         if removed_songs is not None:
-            keys = await cls.get_key_for_path(removed_songs)
-            
+
+            # chaves para remover
+            keys: set[str] = await cls.get_key_for_path(removed_songs)
+
+            # validação de que se está rodando ainda alguma tarefa.
             if ScannerModel.return_is_busy():
                 return
-            
+
+            # deletando as músicas conforme o conjunto de chaves definido e carregamento de memória
             await cls.delete_music(
                 keys = keys
             )
@@ -50,6 +68,7 @@ class Scanner:
             
             await asyncio.sleep(1)
 
+            # callback caso a playlist esteja aberta será executada.
             if (
                 isinstance(PlaylistState.playlist_loaded, dict) and
                 PlaylistState.playlist_loaded['open'] == PlaylistLoaded.ABERTA
@@ -59,116 +78,160 @@ class Scanner:
                     data = path
                 )
 
+
+        # adição de músicas e tarefas
         if new_songs is not None:   
-            if ScannerModel.esta_ocupado():
+            # validando a quantidade de palavras
+            if ScannerModel.return_is_busy():
                 return
-            
+
+            # resolução das operações de adição das novas músicas e carregamento do cache.
             await cls.new_song(
                 path = path,
                 list = new_songs
-            )
-            await MetadataRepository.save_artists_json(
-                # path = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{data.get("id")}/config_play.json',
-                data = data
             )
             await MetadataRepository.load_cache()
             
             await asyncio.sleep(1)
 
+            # Notificação de callback caso a playlist esteja aberta.
             if (
                 isinstance(PlaylistState.playlist_loaded, dict) and
-                PlaylistState.playlist_loaded['open'] == PlaylistLoaded.OPEN 
+                PlaylistState.playlist_loaded["open"] == PlaylistLoaded.OPEN 
             ):
                 PlaylistState.notify(
-                    event = 'update_displayed_musics',
+                    event = "update_displayed_musics",
                     data = path
                 )
-            
+
+
+        # Atualizando dados do config_play.json
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / data.get("id") / "config_play.json",
+            data = data
+        )
+
+        # Callback da quantidade de músicas da playlist
         if (
             len_path is not None
-            or data.get('id') is not None
+            or data.get("id") is not None
         ):
             PlaylistState.notify(
-                event = 'att_qtde_play',
+                event = "att_qtde_play",
                 data = {
-                    "id": data.get('id'), 
+                    "id": data.get("id"), 
                     "qtde": len_path
                 }
             )            
 
         await asyncio.sleep(1)
 
+
     @classmethod
     async def verify_json(cls):
+        """
+        _summary_: Função para realizar intermediar a validação dos dados novos, excluídos ou não.
+        """
+
         if cls._is_running:
             return
         
         cls._is_running = True
         
         try:
-            if not Path(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists").exists():
+            # validando caminho de playlists
+            if path_validation := not Path(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists").exists():
+                print(f"Pasta inválida: {path_validation}")
                 return
-            
-            available_playlists = os.listdir(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists")
-                
-            for playlist in available_playlists:
-                data_playlist = await MetadataRepository.return_artists_json()
-                    # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
 
-                await cls.validar_dados_json(data = data_playlist)
+            # listagem das playlists existentes dentro da pasta de playlists
+            available_playlists: list[str] = os.listdir(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "playlists")
+
+            # for para cada playlist listada sendo verificada individualmente os seus dados
+            for playlist in available_playlists:
+                data_playlist = await Utils.async_load_json(
+                    path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / str(playlist) / "config_play.json"
+                )
+
+                await cls.validate_data_json(data = data_playlist)
         finally:
             cls._is_running = False
 
     @classmethod
-    async def identify_songs(cls, path: str, validate: bool) -> list | None:
-        paths_json = set()
+    async def identify_songs(cls, path: str, validate: bool) -> list[str] | None:
+        """
+        _summary_: Função para identificar músicas novas ou removidas. Por meio dos sets ela retorna a diferença entre um e outro o conforme o validate.
 
-        song_json = await MetadataRepository.return_artists_json()
-            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/songs.json'
-       
+        Args:
+            path (str): Caminho da pasta com as músicas.
+            validate (bool): Se True (novas músicas) Senão (músicas removidas)
+
+        Returns:
+            list[str] | None: Lista quando conter mais de um valor, senão retorna None como um valor nulo. 
+        """
+
+        paths_json: set[str] = set()
+        path_files: set[str] = set()
+
+        song_json: dict = await Utils.async_load_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        )
+
+        # adicionando os caminhos ao conjunto pelos dados do arquivo JSON
         for _, value in song_json.items():
-            if value.get('path') == path:
-                path = os.path.join(
-                    value.get('song_path'),
-                    value.get('mp3_file')
-                )
-                paths_json.add(
-                    os.path.normpath(path)
-                )
-       
-        path_files = set()
+            if value.get("song_path") == path:
+                destination_path: Path = Path(value.get("song_path")) / value.get("mp3_file")
+                paths_json.add(str(destination_path))
 
+        # adicionando os caminhos ao conjunto da listagem de músicas da pasta
+        file: str
         for file in os.listdir(path):
-            path = os.path.join(
-                path, 
-                file
-            )
 
-            if os.path.isfile(path) and file.lower().endswith('.mp3'):
-                path_files.add(
-                    os.path.normpath(path)
-                )
-       
-        list_to_return = list(path_files - paths_json) if validate else list(paths_json - path_files)
-           
+            destination_path: Path = Path(path) / file
+
+            if (
+                destination_path.exists()
+                and file.lower().endswith(".mp3")
+            ):
+                path_files.add(str(destination_path))
+
+        # diferença dos conjuntos convertidos em lista.
+
+        # Se True o validate: diferença dos caminhos que restaram da pasta (para músicas novas)
+        # Se False o validate: diferença dos caminhos que restaram do JSON (para músicas removidas)
+        list_to_return: list[str] = list(path_files - paths_json) if validate else list(paths_json - path_files)
+
+        # print(list(path_files - paths_json))
+        # print(list(paths_json - path_files))
+
+        # retorno da lista, se for zerada retorna None
         return list_to_return if len(list_to_return) != 0 else None
     
     @classmethod
-    async def get_key_for_path(cls, paths : list[str]) -> set[str]:
-        songs_json = await MetadataRepository.return_artists_json()
-            # f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Music/songs.json'
+    async def get_key_for_path(cls, paths: list[str]) -> set[str]:
+        """
+        _summary_: Função para retornar as chaves de cada músicas para remoção.
 
-        paths = set(os.path.normpath(c) for c in paths)
+        Args:
+            paths (list[str]): Lista com os caminhos para validação.
 
-        return {
-            key for key, value in songs_json.items()
-            if os.path.normpath(
-                os.path.join(
-                    value.get('path'), 
-                    value.get('arquivo_original')
-                )
-            ) in paths
-        }
+        Returns:
+            set[str]: Conjunto com as chaves de cada música a ser removida.
+        """
+
+        set_to_return: set[str] = set()
+        songs_json: dict = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        )
+
+        # adicionando as chaves para remoção
+        for key, value in songs_json.items():
+            destination_song: Path = Path(value.get("song_path")) / value.get("mp3_file")
+
+            if str(destination_song) in paths:
+                set_to_return.add(key)
+
+        return set_to_return
     
     @classmethod
     async def identify_artists_albums_existings(cls, keys_to_remove: set[str]):
@@ -200,7 +263,7 @@ class Scanner:
         song_json: dict = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
-        lyrics_json = await Utils.async_load_json(
+        lyrics_json: dict = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
@@ -268,8 +331,12 @@ class Scanner:
         """  parte 4  """
 
         for key in keys_for_remove:
-            del song_json[key]
-            # del lyrics_json[key]
+
+            if song_json.get(key, None) is not None:
+                del song_json[key]
+
+            if lyrics_json.get(key, None) is not None:
+                del lyrics_json[key]
 
 
         """  Restante da execução  """
@@ -294,25 +361,36 @@ class Scanner:
 
         
     @classmethod
-    async def new_song(cls, path: str, list: list):
+    async def new_song(cls, path: str, list: list[str]):
+        """
+        _summary_: Função intermediaria do scanner com o pipeline.
+
+        Args:
+            path (str): caminho da pasta com as músicas.
+            list (list[str]): lista de músicas para serem adicionadas.
+        """
+
         from core.meta.pipeline.pipeline import Pipeline
 
-        base_path_playlists = f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists'
-
+        playlist: str
         for playlist in os.listdir(
-            base_path_playlists
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists"
         ):
-            json_config_play = await MetadataRepository.return_artists_json(
-                f'Assets/Data/Contas/{AccountManager.contas_cache["conta_atual"]}/Playlists/{playlist}/config_play.json'
+            json_config_play: dict = await Utils.async_load_json(
+                AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists" / playlist / "config_play.json"
             )
 
-            if json_config_play['songs'].get('path') == path:
-                playlist_id = playlist
+            if json_config_play["music"].get("music_path") == path:
+                playlist_id: str = playlist
                 break
-        
+
+        # print(list)
+        # print(path)
+        # print(playlist)
+
         asyncio.create_task(
             asyncio.to_thread(
-                Pipeline.processar_wrapper_sync,
+                Pipeline.start_wrapper_sync,
                 path,
                 list,
                 playlist_id
@@ -320,13 +398,22 @@ class Scanner:
         )
 
     @classmethod
-    async def delete_music(cls, keys : set[str]):       
+    async def delete_music(cls, keys: set[str]):
+        """
+        _summary_: função para gerenciar o processo de exclusão de músicas
+
+        Args:
+            keys (set[str]): conjunto com as chaves para serem removidas.
+        """
+
         from core.meta.models.scanner_model import ScannerModel
 
+        # definição de status e quantidade de tarefas ativas do scanner
         ScannerModel.start_task()
         ScannerModel.set_status_prosesses(ScannerStatus.ON_SCANNER)
         cls.manager_status()
 
+        # Notificando conteúdo do drawer do scanner
         ScannerController.notify(
             event = 'icon_status_scanner',
             data = None
@@ -335,18 +422,17 @@ class Scanner:
         await asyncio.sleep(1)
 
         try:
+            # resolução da esclusão do conteúdo
             await cls.identify_artists_albums_existings(
                 keys_to_remove = keys
             )
         finally:
-            ScannerModel.finalizar_tarefa()
+            ScannerModel.finaly_task()
 
             await asyncio.sleep(1)
 
-            if not ScannerModel.esta_ocupado():
-                ScannerModel.definir_status_processo(
-                    None
-                )
+            if not ScannerModel.return_is_busy():
+                ScannerModel.set_status_prosesses(None)
                 ScannerController.notify(
                     event = 'progress_status_scanner',
                     data = None
@@ -355,6 +441,10 @@ class Scanner:
 
     @classmethod
     def manager_status(cls):
+        """
+        _summary_: Função para notificar a informação do scanner conforma sua atividade.
+        """
+
         from core.meta.models.scanner_model import ScannerModel
 
         if ScannerModel.status_procesesses == ScannerStatus.ON_SCANNER:

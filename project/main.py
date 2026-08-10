@@ -44,12 +44,17 @@ async def main(page: ft.Page):
     """  Configurações da page, gerais da aplicação  """
 
     page.title = "Pulse Music"
+
+    page.window.min_width = 500
+    page.window.min_height = 900
     page.padding = 0
+
     page.bgcolor = color.preto_puro_4
     page.theme_mode = ft.ThemeMode.DARK
+
     page.fonts = {
-        "sansita" : r"assets\fonts\SansitaSwashed.ttf",
-        "google_sans_flex" : r"assets\fonts\GoogleSansFlex.ttf"
+        "sansita" : r"fonts\SansitaSwashed.ttf",
+        "google_sans_flex" : r"fonts\GoogleSansFlex.ttf"
     }
     page.theme = ft.Theme(
         font_family = "google_sans_flex"
@@ -125,6 +130,10 @@ async def main(page: ft.Page):
     # validar conexão
     async def start_connection():
         await Connection.start_loop_connection(page)
+
+    # validando argumento do scanner
+    async def start_scanner():
+        await ScannerModel.async_start_scanner(page)
 
     
     """  Validar login  """
@@ -208,7 +217,7 @@ async def main(page: ft.Page):
 
     """  Notificação e execução de eventos globais  """
     
-    # page.run_task(ScannerModel.async_start_scanner)
+    page.run_task(start_scanner)
     page.run_task(start_connection)
 
 

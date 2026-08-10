@@ -85,7 +85,12 @@ class Pipeline:
             )
 
     @classmethod
-    def start_wrapper_sync(cls, path: str, object_list: list = [], playlist_id: str | None = None) -> list[SongMetadata]:
+    def start_wrapper_sync(
+        cls, 
+        path: str, 
+        object_list: list = list[SongMetadata] | list[str], 
+        playlist_id: str | None = None
+    ) -> list[SongMetadata]:
         
         ScannerModel.start_task()
         ScannerModel.set_status_prosesses(
@@ -100,7 +105,7 @@ class Pipeline:
         try:
             asyncio.run(
                 cls.async_process_musics(
-                    path = path, 
+                    path = Path(path), 
                     object_list = object_list,
                     id = playlist_id
                 )
@@ -129,22 +134,25 @@ class Pipeline:
     async def async_process_musics(
         cls, 
         path: Path, 
-        object_list: list[SongMetadata] = [], 
+        object_list: list[SongMetadata] | list[str] = [], 
         id: str | None = None
     ) -> list[SongMetadata]:
 
         list_already_processed: list[SongMetadata] = []
         musics_list = []
-        
-        song: SongMetadata | str
+
+        # print(object_list)
+        song: str
         for song in os.listdir(path) if len(object_list) == 0 else object_list:
-            filtered_title = None
-            filtered_artist = None
+            # print(song)
+
+            filtered_title: dict | None = None
+            filtered_artist: dict | None = None
 
             song = cls.normalize_song(song)
             song = os.path.basename(song)
-
-            destination_file = Path(path) / song
+            # print(path)
+            destination_file: Path = path / song
         
             # FASE 0 - verificação da existencia de data já alterados pelo próprio player, assim carregamento dos data já imbutidos.
             if ExtractMetadata.music_already_processed(destination_file):

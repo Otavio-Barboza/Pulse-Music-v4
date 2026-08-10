@@ -2,26 +2,29 @@
 from core.meta.enum.status import ScannerStatus
 from core.meta.scanner.scanner import Scanner
 
+# imports de back-end
+from ui.utils.utils_ui import UtilsUi
+
 # imports gerais
 import asyncio, os
 
 
 class ScannerModel:
 
-    status: ScannerStatus | None = None
     _status: tuple[ScannerStatus] = (
         ScannerStatus.ON, ScannerStatus.PAUSE, ScannerStatus.BREAK, 
         ScannerStatus.ON_SCANNER, ScannerStatus.ON_PIPELINE_PLAYLIST
     )
     _status_operation: ScannerStatus = ScannerStatus.ON
-    status_procesesses: ScannerStatus | None = None
     _number_of_active_taks: int = 0
+
+    status: ScannerStatus | None = None
+    status_procesesses: ScannerStatus | None = None
+
     
     @classmethod
-    async def async_start_scanner(cls):
-        cls.set_status(
-            None
-        )
+    async def async_start_scanner(cls, page):
+        cls.set_status(None)
         Scanner.manager_status()
         
         while cls._status_operation != ScannerStatus.BREAK:
@@ -31,8 +34,13 @@ class ScannerModel:
                 await Scanner.verify_json()
                 await asyncio.sleep(5)
         else:
+            UtilsUi.snack_bar(
+                page = page,
+                text = "Monitoramento de dados interrompido temporariamente..."
+            )
             raise('Scanner parou inesperadamente!')
 
+    # rever essa função
     @classmethod
     def set_status(cls, status: ScannerStatus):
         for stt in cls._status:

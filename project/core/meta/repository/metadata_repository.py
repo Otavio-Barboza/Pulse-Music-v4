@@ -105,14 +105,18 @@ class MetadataRepository:
     
     @classmethod
     def delete_image(cls, path: str | Path):
+        if path is None:
+            print(f'Arquivo de imagem inválido: {path}')
+
         if isinstance(path, str):
             path: Path = Path(path)
 
+        if not path.exists():
+            print(f'Imagem não encontrada: {path}')
+            return
+
         try:
-            if path.exists():
-                path.unlink()
-                print(f'Imagem removida: {path}')
-            else:
-                print(f'Imagem não encontrada: {path}')
+            path.unlink()
+            print(f'Imagem removida: {path}')
         except Exception as erro:
             print(f'Erro ao remover a imagem: {erro}')

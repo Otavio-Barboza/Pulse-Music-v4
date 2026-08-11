@@ -48,3 +48,15 @@
         ( project\core\meta\models\song.py ) : {
             SongMetadata
         }
+
+
+## Responsabilidades:
+
+1. **Reposítório:**
+    - Responsável pelas tarefas e execuções de persistência como gerenciamento de arquivos, tarefas diversas, utilitários e etc.
+
+2. **Model(s):**
+    - Modelos de objetos ou classes bases de operação.
+
+3. **Cache**
+    - Cache ou memória interna e temporária do app para melhor fluxo e flexibilidade na operação do aplicativo.

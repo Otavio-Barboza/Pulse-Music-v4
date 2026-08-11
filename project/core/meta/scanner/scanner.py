@@ -1,16 +1,14 @@
 # imports de back-end
 from core.services.account_manager import AccountManager
-from core.services.controllers.grid_state import GridState
-from core.meta.repository.metadata_repository import MetadataRepository
-from core.meta.enum.status import ScannerStatus
+from core.services.controllers.grid_state import GridState, GridMode
 from core.playlists.controller.playlist_state import PlaylistState
 from core.playlists.enum.playlist_enum import PlaylistLoaded
+from core.playlists.repository.path import CreatePlaylist
+from core.meta.enum.status import ScannerStatus
 from core.meta.controller.scanner_controller import ScannerController
-from core.services.controllers.grid_state import GridMode
-from core.meta.repository.filtering import Filtering
+from core.meta.repository.metadata_repository import MetadataRepository
 from core.utils.path import AppPaths
 from core.utils.utils import Utils
-from core.playlists.repository.path import CreatePlaylist
 
 # imports gerais
 from pathlib import Path
@@ -72,15 +70,12 @@ class Scanner:
             
             await asyncio.sleep(1)
 
-            
-
-
         # adição de músicas e tarefas
         if new_songs is not None:   
 
             _changed = True
 
-            # validando a quantidade de palavras
+            # validando operação do scanner
             if ScannerModel.return_is_busy():
                 return
 
@@ -115,8 +110,6 @@ class Scanner:
 
             # Callback da quantidade de músicas da playlist
             if data.get("id") is not None:
-                print("atualizando card único diretamente")
-
                 PlaylistState.notify(
                     event = "actualization_card_open_playlist",
                     data = {
@@ -388,10 +381,6 @@ class Scanner:
                 playlist_id: str = playlist
                 break
 
-        # print(list)
-        # print(path)
-        # print(playlist)
-
         asyncio.create_task(
             asyncio.to_thread(
                 Pipeline.start_wrapper_sync,
@@ -404,7 +393,7 @@ class Scanner:
     @classmethod
     async def delete_music(cls, keys: set[str]):
         """
-        _summary_: função para gerenciar o processo de exclusão de músicas
+        _summary_: Função para gerenciar o processo de exclusão de músicas.
 
         Args:
             keys (set[str]): conjunto com as chaves para serem removidas.

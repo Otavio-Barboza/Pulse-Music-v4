@@ -206,4 +206,7 @@ class ListViewMusic(ft.ListView):
         for container in self.controls:
             container.cover_image.src = self.return_cover(container.data.name)
             container.artist_name.value = self.return_artist(container.data.key)
-            container.update()
+
+            # teste para atualizar os dados.
+            container.cover_image.update()
+            container.artist_name.update()

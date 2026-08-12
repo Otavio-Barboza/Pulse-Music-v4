@@ -13,7 +13,7 @@ class ServiceSettings:
     def load_overlay(cls) -> True | False:
         path: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "settings.json"
         data: dict = Utils.sync_load_json(path)
-        
+
         if data.keys():
             return data['overlays']['ON_overlay_playlist_size_tip']
         return None

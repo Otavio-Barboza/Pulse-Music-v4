@@ -40,8 +40,11 @@ class OtherSettings(ft.Container):
             ]
         )
 
-        StateApp.register_callback('atualization_switch', self.change_switch)
-
+        StateApp.register_callback(
+            event = 'actualization_switch', 
+            func = self.change_switch
+        )
+        
     def _text(self, text: str, tamanho: int):
         return ft.Text(
             value = text,
@@ -53,8 +56,10 @@ class OtherSettings(ft.Container):
         self.update()
 
         StateApp.notify(event = "overlay_tips", data = e.control.value)
-        StateApp.notify(event = "atualization_on_click", data = e.control.value)
+        StateApp.notify(event = "actualization_on_click", data = e.control.value)
     
     def change_switch(self, value: bool):
         self.switch.value = value
-        self.update()
+        
+        if self.page:
+            self.update()

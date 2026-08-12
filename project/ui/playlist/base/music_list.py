@@ -90,16 +90,16 @@ class ListViewMusic(ft.ListView):
         if Reproduction.current_reproduction == ReproductionMode.NOT_REPRODUCE:
             Reproduction.set_current_reproduction(ReproductionMode.PLAYLIST)
             
-        favorites_key = FavoriteState.list_favorite()
+        favorites_key: list[str] = FavoriteState.list_favorite()
 
         # song: Song (models de songs)
         for song in self.musics:
-
+            
             if song.key in favorites_key:
                 status = Favorited.FAVORITED
             else:
                 status = Favorited.NOT_FAVORITED
-            
+                        
             container = RowContainer(
                 page = self.page,
                 song = song,
@@ -140,7 +140,7 @@ class ListViewMusic(ft.ListView):
             RowContainer(
                 page = self.page,
                 song = data,
-                status_favoritada = data.mode
+                favorited_status = data.mode
             )
         )
         self.update()
@@ -197,11 +197,9 @@ class ListViewMusic(ft.ListView):
             container.update()
 
     def return_artist(self, key: str) -> str:
-        print(key)
         return PlaylistState.return_music_artist(key)
     
     def return_cover(self, name: str) -> str:
-        print(name)
         return PlaylistState.return_cover(name)
 
     def update_images_and_names(self, *_):

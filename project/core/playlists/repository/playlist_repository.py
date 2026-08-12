@@ -264,44 +264,44 @@ class PlaylistRepository:
     def remove_dead_content(cls, id: str, path: Path):
         from core.meta.scanner.scanner import Scanner
 
-        chaves_para_remover = set()
+        keys_to_remove: set[str] = set()
 
-        json_musicas = Utils.sync_load_json(
-            f'Assets/Data/Contas/{AccountManager.accounts_cache["current_account"]}/Music/musicas.json'
+        songs_json = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
         )
 
-        for chave, valor in json_musicas.items():
+        for key, value in songs_json.items():
             if (
-                valor.get('id_playlist') == id and
-                valor.get('caminho') != path
+                value.get('id_playlist') == id and
+                value.get('caminho') != path
             ):
-                chaves_para_remover.add(chave)
+                keys_to_remove.add(key)
 
         asyncio.run(
-            Scanner.reconhecer_artistas_albuns_inexistentes(
-                chaves_remover = chaves_para_remover
+            Scanner.identify_artists_albums_existings(
+                keys_to_remove = keys_to_remove
             )
         )
 
     @classmethod
     def check_playlist_names(cls) -> list[str]:
-        nomes_playlists_existentes: set[str] = set()
+        existing_names_playlists: set[str] = set()
         
-        playlists_json = Utils.sync_load_json(
+        playlists_json: dict = Utils.sync_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists.json"
         )
         
-        for key, value in playlists_json.get("playlists").items():
-            nomes_playlists_existentes.add(value.get("name"))
+        for _, value in playlists_json.get("playlists").items():
+            existing_names_playlists.add(value.get("name"))
 
-        return list(nomes_playlists_existentes)
+        return list(existing_names_playlists)
     
     @classmethod
     def check_existing_folders(cls) -> list[str]:
 
         base_path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "playlists"
         
-        pastas_existentes = list()
+        existing_paths = list()
 
         for playlist in os.listdir(
             base_path
@@ -312,10 +312,10 @@ class PlaylistRepository:
 
             caminho_pasta = config_play_json['music'].get('music_path')
 
-            if caminho_pasta not in pastas_existentes:
-                pastas_existentes.append(caminho_pasta)
+            if caminho_pasta not in existing_paths:
+                existing_paths.append(caminho_pasta)
 
-        return pastas_existentes
+        return existing_paths
     
     @classmethod
     def identify_music_artist(cls, song_id: str) -> str:

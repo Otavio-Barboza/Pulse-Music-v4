@@ -15,11 +15,11 @@ class FavoriteRepository:
     @classmethod
     def format_object_in_json(cls, data: Song, status: Favorited) -> str | dict[str, dict[str, str]]:
         from core.song.enum.song_enum import ReproductionMode
-        return data.chave, {
+        return data.key, {
             'status' : status,
-            'nome' : data.nome,
-            'caminho' : data.caminho,
-            'modo' : ReproductionMode.FAVORITE.value
+            'name' : data.name,
+            'path' : data.path,
+            'mode' : ReproductionMode.FAVORITE.value
         }
 
     @classmethod
@@ -38,6 +38,7 @@ class FavoriteRepository:
     @classmethod
     def list_favorite_objects(cls) -> list[Song]:
         favorite_json: dict = Utils.sync_load_json(AppPaths.ACCOUNT / AccountManager.accounts_cache["current_account"] / "music" / "favorites.json")
+        
         list_music: list[Song] = []
         
         key: str

@@ -5,6 +5,8 @@ from core.song.enum.song_enum import ReproductionMode
 from core.favorite.repository.favorite_repository import FavoriteRepository
 from core.favorite.enum.favorite_enum import Favorited
 from core.utils.utils import Utils
+from core.utils.path import AppPaths
+from core.services.account_manager import AccountManager
 
 # import geral
 import inspect, asyncio
@@ -48,40 +50,50 @@ class FavoriteState:
     
     @classmethod
     def convert_object_to_json(cls, data: Song):
-        nova_chave, novo_item = FavoriteRepository.format_object_in_json(
-            dado = data, 
+        new_key, new_item = FavoriteRepository.format_object_in_json(
+            data = data, 
             status = Favorited.FAVORITED.value
         )
 
-        json_musicas = FavoriteRepository.ler_json()
+        favorites_json: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json"
+        )
 
-        if nova_chave not in json_musicas:
-            json_musicas[nova_chave] = novo_item
+        if new_key not in favorites_json:
+            favorites_json[new_key] = new_item
 
-        Utils.sync_update_json(json_musicas)
+        Utils.sync_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json", 
+            data = favorites_json
+        )
 
-        data.mode = ReproductionMode.FAVORITA.value
+        data.mode = ReproductionMode.FAVORITE.value
 
         cls.notify(
-            evento = 'add_to_favorites',
+            event = 'add_to_favorites',
             data = data
         )
 
     @classmethod
     def remove_favorite_json(cls, data: Song):
-        json_favorita = FavoriteRepository.ler_json()
-        chave_para_remover = None
+        favorites_json: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json"
+        )
+        key_to_remove = None
 
-        for chave, _ in json_favorita.items():
-            if chave == data.chave:
-                chave_para_remover = chave
+        for key, _ in favorites_json.items():
+            if key == data.key:
+                key_to_remove = key
                 break
         
-        if chave_para_remover is None:
+        if key_to_remove is None:
             return 
         
-        del json_favorita[chave_para_remover]
-        FavoriteRepository.salvar_json(json_favorita)
+        del favorites_json[key_to_remove]
+        Utils.sync_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json",
+            data = favorites_json
+        )
 
         cls.notify(
             'unfavorite',

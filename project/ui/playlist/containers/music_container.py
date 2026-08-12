@@ -105,11 +105,11 @@ class RowContainer(ft.Container):
             width = size
         )
     
-    def is_favorited(self):          
+    def is_favorited(self) -> ft.Icons:          
         if self._is_favorited == Favorited.NOT_FAVORITED:
-            return ft.Icons.FAVORITE_ROUNDED
-        else:
             return ft.Icons.HEART_BROKEN_ROUNDED
+        else:
+            return ft.Icons.FAVORITE_ROUNDED
 
     def actualization_icon(self):
         self._is_favorited = Favorited.NOT_FAVORITED
@@ -162,9 +162,7 @@ class RowContainer(ft.Container):
         ReproductionManager.play()
 
     def return_artist(self) -> str:
-        print(self.data.key)
         return PlaylistState.return_music_artist(self.data.key)
     
     def return_cover(self) -> str:
-        print(self.data.name)
         return PlaylistState.return_cover(self.data.name)

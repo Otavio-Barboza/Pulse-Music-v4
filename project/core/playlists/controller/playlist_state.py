@@ -8,7 +8,7 @@ import inspect, asyncio
 
 class PlaylistState:
     playlist_loaded = PlaylistLoaded.CLOSE
-    _callbacks = {}
+    _callbacks: dict[str, list[callable]] = {}
 
 
     @classmethod
@@ -35,6 +35,7 @@ class PlaylistState:
                     res = func(data)
                     if inspect.isawaitable(res):
                         asyncio.create_task(res)
+                    print(f"EVENTO EXECUTADO: {event}")
             except Exception as e:
                 import traceback
                 print(f"[CALLBACK ERROR]: {e}")

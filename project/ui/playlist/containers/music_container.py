@@ -94,7 +94,7 @@ class RowContainer(ft.Container):
             ]
         )
 
-    def _create_text(self, name: str, size: int):
+    def _create_text(self, name: str, size: int) -> ft.Text:
         return ft.Text(
             value = name,
             size = 15,

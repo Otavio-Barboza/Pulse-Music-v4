@@ -203,10 +203,18 @@ class ListViewMusic(ft.ListView):
         return PlaylistState.return_cover(name)
 
     def update_images_and_names(self, *_):
+        print("CALLBACK UPDATE")
+
         for container in self.controls:
+            print(
+                container.data.name,
+                "page =", container.page,
+                "cover =", container.cover_image.src
+            )
+            
+            if not container.page or container.page is None:
+                continue 
+
             container.cover_image.src = self.return_cover(container.data.name)
             container.artist_name.value = self.return_artist(container.data.key)
-
-            # teste para atualizar os dados.
-            container.cover_image.update()
-            container.artist_name.update()
+            container.update()

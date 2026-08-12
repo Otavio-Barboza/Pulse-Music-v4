@@ -64,11 +64,12 @@ class Pipeline:
         )
 
         if (
-            isinstance(PlaylistState.playlist_loaded, dict) and 
-            PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
+            isinstance(PlaylistState.playlist_loaded, dict) 
+            and PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
         ):
             _added_to_page = True
 
+            print("notificando updates")
             PlaylistState.notify(
                 event = 'update_covers_and_names',
                 data = None

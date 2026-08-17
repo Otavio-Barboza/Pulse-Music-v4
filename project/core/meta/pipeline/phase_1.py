@@ -13,7 +13,8 @@ class Phase1:
         song_path,
         mp3_file: str, 
         song_metadata_id3: dict | None, 
-        original_artist_id3: str | None
+        original_artist_id3: str | None,
+        playlist_id: str | None
     ) -> SongMetadata:
         score = Task.similarity(
             b = original_artist_id3.strip().lower(),
@@ -26,7 +27,8 @@ class Phase1:
                 song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
                 status = SongStatus.BOTH,
-                song_path = song_path
+                song_path = song_path,
+                playlist_id = playlist_id
             )
         elif 0.65 <= score < 0.85:
             return await ExtractMetadata.async_organize_data(
@@ -34,7 +36,8 @@ class Phase1:
                 song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
                 status = SongStatus.MEDIUM,
-                song_path = song_path
+                song_path = song_path,
+                playlist_id = playlist_id
             )
         else:
             return await ExtractMetadata.async_organize_data(
@@ -42,5 +45,6 @@ class Phase1:
                 song_metadata_id3 = song_metadata_id3,
                 original_artist_id3 = original_artist_id3,
                 status = SongStatus.INCONSISTENT,    
-                song_path = song_path
+                song_path = song_path,
+                playlist_id = playlist_id
             )

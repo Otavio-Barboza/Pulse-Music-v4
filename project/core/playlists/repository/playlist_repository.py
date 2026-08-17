@@ -6,6 +6,7 @@ from core.playlists.models.playlist_config import PlaylistConfig
 from core.playlists.models.playlist_card import PlaylistCard
 from core.playlists.repository.path import CreatePlaylist
 from core.utils.path import AppPaths
+from core.meta.cache.global_cache import cache_metadata
 
 # imports gerais
 from pathlib import Path
@@ -266,11 +267,11 @@ class PlaylistRepository:
 
         keys_to_remove: set[str] = set()
 
-        songs_json = Utils.sync_load_json(
-            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
-        )
+        # songs_json = Utils.sync_load_json(
+        #     AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
+        # )
 
-        for key, value in songs_json.items():
+        for key, value in cache_metadata.tracks.items():
             if (
                 value.get('id_playlist') == id and
                 value.get('caminho') != path
@@ -319,14 +320,19 @@ class PlaylistRepository:
     
     @classmethod
     def identify_music_artist(cls, song_id: str) -> str:
-        songs_json: dict = Utils.sync_load_json(
-            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
-        )
+        
+        # songs_json: dict = Utils.sync_load_json(
+        #     AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        # )
 
-        for key, value in songs_json.items():
+        for key, value in cache_metadata.tracks.items():
+            # print(key, song_id)
+
             if key == song_id:
-                return value.get("defined_artist", "Artista Desconhecido")
-            
+                return value.get("defined_artist", "Artista Desconhedido")
+        else:
+            return "Artista Desconhedido"
+        
     @classmethod
     def return_cover(cls, music_name: str) -> Path:
         covers_list: list[str] = os.listdir(

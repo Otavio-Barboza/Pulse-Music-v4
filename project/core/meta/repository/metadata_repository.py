@@ -17,46 +17,27 @@ class MetadataRepository:
         current_song_json: dict = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
-
-        print()
-        # print(current_song_json)
-        print()
         
         object_list = [
             musica
             for grupo in groups.values()
             for musica in grupo
         ]
-
-        print()
-        # print(object_list)
-        print()
         
         final_data = {}
         
         song: SongMetadata
         for song in object_list:            
-            song_path = os.path.normpath(
-                os.path.join(
-                    song.song_path, 
-                    song.mp3_file
-                )
-            )
-            song_id = Task.return_track_id(song_path)
-            
-            final_data[song_id] = Task.return_song_json(
-                song = song
-            )
+            final_data[song.song_id] = Task.return_song_json(song = song)
         
         for id, data in current_song_json.items():
             if id not in final_data:
                 final_data[id] = data
-        
-        print()
-        # print(final_data)
-        print()
 
-        await Utils.async_update_json(path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json", data = final_data)
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json", 
+            data = final_data
+        )
     
     @classmethod
     async def load_cache(cls):
@@ -67,7 +48,6 @@ class MetadataRepository:
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
         )
         cache_metadata.load(dados)
-
         await CacheArtists.load()
 
     @classmethod

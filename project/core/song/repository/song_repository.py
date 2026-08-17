@@ -2,8 +2,9 @@
 from core.song.model.song import Song
 from core.song.enum.song_enum import ReproductionMode
 from core.meta.repository.tasks import Task
-from core.utils.utils import Utils
+from core.meta.cache.global_cache import cache_metadata
 from core.services.account_manager import AccountManager
+from core.utils.utils import Utils
 
 # imports gerais
 from pathlib import Path
@@ -14,20 +15,47 @@ class SongRepository:
 
     @classmethod
     def load_songs(cls, path: Path, mode: ReproductionMode) -> list[Song]:
-        return [
-            Song(
-                name = song.removesuffix('.mp3'),
-                path = os.path.normpath(
-                    os.path.join(path, song)
-                ),
-                key = Task.return_track_id(
-                    os.path.normpath(
-                        os.path.join(path, song)
-                    )
-                ),
-                mode = mode
-            ) for song in os.listdir(path)
+        if isinstance(path, str):
+            path = Path(path)
+        
+        # songs_json: dict = Utils.sync_load_json(
+        #     path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
+        # )
+        music_list_path: list[str] = [
+            str(path / song)
+            for song in os.listdir(path)
         ]
+        music_list_json: list[str] = [
+            key
+            for key, value in cache_metadata.tracks.items()
+            if value.get("song_path") == str(path)
+        ]
+
+        print(music_list_json)
+        print(music_list_path)
+
+        if len(music_list_path) > len(music_list_json):
+            print("playlist adicionanda pela primeira vez, carregando dados pelo os.listidr() do path")
+            return [
+                Song(
+                    name = song.removesuffix('.mp3'),
+                    path = path / song,
+                    key = Task.return_track_id(path / song),
+                    mode = mode
+                ) for song in os.listdir(path)
+            ]
+        else:
+            print("playlist já adicionanda, carregando dados pelo songs.json")
+            return [
+                Song(
+                    name = value.get("mp3_file").removesuffix(".mp3"),
+                    path = str(value.get("song_path")),
+                    key = key,
+                    mode = mode
+                ) for key, value in cache_metadata.tracks.items() if value.get("song_path") == str(path)
+            ]
+
+
 
     @classmethod
     def get_artist(cls, key_song : str):

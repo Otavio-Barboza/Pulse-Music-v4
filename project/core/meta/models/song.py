@@ -11,6 +11,7 @@ class SongMetadata:
         self,
 
         # IDs a serem salvos
+        song_id: str,
         playlist_id: str,
         artist_id: str | None,
         
@@ -62,6 +63,7 @@ class SongMetadata:
             }
         }
     ):
+        self.song_id = song_id
         self.song_path = song_path
         self.playlist_id = playlist_id
         self.artist_id = artist_id

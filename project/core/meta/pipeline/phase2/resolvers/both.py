@@ -40,18 +40,11 @@ async def resolve_both(both_list : list[SongMetadata], path: str):
             song.set_status(SongStatus.HIGH)
             song.set_score(1.5)
             song.set_song_path(path)
-            
-
-            print(song.defined_artist)
-            print(song.id3_data)
-
-
 
 
             deezer_data = await fonts.deezer.get_song(
                 title = song.id3_data["filtered_data"].get("title"), artist = song.defined_artist
             )
-            print(deezer_data)
 
             # validando caso a lista (track) retornado pela API da Deezer seja nula ou vazia.
             if len(deezer_data.get("track")) == 0:

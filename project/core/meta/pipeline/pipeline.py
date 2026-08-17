@@ -7,6 +7,7 @@ from core.meta.pipeline.phase_3 import Phase3
 from core.meta.repository.filtering import Filtering
 from core.meta.repository.extract_metadata import ExtractMetadata
 from core.meta.repository.metadata_repository import MetadataRepository
+from core.meta.repository.tasks import Task
 from core.meta.cache.cache_artists import CacheArtists
 from core.meta.models.scanner_model import ScannerModel
 from core.meta.scanner.scanner import Scanner
@@ -169,6 +170,7 @@ class Pipeline:
                 )
                 
                 list_already_processed.append(SongMetadata(
+                    song_id = Task.return_track_id(destination_file),
                     playlist_id = id,
                     artist_id = artista_id,
                     song_title_id3_filtered = mus.get('title'),
@@ -221,7 +223,8 @@ class Pipeline:
                             mp3_file = song,
                             song_metadata_id3 = filtered_title,
                             original_artist_id3 = filtered_artist,
-                            song_path = path
+                            song_path = path,
+                            playlist_id = id
                         ))
                     else:
                         musics_list.append(await ExtractMetadata.async_organize_data(

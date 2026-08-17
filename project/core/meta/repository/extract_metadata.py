@@ -2,6 +2,7 @@
 from core.meta.models.song import SongMetadata
 from core.services.account_manager import AccountManager
 from core.utils.path import AppPaths
+from core.meta.repository.tasks import Task
 
 # imports gerais
 from mutagen import File
@@ -84,6 +85,7 @@ class ExtractMetadata:
             dict[str | None]: Dicionário organizados com todas as informações
         """
         return SongMetadata(
+            song_id = Task.return_track_id(Path(song_path) / mp3_file),
             playlist_id = playlist_id,
             artist_id = artist_id,
 

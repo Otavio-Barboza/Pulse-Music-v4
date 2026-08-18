@@ -51,7 +51,7 @@ class SongRepository:
             ]
 
 
-    # Onde é chamadas essas funções?
+    # Onde é chamadas essas funções?    
     @classmethod
     def get_artist(cls, key_song : str):
         song_json: dict = Utils.sync_load_json(f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Song/musicas.json')

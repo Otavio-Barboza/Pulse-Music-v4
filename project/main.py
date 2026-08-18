@@ -11,7 +11,7 @@ from core.utils.utils import Utils
 from core.utils.path import AppPaths
 from core.services.account_manager import AccountManager
 from core.services.controllers.resize_manager import ResizeManager
-from core.song.model.audio import AudioLoop
+# from core.song.model.audio import AudioLoop
 from core.song.controller.reproduction_manager import ReproductionManager
 from core.meta.models.scanner_model import ScannerModel
 from core.meta.cache.global_cache import cache_metadata

@@ -1,81 +1,144 @@
-from core.song.model.monitoring import Monitoring
-from core.song.model.audio import AudioLoop
+# import de back-end
+from core.song.model.audio import AudioProcess
 
 # imports gerais
 from pathlib import Path
-import threading, pyglet
 
 
 class Player:
 
+    # Armazena o volume atual conhecido pelo processo principal.
+    # O valor real será aplicado no pyglet.Player através do AudioProcess.
     _volume = 1.0
+
 
     @classmethod
     def load_song(cls, path: Path):
+        """
+        _summary_: (
+            Solicita ao processo de áudio que carregue uma música.
 
-        if not AudioLoop.player:
-            return
+            O Player não acessa mais o pyglet diretamente.
+            Ele apenas envia o comando para o AudioProcess.
+        )
 
-        AudioLoop.player.pause()
-        AudioLoop.player.delete()
+        Args:
+            path (Path): Caminho da música que deve ser carregada.
+        """
 
-        # AudioLoop.set_player(pyglet.media.Player())
-
-        # @AudioLoop.player.event
-        # def on_eos():
-        #     Monitoring.notify_end()
-
-        # font= pyglet.media.load(str(path))
-        AudioLoop.player.queue(str(path))
+        AudioProcess.send_command("load", str(path))
 
     @classmethod
     def play(cls):
-        AudioLoop.player.play()
+        """
+            Solicita ao processo de áudio que inicie ou continue a reprodução da música atual.
+        """
+
+        AudioProcess.send_command("play")
 
     @classmethod
     def pause(cls):
-        AudioLoop.player.pause()
+        """
+            Solicita ao processo de áudio que pause a reprodução.
+        """
+
+        AudioProcess.send_command("pause")
 
     @classmethod
     def stop(cls):
-        AudioLoop.player.pause()
-        AudioLoop.player.seek(0)
+        """
+            Para a reprodução e retorna a posição para o início.
+
+            O comando de seek ainda será implementado no AudioProcess. Por isso, esta operação será completada em uma etapa posterior.
+        """
+
+        AudioProcess.send_command("pause")
     
     @classmethod
     def formatted_total_duration(cls) -> str:
+        """
+            Retorna a duração total da música formatada como:
+
+                MM:SS
+
+            A obtenção da duração ainda será adaptada para funcionar através da comunicação com o processo de áudio.
+        """
+
         font: float = cls.current_duration()
         
         minutes = int(font / 60)
         seconds = int(font - (minutes * 60))
 
-        return f'{minutes:02}:{seconds:02}'
+        return f"{minutes:02}:{seconds:02}"
 
     @classmethod
     def formatted_current_duration(cls) -> str:
+        """
+            Retorna a posição atual da música formatada como:
+
+                MM:SS
+
+            A posição será obtida através do estado enviado pelo processo de áudio.
+        """
+
         font: float = cls.current_position()
         
         minutes = int(font / 60)
         seconds = int(font - (minutes * 60))
         
-        return f'{minutes:02}:{seconds:02}' or f'00:00'
+        return f"{minutes:02}:{seconds:02}" or f"00:00"
     
     @classmethod
     def current_position(cls) -> float:
-        return AudioLoop.player.time
+        """
+            Retorna a posição atual da música.
+
+            Ainda será implementado através da comunicação entre o processo de áudio e o processo principal.
+        """
+
+        return 0.0
     
     @classmethod
     def current_duration(cls) -> float:
-        return AudioLoop.player.source.duration
+        """
+            Retorna a duração total da música.
+
+            Ainda será implementado através da comunicação entre o processo de áudio e o processo principal.
+        """
+
+        return 0.0
 
     @classmethod
     def set_volume(cls, volume: float):
+        """
+            Define o volume da reprodução.
+
+            O valor é limitado ao intervalo aceito pelo pyglet:
+
+                0.0 → mínimo
+                1.0 → máximo
+
+            Depois da validação, o valor é enviado para o processo de áudio.
+        """
+
         cls._volume = max(0.0, min(1.0, volume))
-        AudioLoop.player.volume = cls._volume
+        AudioProcess.send_command("volume", cls._volume)
 
     @classmethod
     def get_volume(cls):
+        """
+            Retorna o volume conhecido pelo processo principal.
+        """
+
         return cls._volume
 
     @classmethod
     def go_to(cls, seconds: float):
-        AudioLoop.player.seek(seconds)
+        """
+        Solicita a alteração da posição da música.
+
+        O comando 'seek' ainda será implementado no AudioProcess.
+        """
+
+        # Será implementado na etapa de controle de posição.
+        pass

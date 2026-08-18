@@ -148,15 +148,12 @@ class GridImages(ft.GridView):
                     song_list.append(
                         Song(
                             mode = ReproductionMode.ALBUM,
-                            
                             name = os.path.basename(
                                 str(
                                     song_path.get('destination_song')
                                 ).replace('.mp3', '')
                             ),
-                            
                             path = str(song_path.get('destination_song')),
-                            
                             key = song_path.get('key_song')
                         ) 
                     )                
@@ -176,7 +173,10 @@ class GridImages(ft.GridView):
         self.page.overlay.append(
             OverlayImages(
                 image_big = img,
-                music = song_list,
+                music = sorted(
+                    song_list, 
+                    key = lambda song: song.name.casefold()
+                ),
                 mode = self.mode,
                 name = name,
                 playlist_mode = modo_playlist,

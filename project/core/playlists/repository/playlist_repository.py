@@ -267,10 +267,6 @@ class PlaylistRepository:
 
         keys_to_remove: set[str] = set()
 
-        # songs_json = Utils.sync_load_json(
-        #     AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
-        # )
-
         for key, value in cache_metadata.tracks.items():
             if (
                 value.get('id_playlist') == id and
@@ -320,14 +316,7 @@ class PlaylistRepository:
     
     @classmethod
     def identify_music_artist(cls, song_id: str) -> str:
-        
-        # songs_json: dict = Utils.sync_load_json(
-        #     AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "songs.json"
-        # )
-
         for key, value in cache_metadata.tracks.items():
-            # print(key, song_id)
-
             if key == song_id:
                 return value.get("defined_artist", "Artista Desconhedido")
         else:

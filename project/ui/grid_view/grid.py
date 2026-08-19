@@ -122,6 +122,7 @@ class GridImages(ft.GridView):
             for key, song in dados.get(e.control.data).items():
                 if key == 'songs':
                     for music in song:
+
                         song_list.append(
                             Song(
                                 mode = modo_playlist,

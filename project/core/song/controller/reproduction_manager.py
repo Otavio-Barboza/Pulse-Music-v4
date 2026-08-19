@@ -115,9 +115,9 @@ class ReproductionManager:
     # MÚSICA
     @classmethod
     def get_index(cls, key: str):
+        
         index: int
         song: Song
-
         for index, song in enumerate(cls._queue):
             if song.key == key:
                 cls._current_index = index
@@ -143,10 +143,12 @@ class ReproductionManager:
 
         cls.state.current_song = song
         cls.state.current_time = 0
-
-        Player.load_song(
-            Path(song.path) / f"{song.name}.mp3"
-        )
+        
+        if ReproductionManager.current_font != ReproductionMode.PLAYLIST:
+            Player.load_song(Path(song.path))
+        else:
+            Player.load_song(Path(song.path) / f"{song.name}.mp3")
+            
         Player.play()
 
         cls.set_is_playing(True)
@@ -155,20 +157,20 @@ class ReproductionManager:
         cls.notify('play/pause')
         cls.notify('current_song')
         
-        LyricsServices.notify(
-            event = 'get_lyrics',
-            data = {
-                'key' : cls.state.current_song.key,
-                'name' : cls.get_name(),
-                'artist' : cls.get_artist()
-            }
-        )
+        # LyricsServices.notify(
+        #     event = 'get_lyrics',
+        #     data = {
+        #         'key' : cls.state.current_song.key,
+        #         'name' : cls.get_name(),
+        #         'artist' : cls.get_artist()
+        #     }
+        # )
 
-        if LyricsServices.expanded_screen:
-            LyricsServices.notify(
-                event = 'actualization_letra',
-                data = None
-            )
+        # if LyricsServices.expanded_screen:
+        #     LyricsServices.notify(
+        #         event = 'actualization_letra',
+        #         data = None
+        #     )
 
     @classmethod
     def set_is_playing(cls, value: bool):

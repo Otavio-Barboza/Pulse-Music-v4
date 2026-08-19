@@ -15,6 +15,11 @@ class CacheLyrics:
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
+        print()
+        print("cls.lyrics:\n")
+        print(cls.lyric)
+        print()
+
     @classmethod
     def return_lyric(cls) -> str:        
         from core.song.controller.reproduction_manager import ReproductionManager

@@ -157,20 +157,20 @@ class ReproductionManager:
         cls.notify('play/pause')
         cls.notify('current_song')
         
-        # LyricsServices.notify(
-        #     event = 'get_lyrics',
-        #     data = {
-        #         'key' : cls.state.current_song.key,
-        #         'name' : cls.get_name(),
-        #         'artist' : cls.get_artist()
-        #     }
-        # )
+        LyricsServices.notify(
+            event = 'get_lyrics',
+            data = {
+                'key' : cls.state.current_song.key,
+                'name' : cls.get_name(),
+                'artist' : cls.get_artist()
+            }
+        )
 
-        # if LyricsServices.expanded_screen:
-        #     LyricsServices.notify(
-        #         event = 'actualization_letra',
-        #         data = None
-        #     )
+        if LyricsServices.expanded_screen:
+            LyricsServices.notify(
+                event = 'actualization_letra',
+                data = None
+            )
 
     @classmethod
     def set_is_playing(cls, value: bool):

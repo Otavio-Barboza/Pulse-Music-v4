@@ -44,6 +44,7 @@ class LyricsServices:
     def get_lyric(cls, data: dict) -> str | None:
         try:    
             if data.get("key") in CacheLyrics.lyric:
+                print(f"key is None: {data.get('key')}")
                 return
             
             song = cls.GENIUS.search_song(
@@ -52,6 +53,7 @@ class LyricsServices:
             )
             
             if not song:
+                print(f"Song: {song}")
                 return
             
             cls.save_lyric(
@@ -97,11 +99,21 @@ class LyricsServices:
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
+        print()
+        print(f"Letras existentes:\n")
+        print(existing_letters)
+        print()
+
         existing_letters[key_song] = {
             "original_lyric" : lyric,
             "original_language" : original_lyric,
             "translations" : []
         }
+
+        print()
+        print(f"Letras existentes:\n")
+        print(existing_letters)
+        print()
 
         Utils.sync_update_json(data = existing_letters, path = None)
 

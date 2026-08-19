@@ -4,6 +4,8 @@ from ui.playlist.base.music_list import ListViewMusic
 
 # import de back-end
 from core.services.controllers.grid_state import GridMode
+from core.playlists.controller.playlist_state import PlaylistState
+from core.playlists.enum.playlist_enum import PlaylistLoaded
 
 # import geral
 import flet as ft
@@ -100,3 +102,8 @@ class OverlayImages(ft.Container):
                 )
             ]
         )
+        
+        # PlaylistState.open_playlist(
+        #     id = card.data["id"],
+        #     status = PlaylistLoaded.OPEN
+        # )

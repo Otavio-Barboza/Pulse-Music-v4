@@ -186,9 +186,9 @@ class ListViewMusic(ft.ListView):
                 continue
 
             if (
-                sessao.estado.current_song is not None and
+                sessao.state.current_song is not None and
                 container.data.key is not None and
-                container.data.key == sessao.estado.current_song.key
+                container.data.key == sessao.state.current_song.key
             ):
                 container.bgcolor = color.amarelo3
             else:

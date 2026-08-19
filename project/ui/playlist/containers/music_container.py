@@ -145,20 +145,20 @@ class RowContainer(ft.Container):
         ReproductionManager.update_queues()
 
     def play_or_pause(self, e):
-        if Reproduction.current_reproduction != e.control.data.modo:
-            if e.control.data.modo == ReproductionMode.FAVORITE.value:
+        if Reproduction.current_reproduction != e.control.data.mode:
+            if e.control.data.mode == ReproductionMode.FAVORITE.value:
                 Reproduction.set_current_reproduction(ReproductionMode.FAVORITE)
             else:
-                Reproduction.set_current_reproduction(e.control.data.modo)
+                Reproduction.set_current_reproduction(e.control.data.mode)
         
-        if ReproductionManager.fonte_atual != e.control.data.modo:
+        if ReproductionManager.current_font != e.control.data.mode:
             ReproductionManager.set_font()
 
         if ReproductionManager.current_font is ReproductionMode.NOT_REPRODUCE:
             print('Sem reprodução definida')
             return
 
-        ReproductionManager.get_index(e.control.data.chave)
+        ReproductionManager.get_index(e.control.data.key)
         ReproductionManager.play()
 
     def return_artist(self) -> str:

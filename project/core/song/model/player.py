@@ -47,12 +47,11 @@ class Player:
     @classmethod
     def stop(cls):
         """
-            Para a reprodução e retorna a posição para o início.
-
-            O comando de seek ainda será implementado no AudioProcess. Por isso, esta operação será completada em uma etapa posterior.
+            Pausa a reprodução e retorna a posição para o início.
         """
 
         AudioProcess.send_command("pause")
+        AudioProcess.send_command("seek", 0)
     
     @classmethod
     def formatted_total_duration(cls) -> str:
@@ -91,22 +90,18 @@ class Player:
     @classmethod
     def current_position(cls) -> float:
         """
-            Retorna a posição atual da música.
-
-            Ainda será implementado através da comunicação entre o processo de áudio e o processo principal.
+            Retorna a posição atual conhecida da reprodução.
         """
 
-        return 0.0
+        return AudioProcess.get_position()
     
     @classmethod
     def current_duration(cls) -> float:
         """
-            Retorna a duração total da música.
-
-            Ainda será implementado através da comunicação entre o processo de áudio e o processo principal.
+            Retorna a duração atual conhecida da música.
         """
 
-        return 0.0
+        return AudioProcess.get_duration()
 
     @classmethod
     def set_volume(cls, volume: float):
@@ -135,10 +130,6 @@ class Player:
     @classmethod
     def go_to(cls, seconds: float):
         """
-        Solicita a alteração da posição da música.
-
-        O comando 'seek' ainda será implementado no AudioProcess.
+            Solicita ao processo de áudio que altere a posição atual da música.
         """
-
-        # Será implementado na etapa de controle de posição.
-        pass
+        AudioProcess.send_command("seek", seconds)

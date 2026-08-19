@@ -1,13 +1,15 @@
 # imports de back-end
+from core.song.model.song import Song
 from core.song.model.data_song import PlayerState, ReproductionConfiguration
 from core.song.model.reproduction import Reproduction
 from core.song.model.player import Player
+from core.song.model.audio import AudioProcess
 from core.song.enum.song_enum import ReproductionMode
-from core.song.model.song import Song
 from core.song.repository.song_repository import SongRepository
 from core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
+from pathlib import Path
 import random, threading, time
 
 
@@ -131,13 +133,20 @@ class ReproductionManager:
 
         if not cls._queue:
             return
-        
-        song: Song = cls._queue[cls._current_index] if not cls.configuration.shuffle else cls._random_queue[cls._current_index]
+
+        if not cls.configuration.shuffle:
+            song: Song = cls._queue[cls._current_index]
+        elif cls.configuration.shuffle and cls.configuration.repeat:
+            song: Song = cls._queue[cls._current_index]
+        elif cls.configuration.shuffle and not cls.configuration.repeat:
+            song: Song = cls._random_queue[cls._current_index]
 
         cls.state.current_song = song
         cls.state.current_time = 0
 
-        Player.load_song(song.path)
+        Player.load_song(
+            Path(song.path) / f"{song.name}.mp3"
+        )
         Player.play()
 
         cls.set_is_playing(True)
@@ -148,17 +157,17 @@ class ReproductionManager:
         
         LyricsServices.notify(
             event = 'get_lyrics',
-            dados = {
-                'chave' : cls.state.current_song.chave,
-                'nome' : cls.get_name(),
-                'artista' : cls.get_artist()
+            data = {
+                'key' : cls.state.current_song.key,
+                'name' : cls.get_name(),
+                'artist' : cls.get_artist()
             }
         )
 
         if LyricsServices.expanded_screen:
             LyricsServices.notify(
                 event = 'actualization_letra',
-                dados = None
+                data = None
             )
 
     @classmethod
@@ -206,12 +215,16 @@ class ReproductionManager:
     # CONFIGURAÇÕES
     @classmethod
     def toggle_shuffle(cls):
+
         cls.configuration.shuffle = not cls.configuration.shuffle
+        print(f"SHUFFLE: {cls.configuration.shuffle}")
         cls.notify('shuffle')
 
     @classmethod
     def toggle_repeat(cls):
+
         cls.configuration.repeat = not cls.configuration.repeat
+        print(f"REPEAT: {cls.configuration.repeat}")
         cls.notify('repeat')
 
     
@@ -228,17 +241,48 @@ class ReproductionManager:
         cls._is_monitoring = True
         cls.start_time_monitor()
 
+
+    @classmethod
+    def process_audio_events(cls):
+        """
+            Processa os eventos enviados pelo processo de áudio.
+
+            O processo de áudio apenas informa o que aconteceu.
+            A decisão sobre o que fazer pertence ao ReproductionManager.
+        """
+
+        for event, value in AudioProcess.process_events():
+
+            match event:
+
+                case "end_of_song":
+                    cls.handle_end_of_music()
+                    
     @classmethod
     def start_time_monitor(cls):
 
         def loop():
+            """
+                Monitora continuamente o estado da reprodução.
+
+                O áudio executa em um processo separado.
+                Este monitor apenas recebe informações desse processo e atualiza o estado da aplicação.
+            """
 
             while True:
+
+                # Obtém os estados mais recentes enviados pelo processo de áudio
+                AudioProcess.update_state()
+
+                # Verifica se o processo de áudio enviou algum evento, como o término da música.
+                cls.process_audio_events()
+
                 if (
                     cls.state.is_playing 
                     and not cls._slider_dragging
                 ):
-                    current_duration = Player.current_duration()
+                    # Obtém a duração atual através do estado recebido do processo de áudio.
+                    current_duration: float = Player.current_duration()
 
                     if (
                         cls.state.total_time != current_duration
@@ -247,11 +291,13 @@ class ReproductionManager:
                         cls.update_total_time()
                         cls.notify('slider')
 
-                    tempo = Player.current_position()
-                    cls.update_time(tempo)
-
+                    # Obtém a posição atual através do estado recebido do processo de áudio.
+                    temp: float = Player.current_position()
+                    cls.update_time(temp)
+                    
                 time.sleep(0.2)
-        
+
+        # O monitor continua sendo executado fora do fluxo principal da aplicação.
         threading.Thread(
             target = loop,
             daemon = True
@@ -294,6 +340,8 @@ class ReproductionManager:
     # TRATAMENTO AUTOMÁTICO DA MÚSICA
     @classmethod
     def handle_end_of_music(cls):
+        print(f"(handle_end_of_music): {cls.configuration.repeat}")
+
         if cls.configuration.repeat:
             cls.play()
         else:

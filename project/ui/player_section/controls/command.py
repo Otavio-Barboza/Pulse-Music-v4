@@ -111,20 +111,20 @@ class PlayerCommands(ft.Container):
         ReproductionManager.register_callback('volume', self.actualization_volume)
 
     def open_volume(self, e):
-        if not self.player.expandido.visible:
+        if not self.player.expanded.visible:
             if self.volume_overlay.visible:
                 self.volume_overlay.visible = False
             else:
                 self.player.close_overlay()
                 self.volume_overlay.visible = True
-        elif self.player.expandido.visible and not self.volume.visible:
+        elif self.player.expanded.visible and not self.volume.visible:
             self.expand_icon.col = 2
             self.icon_volume.col = 2
-        elif self.player.expandido.visible and self.volume.visible:
+        elif self.player.expanded.visible and self.volume.visible:
             self.expand_icon.col = 6
             self.icon_volume.col = 6
         
-        self.volume.visible = not self.volume.visible if self.player.expandido.visible else False
+        self.volume.visible = not self.volume.visible if self.player.expanded.visible else False
         self.page.update()
     
     def close_overlay(self, e):

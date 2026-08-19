@@ -95,6 +95,6 @@ class CompactProgressBar(ft.Container):
     def detect_drag_slider(self, e):
         ReproductionManager.set_drag_slider(True)
     
-    def alter_position_slider(self, e):
-        ReproductionManager.go_to(e.control.value)
+    def alter_position_slider(self, e):        
         ReproductionManager.set_drag_slider(False)
+        ReproductionManager.go_to(e.control.value)

@@ -5,6 +5,7 @@ from core.meta.repository.tasks import Task
 from core.meta.cache.global_cache import cache_metadata
 from core.services.account_manager import AccountManager
 from core.utils.utils import Utils
+from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
@@ -54,49 +55,48 @@ class SongRepository:
     # Onde é chamadas essas funções?    
     @classmethod
     def get_artist(cls, key_song : str):
-        song_json: dict = Utils.sync_load_json(f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Song/musicas.json')
+        song_json: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
+        )
         
         key: str
         item: dict
         for key, item in song_json.items():
             if key == key_song:
-                artista = item.get('artista_final')
+                artista = item.get('defined_artist')
                 return artista if artista is not None else 'Artista Desconhecido'
 
     @classmethod
-    def get_cover(cls, song: str):    
-        cover: str
+    def get_cover(cls, song: str):
+        cover_destination: Path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "images" / "covers"
 
-        for cover in os.listdir(
-            f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Song'
-        ):
+        cover: str
+        for cover in os.listdir(cover_destination):
             if cover.removesuffix('.jpg') == song:
-                return os.path.normpath(
-                    os.path.join(
-                        f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Imagens/Capa Song',
-                        cover
-                    )
-                )
+                return cover_destination / cover
         else:
-            return r'Assets\Global\Images\Padrao\capa_musicas_desconhecidas.png'
+            return r'images\placeholders\capa_musicas_desconhecidas.png'
     
     @classmethod
     def get_song(cls, key_song: str):
-        song_json = Utils.sync_load_json(f'Assets/Data/Contas/{AccountManager.account_cache["current_account"]}/Song/musicas.json')
+        song_json: dict = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" /"songs.json"
+        )
         
         key: str
         item: dict
-
         for key, item in song_json.items():
             if key == key_song:
                 song = item
                 break
 
-        if song['nome_musica_filtrado'].get('titulo_ID3_filtrado') is not None:
-            return song['nome_musica_filtrado'].get('titulo_ID3_filtrado')
-        elif song['nome_musica_filtrado'].get('arquivo_mp3_filtrado') is not None:
-            return song['nome_musica_filtrado'].get('arquivo_mp3_filtrado')
-        elif song['titulo_ID3_original'] is not None:
-            return song.get('titulo_ID3_original')
-        else:
-            return song.get('arquivo_original')
+        if song["id3_data"]["filtered_data"].get("title") is not None:
+            return song["id3_data"]["filtered_data"].get("title")
+
+        if song["mp3_file_filtered"].get("title") is not None:
+            return song["mp3_file_filtered"].get("title")
+
+        if song["id3_data"]["original_data"].get("title") is not None:
+            return song["id3_data"]["original_data"].get("title")
+
+        return song["mp3_file_filtered"].get("title")

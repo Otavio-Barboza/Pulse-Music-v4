@@ -211,10 +211,8 @@ async def main(page: ft.Page):
     
     page.on_resized = ResizeManager.to_execute
    
-    # AudioLoop.start()
     AudioProcess.start()
-    # ReproductionManager.start()
-
+    
 
     """  Notificação e execução de eventos globais  """
     

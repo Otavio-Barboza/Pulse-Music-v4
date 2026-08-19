@@ -3,7 +3,9 @@ from core.lyrics.model.genius import Genius
 from core.lyrics.translate.translator import Translator
 from core.lyrics.cache.cache_lyrics import CacheLyrics
 from core.lyrics.translate.language_detect import language_detect
+from core.services.account_manager import AccountManager
 from core.utils.utils import Utils
+from core.utils.path import AppPaths
 
 # import geral
 import requests
@@ -61,7 +63,7 @@ class LyricsServices:
             CacheLyrics.load_cache()
 
             if cls.expanded_screen:
-                cls.notifify(
+                cls.notify(
                     event = "actualization_lyric",
                     data = None
                 )
@@ -91,7 +93,9 @@ class LyricsServices:
     
     @classmethod
     def save_lyric(cls, lyric: str, key_song: str, original_lyric: str):
-        existing_letters = Utils.sync_load_json()
+        existing_letters = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
 
         existing_letters[key_song] = {
             "original_lyric" : lyric,
@@ -103,7 +107,9 @@ class LyricsServices:
 
     @classmethod
     def update_translations(cls, key_song: str, new_language: str, new_lyric: str):
-        existing_letters = Utils.sync_load_json()
+        existing_letters = Utils.sync_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
 
         if new_language not in existing_letters[key_song]["translations"]:
             existing_letters[key_song]["translations"].append({

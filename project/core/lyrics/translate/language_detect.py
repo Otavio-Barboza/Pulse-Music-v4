@@ -12,4 +12,3 @@ def language_detect(lyric: str):
     except Exception as e:
         print(e)
         return None
-    

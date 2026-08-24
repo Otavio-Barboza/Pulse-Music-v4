@@ -16,7 +16,7 @@ class LyricsContainer(ft.Container):
             expand = True,
             alignment = ft.alignment.center
         )
-        self.page = page
+        # self.page = page
 
         self.content = ft.Column(
             controls = [

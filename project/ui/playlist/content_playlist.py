@@ -80,6 +80,7 @@ class ContentPlaylist(ft.Container):
         self.state.create_playlist()
         
     def open_playlist(self, id : str, data : str):
+        from core.song.controller.reproduction_manager import ReproductionManager
         """
             Ordem: PlaylistManager ->
         Args:
@@ -98,7 +99,8 @@ class ContentPlaylist(ft.Container):
         fonte.load_playlist(
             song_list = list_music
         )
-
+        ReproductionManager.set_font()
+        
         self.open_function()
 
         list_view = ListViewMusic(

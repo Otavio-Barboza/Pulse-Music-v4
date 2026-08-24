@@ -10,7 +10,7 @@ class ContentInformation(ft.Container):
                 controls = []
             )
         )
-        self.page = page
+        # self.page = page
 
     def to_replace(self, new):
         self.content.controls.clear()

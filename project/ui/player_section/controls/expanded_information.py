@@ -39,7 +39,7 @@ class ExpandedInformation(ft.Container):
             value = value
         )
     
-    def _add_image(self, img: str = r'assets\images\placeholders\capa_musicas_desconhecidas.png') -> ft.Image:
+    def _add_image(self, img: str = r'images\placeholders\capa_musicas_desconhecidas.png') -> ft.Image:
         return ft.Image(
             src = img,
             border_radius = ft.border_radius.all(10),

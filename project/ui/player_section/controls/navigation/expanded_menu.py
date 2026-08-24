@@ -28,12 +28,12 @@ class InformationMenu(ft.Container):
             controls = [
                 self._create_text_button(
                     text = 'Letra', 
-                    view = 'letra', 
+                    view = 'lyric', 
                     callback = alter_view
                 ),
                 self._create_text_button(
                     text = 'Traduções da Letra', 
-                    view = 'traducao', 
+                    view = 'translation', 
                     callback = alter_view
                 )
             ]

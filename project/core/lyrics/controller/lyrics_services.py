@@ -26,18 +26,18 @@ class LyricsServices:
     callbacks = {}
 
     @classmethod
-    def register_callback(cls, event: str, callback : callable):
+    def register_callback(cls, event: str, callback: callable):
         if event not in cls.callbacks:
             cls.callbacks[event] = []
         cls.callbacks[event].append(callback)
 
     @classmethod
-    def notify(cls, data, event : str):
+    def notify(cls, data, event: str):
         for callback in cls.callbacks.get(event, []):
             callback(data)
 
     @classmethod
-    def set_expanded_screen(cls, valor : bool):
+    def set_expanded_screen(cls, valor: bool):
         cls.expanded_screen = valor
 
     @classmethod
@@ -49,7 +49,7 @@ class LyricsServices:
             song = cls.GENIUS.search_song(
                 title = data.get("name"),
                 artist = data.get("artist")
-            )
+            )   
             
             if not song:
                 return
@@ -103,7 +103,10 @@ class LyricsServices:
             "translations" : []
         }
 
-        Utils.sync_update_json(data = existing_letters, path = None)
+        Utils.sync_update_json(
+            data = existing_letters, 
+            path =  AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
 
     @classmethod
     def update_translations(cls, key_song: str, new_language: str, new_lyric: str):
@@ -117,7 +120,10 @@ class LyricsServices:
                 "lyric" : new_lyric
             })
 
-        Utils.sync_update_json(data = existing_letters, path = None)
+        Utils.sync_update_json(
+            data = existing_letters, 
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
+        )
 
     @classmethod
     def start_translation(cls, language: str):

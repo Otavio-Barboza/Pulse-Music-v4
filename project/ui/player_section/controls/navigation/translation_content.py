@@ -86,7 +86,7 @@ class TranslationContent(ft.Container):
         )
 
     def load_lyric(self):
-        from project.core.lyrics.cache.cache_lyrics import CacheLyrics
+        from core.lyrics.cache.cache_lyrics import CacheLyrics
 
         if CacheLyrics.cache_lyrics is None:
             return 'Nenhuma lyric carregada para tradução'
@@ -94,7 +94,7 @@ class TranslationContent(ft.Container):
             return LyricsServices.start_translation(CacheLyrics.cache_lyrics)
 
     def select_language(self, e):
-        from project.core.lyrics.cache.cache_lyrics import CacheLyrics
+        from core.lyrics.cache.cache_lyrics import CacheLyrics
 
         CacheLyrics.update_cache(e.control.data.get('language'))
         LyricsServices.translator.target = e.control.data.get('uf')

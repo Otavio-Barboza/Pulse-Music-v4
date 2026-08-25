@@ -41,7 +41,8 @@ class CacheLyrics:
     @classmethod
     def return_translated_lyric(cls, language: str) -> str:        
         from core.song.controller.reproduction_manager import ReproductionManager
-        
+
+        print(f"(return_translated_lyric): {language}")
         if ReproductionManager.state.current_song is None:
             return None
         
@@ -55,8 +56,7 @@ class CacheLyrics:
         if len(lyrics) == 0:
             return None
         
-        translation: dict
-        
+        translation: dict 
         for translation in lyrics:
             if translation.get('language') == language:
                 return translation.get('lyric')

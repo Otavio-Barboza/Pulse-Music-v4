@@ -8,7 +8,8 @@ from core.utils.utils import Utils
 from core.utils.path import AppPaths
 
 # import geral
-import requests
+from deep_translator.exceptions import TranslationNotFound
+import requests, time
 
 
 class LyricsServices:
@@ -84,13 +85,20 @@ class LyricsServices:
         cls.translator.source = language_detect(lyric)
         
         if (
-            cls.translator.source is None
-             or
-            cls.translator.target is None
+            (cls.translator.source is None)
+            or (cls.translator.target is None)
         ):
             return
-        return cls.translator.translate(lyric)
-    
+
+        for attempt in range(5):
+            try:
+                return cls.translator.translate(lyric)
+            except TranslationNotFound:
+                if attempt < 4:
+                    time.sleep(0.5)
+        else:
+            return None
+        
     @classmethod
     def save_lyric(cls, lyric: str, key_song: str, original_lyric: str):
         existing_letters = Utils.sync_load_json(
@@ -114,12 +122,15 @@ class LyricsServices:
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
-        if new_language not in existing_letters[key_song]["translations"]:
+        if not any(
+            translation["language"] == new_language
+            for translation in existing_letters[key_song]["translations"]
+        ):
             existing_letters[key_song]["translations"].append({
                 "language" : new_language,
                 "lyric" : new_lyric
             })
-
+        
         Utils.sync_update_json(
             data = existing_letters, 
             path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
@@ -129,30 +140,48 @@ class LyricsServices:
     def start_translation(cls, language: str):
         from core.song.controller.reproduction_manager import ReproductionManager
 
+        # Senão tiver nenhuma música definida, não tem nada para traduzir
         if ReproductionManager.state.current_song is None:
             return "Nenhuma lyric carregada para tradução"
-        
-        existing_translated_lyrics = CacheLyrics.return_translated_lyric(language)
-        
-        if existing_translated_lyrics is not None:
-            return existing_translated_lyrics
-        
+
+
+        # Tenta buscar a letra com base na linguagem definida.
+        existing_translated_lyric = CacheLyrics.return_translated_lyric(language)
+
+        # Se existir a letra, retorna ela.
+        if existing_translated_lyric is not None:
+            return existing_translated_lyric
+
+
+        # Parte 2
+
+        # pega a letra original
         lyric = CacheLyrics.return_lyric()
 
+        # Senão houver diz que não encontrou
         if not lyric:
-            return "A respectiva lyric não foi encontrada. Portanto, não é possível translate!"
-        
+            return "A letra musical não foi encontrada. Portanto, não é possível traduzir!"
+
+
+        # traduz a letra
         translated_lyric = cls.translate(lyric)
 
+        # se der erro na tradução, retorna que não foi possível
         if not translated_lyric:
             return "Falha na tradução, tente novamente!"
-        
+
+
+        # Atualiza o json com as letras
         cls.update_translations(
             key_song = ReproductionManager.state.current_song.key,
             new_language = language,
             new_lyric = translated_lyric
         )
 
+
+        # atualiza o cache
         CacheLyrics.load_cache()
 
+
+        # retorna a letra traduzida
         return translated_lyric

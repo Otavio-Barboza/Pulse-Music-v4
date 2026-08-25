@@ -88,6 +88,8 @@ class TranslationContent(ft.Container):
     def load_lyric(self):
         from core.lyrics.cache.cache_lyrics import CacheLyrics
 
+        print(CacheLyrics.cache_lyrics)
+
         if CacheLyrics.cache_lyrics is None:
             return 'Nenhuma lyric carregada para tradução'
         else:

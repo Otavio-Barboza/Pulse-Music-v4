@@ -23,3 +23,5 @@ class AppPaths:
 
     # jsons
     ACCOUNT_JSON: Path = LOCAL_APP_DATA / "accounts.json"
+    
+print(AppPaths.ACCOUNT)

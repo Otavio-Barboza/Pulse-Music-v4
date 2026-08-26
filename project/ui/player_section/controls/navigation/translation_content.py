@@ -44,7 +44,9 @@ class TranslationContent(ft.Container):
                         'uf' : uf,
                         'language' : language
                     },                                        
-                    on_click = self.select_language
+                    on_click = lambda event: self.page.run_task(
+                        self.select_language, event
+                    )
                 ) for language, uf in LyricsServices.AVAILABLE_LANGUAGES.items()
             ]
         )
@@ -57,7 +59,7 @@ class TranslationContent(ft.Container):
                 size = 18,
                 weight = ft.FontWeight.W_500,
 
-                value = self.load_lyric()
+                value = "Nenhuma letra traduzida foi selecionada"
             )
         )
 
@@ -84,22 +86,45 @@ class TranslationContent(ft.Container):
                 self.lyric
             ]
         )
-
-    def load_lyric(self):
+        
+        
+    def did_mount(self):
+        self.translation_task = self.page.run_task(self.load_lyric)
+        
+        self.callback_state_translation = self.actualization_status_translation
+        LyricsServices.register_callback(
+            event = "actualization_status_translation_lyric",
+            callback = self.actualization_status_translation
+        ) 
+        
+    def will_unmount(self):
+        if self.translation_task:
+            self.translation_task.cancel()
+            
+        if self.actualization_status_translation in LyricsServices.callbacks["actualization_status_translation_lyric"]:
+            LyricsServices.callbacks["actualization_status_translation_lyric"].remove(self.actualization_status_translation)
+    
+    
+    def actualization_status_translation(self, message: str):
+        self.lyric.content.value = message
+        self.page.update()
+        
+        
+    async def load_lyric(self):
         from core.lyrics.cache.cache_lyrics import CacheLyrics
 
-        print(CacheLyrics.cache_lyrics)
-
         if CacheLyrics.cache_lyrics is None:
-            return 'Nenhuma lyric carregada para tradução'
+            self.lyric.content.value = 'Nenhuma lyric carregada para tradução'
+            self.update()
         else:
-            return LyricsServices.start_translation(CacheLyrics.cache_lyrics)
+            self.lyric.content.value = await LyricsServices.start_translation(CacheLyrics.cache_lyrics)
+            self.update()
 
-    def select_language(self, e):
+    async def select_language(self, e):
         from core.lyrics.cache.cache_lyrics import CacheLyrics
 
         CacheLyrics.update_cache(e.control.data.get('language'))
         LyricsServices.translator.target = e.control.data.get('uf')
         
-        self.lyric.content.value = LyricsServices.start_translation(e.control.data.get('language'))
+        self.lyric.content.value = await LyricsServices.start_translation(e.control.data.get('language'))
         self.update()

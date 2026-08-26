@@ -15,11 +15,6 @@ class CacheLyrics:
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
-        print()
-        print("cls.lyrics:\n")
-        print(cls.lyric)
-        print()
-
     @classmethod
     def return_lyric(cls) -> str:        
         from core.song.controller.reproduction_manager import ReproductionManager
@@ -42,7 +37,6 @@ class CacheLyrics:
     def return_translated_lyric(cls, language: str) -> str:        
         from core.song.controller.reproduction_manager import ReproductionManager
 
-        print(f"(return_translated_lyric): {language}")
         if ReproductionManager.state.current_song is None:
             return None
         

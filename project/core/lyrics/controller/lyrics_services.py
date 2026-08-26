@@ -9,16 +9,17 @@ from core.utils.path import AppPaths
 
 # import geral
 from deep_translator.exceptions import TranslationNotFound
-import requests, time
+import requests, time, asyncio
 
 
 class LyricsServices:
 
     expanded_screen: bool = False
+    
     GENIUS = Genius()
     translator = Translator()
 
-    AVAILABLE_LANGUAGES : dict[str, str] = {}    
+    AVAILABLE_LANGUAGES: dict[str, str] = {}    
     for language, uf in translator._languages.items():
         AVAILABLE_LANGUAGES[
             language.replace(" ", "_")
@@ -26,6 +27,8 @@ class LyricsServices:
 
     callbacks = {}
 
+
+    # callbacks, registros e chamadas
     @classmethod
     def register_callback(cls, event: str, callback: callable):
         if event not in cls.callbacks:
@@ -37,12 +40,20 @@ class LyricsServices:
         for callback in cls.callbacks.get(event, []):
             callback(data)
 
+
+    # setters
     @classmethod
     def set_expanded_screen(cls, valor: bool):
         cls.expanded_screen = valor
 
     @classmethod
-    def get_lyric(cls, data: dict) -> str | None:
+    def set_language_target(cls, target: str):
+        cls.translator.target = target
+            
+            
+    # Operações
+    @classmethod
+    async def get_lyric(cls, data: dict) -> str | None:
         try:    
             if data.get("key") in CacheLyrics.lyric:
                 return
@@ -77,25 +88,76 @@ class LyricsServices:
             return 
     
     @classmethod
-    def set_language_target(cls, target: str):
-        cls.translator.target = target
-
-    @classmethod
-    def translate(cls, lyric: str) -> str | None:
-        cls.translator.source = language_detect(lyric)
+    async def translate(cls, lyric: str) -> str | None:
+        """
+        _summary_: Realiza a tradução de forma assíncrona.
         
-        if (
-            (cls.translator.source is None)
-            or (cls.translator.target is None)
+        O deep_translator continua sendo síncrono internamente, portanto sua execução é tranferida para uma thread.
+
+        Args:
+            lyric (str): letra da música completa para tradução
+
+        Returns:
+            str | None: Retorna a letra (str) se sucedida a tradução, caso contrário retornará None, como um identificador de falha.
+        """
+        
+        # Identificação do idioma
+        _source: str = await asyncio.to_thread(
+            language_detect,
+            lyric
+        )
+        
+        if (    
+            _source is None
+            or cls.translator.target is None
         ):
             return
+        
+        cls.translator.source = _source
 
-        for attempt in range(5):
+
+        # tratamento das tentativas de busca pela letra da música.
+        max_attempts: int = 5
+        timeout: int = 15
+        retry_delay: int = 1
+        
+        for attempt in range(1, max_attempts + 1):
+            
             try:
-                return cls.translator.translate(lyric)
-            except TranslationNotFound:
-                if attempt < 4:
-                    time.sleep(0.5)
+                # Callcback do front-end
+                
+                # informar que a tradução está sendo realizada.
+                
+                translated_lyric: str | None = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        cls.translator.translate,
+                        lyric
+                    ),
+                    timeout = timeout
+                ) 
+                
+                if (
+                    not translated_lyric
+                    or translated_lyric.startswith("Error ")
+                ):
+                    raise TranslationNotFound(lyric)
+                
+                return translated_lyric
+            except (
+                TranslationNotFound, 
+                asyncio.TimeoutError        
+            ):
+                if attempt >= max_attempts:
+                     # CALLBACK FRONT-END:
+                    # informar que todas as tentativas falharam.
+                    #
+                    # Aqui a UI pode mostrar:
+                    # "Não foi possível traduzir a letra.
+                    #  Tente novamente mais tarde."
+                    
+                    return
+                
+            await asyncio.sleep(retry_delay)
         else:
             return None
         
@@ -137,12 +199,14 @@ class LyricsServices:
         )
 
     @classmethod
-    def start_translation(cls, language: str):
+    async def start_translation(cls, language: str):
         from core.song.controller.reproduction_manager import ReproductionManager
 
+        # Parte 1: Se existir a letra já traduzida para o idioma definido, obtém ela e a retorna. 
+        
         # Senão tiver nenhuma música definida, não tem nada para traduzir
         if ReproductionManager.state.current_song is None:
-            return "Nenhuma lyric carregada para tradução"
+            return "Nenhuma letra carregada para tradução"
 
 
         # Tenta buscar a letra com base na linguagem definida.
@@ -153,7 +217,7 @@ class LyricsServices:
             return existing_translated_lyric
 
 
-        # Parte 2
+        # Parte 2: senão é efetuada a tentativa de tradução da letra.
 
         # pega a letra original
         lyric = CacheLyrics.return_lyric()
@@ -162,12 +226,20 @@ class LyricsServices:
         if not lyric:
             return "A letra musical não foi encontrada. Portanto, não é possível traduzir!"
 
-
+        cls.notify(
+            event = "actualization_status_translation_lyric",
+            data = "Traduzindo a letra, aguarde..."
+        )
+        
         # traduz a letra
-        translated_lyric = cls.translate(lyric)
+        translated_lyric = await cls.translate(lyric)
 
         # se der erro na tradução, retorna que não foi possível
         if not translated_lyric:
+            cls.notify(
+                event = "actualization_status_translation_lyric",
+                data = "Falha na tradução, tente novamente!"
+            )
             return "Falha na tradução, tente novamente!"
 
 
@@ -179,9 +251,13 @@ class LyricsServices:
         )
 
 
-        # atualiza o cache
+        # atualiza o cache, notificação e retorno da letra.
         CacheLyrics.load_cache()
 
-
+        # cls.notify(
+        #     event = "actualization_status_translation_lyric",
+        #     data = ""
+        # )
+        
         # retorna a letra traduzida
         return translated_lyric

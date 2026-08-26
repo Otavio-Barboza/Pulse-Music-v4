@@ -28,20 +28,31 @@ class LyricsContainer(ft.Container):
             ]
         )
 
-        self.callback = self.update_lyric
+        
+
+    def did_mount(self):
+        self._update_callback = self.update_lyric
         LyricsServices.register_callback(
             event = "actualization_lyric",
             callback = self.update_lyric
         )
-
-    def did_mount(self):
+        
+        self._get_lyric_callback = LyricsServices.get_lyric
+        LyricsServices.register_callback(
+            event = 'get_lyrics',
+            callback = LyricsServices.get_lyric
+        )
+        
         LyricsServices.set_expanded_screen(True)
 
     def will_unmount(self):
         LyricsServices.set_expanded_screen(False)
         
-        if self.callback in LyricsServices.callbacks["actualization_lyric"]:
-            LyricsServices.callbacks["actualization_lyric"].remove(self.callback)
+        if self._update_callback in LyricsServices.callbacks["actualization_lyric"]:
+            LyricsServices.callbacks["actualization_lyric"].remove(self._update_callback)
+       
+        if self._get_lyric_callback in LyricsServices.callbacks["get_lyrics"]:
+            LyricsServices.callbacks["get_lyrics"].remove(self._get_lyric_callback)
         
     def load_lyric(self) -> str:
         from core.lyrics.cache.cache_lyrics import CacheLyrics

@@ -38,11 +38,7 @@ class ReproductionManager:
         'repeat' : [],
         'shuffle' : []
     }
-
-    LyricsServices.register_callback(
-        event = 'get_lyrics',
-        callback = LyricsServices.get_lyric
-    )
+    
 
     # CALLBACKS
     @classmethod

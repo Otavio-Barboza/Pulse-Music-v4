@@ -35,13 +35,7 @@ class LyricsContainer(ft.Container):
         LyricsServices.register_callback(
             event = "actualization_lyric",
             callback = self.update_lyric
-        )
-        
-        self._get_lyric_callback = LyricsServices.get_lyric
-        LyricsServices.register_callback(
-            event = 'get_lyrics',
-            callback = LyricsServices.get_lyric
-        )
+        )        
         
         LyricsServices.set_expanded_screen(True)
 
@@ -50,9 +44,6 @@ class LyricsContainer(ft.Container):
         
         if self._update_callback in LyricsServices.callbacks["actualization_lyric"]:
             LyricsServices.callbacks["actualization_lyric"].remove(self._update_callback)
-       
-        if self._get_lyric_callback in LyricsServices.callbacks["get_lyrics"]:
-            LyricsServices.callbacks["get_lyrics"].remove(self._get_lyric_callback)
         
     def load_lyric(self) -> str:
         from core.lyrics.cache.cache_lyrics import CacheLyrics

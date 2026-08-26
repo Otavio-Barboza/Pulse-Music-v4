@@ -40,6 +40,14 @@ class LyricsServices:
         for callback in cls.callbacks.get(event, []):
             callback(data)
 
+    @classmethod
+    async def notify_callback_lyrics(cls, data, event: str):
+        for callback in cls.callbacks.get(event, []):
+            result = callback(data)
+
+            if asyncio.iscoroutine(result):
+                await result
+
 
     # setters
     @classmethod
@@ -58,15 +66,21 @@ class LyricsServices:
             if data.get("key") in CacheLyrics.lyric:
                 return
             
-            song = cls.GENIUS.search_song(
+            song = await asyncio.to_thread(
+                cls.GENIUS.search_song,
                 title = data.get("name"),
                 artist = data.get("artist")
-            )   
+            )
             
             if not song:
                 return
+
+            original_lyric = await asyncio.to_thread(
+                language_detect,
+                song.lyrics
+            )
             
-            cls.save_lyric(
+            await cls.save_lyric(
                 key_song = data.get("key"),
                 lyric = song.lyrics,
                 original_lyric = language_detect(song.lyrics)
@@ -155,15 +169,15 @@ class LyricsServices:
                     # "Não foi possível traduzir a letra.
                     #  Tente novamente mais tarde."
                     
-                    return
+                    return 
                 
             await asyncio.sleep(retry_delay)
         else:
             return None
         
     @classmethod
-    def save_lyric(cls, lyric: str, key_song: str, original_lyric: str):
-        existing_letters = Utils.sync_load_json(
+    async def save_lyric(cls, lyric: str, key_song: str, original_lyric: str):
+        existing_letters = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
 
@@ -173,7 +187,7 @@ class LyricsServices:
             "translations" : []
         }
 
-        Utils.sync_update_json(
+        Utils.async_update_json(
             data = existing_letters, 
             path =  AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )

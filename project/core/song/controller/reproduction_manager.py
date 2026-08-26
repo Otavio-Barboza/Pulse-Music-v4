@@ -10,7 +10,7 @@ from core.lyrics.controller.lyrics_services import LyricsServices
 
 # import geral
 from pathlib import Path
-import random, threading, time
+import random, threading, time, asyncio
 
 
 class ReproductionManager:
@@ -38,7 +38,11 @@ class ReproductionManager:
         'repeat' : [],
         'shuffle' : []
     }
-    
+
+    LyricsServices.register_callback(
+        event = 'get_lyrics',
+        callback = LyricsServices.get_lyric
+    )
 
     # CALLBACKS
     @classmethod
@@ -153,13 +157,15 @@ class ReproductionManager:
         cls.notify('play/pause')
         cls.notify('current_song')
         
-        LyricsServices.notify(
-            event = 'get_lyrics',
-            data = {
-                'key' : cls.state.current_song.key,
-                'name' : cls.get_name(),
-                'artist' : cls.get_artist()
-            }
+        asyncio.create_task(
+            LyricsServices.notify_callback_lyrics(
+                event = 'get_lyrics',
+                data = {
+                    'key' : cls.state.current_song.key,
+                    'name' : cls.get_name(),
+                    'artist' : cls.get_artist()
+                }
+            )
         )
 
         if LyricsServices.expanded_screen:

@@ -9,6 +9,7 @@ from core.meta.controller.scanner_controller import ScannerController
 from core.meta.repository.metadata_repository import MetadataRepository
 from core.utils.path import AppPaths
 from core.utils.utils import Utils
+from core.favorite.controller.favoritas_controller import FavoriteState
 
 # imports gerais
 from pathlib import Path
@@ -118,7 +119,7 @@ class Scanner:
                         "added_to_page" : True
                     }
                 )
-
+            
             _changed = False
 
         await asyncio.sleep(1)
@@ -263,6 +264,9 @@ class Scanner:
         lyrics_json: dict = await Utils.async_load_json(
             AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )
+        favorites_json: dict = await Utils.async_load_json(
+            AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json"
+        )
 
         """  parte 2  """
 
@@ -335,6 +339,9 @@ class Scanner:
             if lyrics_json.get(key, None) is not None:
                 del lyrics_json[key]
 
+            if favorites_json.get(key, None) is not None:
+                del favorites_json[key]
+
 
         """  Restante da execução  """
 
@@ -346,6 +353,10 @@ class Scanner:
             path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json",
             data = lyrics_json
         )            
+        await Utils.async_update_json(
+            path = AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "favorites.json",
+            data = favorites_json
+        )            
 
         GridState.notify(
             event = 'actualization_grid', 
@@ -354,6 +365,10 @@ class Scanner:
         GridState.notify(
             event = 'actualization_grid',
             data = GridMode.ALBUM
+        )
+        FavoriteState.notify(
+            event = "actualization_favorites",
+            data = None
         )
 
         

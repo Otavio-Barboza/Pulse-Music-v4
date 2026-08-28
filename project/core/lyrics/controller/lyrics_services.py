@@ -187,7 +187,7 @@ class LyricsServices:
             "translations" : []
         }
 
-        Utils.async_update_json(
+        await Utils.async_update_json(
             data = existing_letters, 
             path =  AppPaths.ACCOUNT / AccountManager.accounts_cache.get("current_account") / "music" / "lyrics.json"
         )

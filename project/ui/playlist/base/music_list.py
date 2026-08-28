@@ -42,10 +42,6 @@ class ListViewMusic(ft.ListView):
             callback = self.acutalization_container
         )
         PlaylistState.register_callback(
-            event = 'update_displayed_musics',
-            function = self.reload
-        )
-        PlaylistState.register_callback(
             event = 'actualization_not_favorited',
             function = self.actualization_unfavorited
         )
@@ -61,7 +57,7 @@ class ListViewMusic(ft.ListView):
         if self.favorite_mode is not None:            
             self._callback_favoritar = self.add_favorite
             self._callback_desfavoritar = self.remove_favorite
-
+            
             FavoriteState.register_callback(
                 event = 'add_to_favorites',
                 callback = self.add_favorite
@@ -71,13 +67,21 @@ class ListViewMusic(ft.ListView):
                 callback = self.remove_favorite
             )
 
+        if self.favorite_mode is None:
+            PlaylistState.register_callback(
+                event = 'update_displayed_musics',
+                function = self.reload
+            )
+    
     def will_unmount(self):        
         ReproductionManager._callbacks["actualization_container"].remove(self._callback)
-        PlaylistState._callbacks["update_displayed_musics"].remove(self._callback_qtde)
         PlaylistState._callbacks["actualization_not_favorited"].remove(self._callback_favoritas)
         PlaylistState._callbacks["actualization_favorited"].remove(self._callback_favorita)
         PlaylistState._callbacks["update_covers_and_names"].remove(self._callback_update_containers)
-        
+
+        if self.favorite_mode is None:
+            PlaylistState._callbacks["update_displayed_musics"].remove(self._callback_qtde)
+
         if self.favorite_mode is not None:
             FavoriteState._callbacks["add_to_favorites"].remove(self._callback_favoritar)
             FavoriteState._callbacks["unfavorite"].remove(self._callback_desfavoritar)
@@ -131,6 +135,20 @@ class ListViewMusic(ft.ListView):
                 self.update()
             except Exception as e:
                 print(f'CALLBACK RECARREGA PLATLIST ERROR: {e}')
+
+
+    # def reload_favorites(self):
+    #     if (
+    #         isinstance(PlaylistState.playlist_loaded, dict) and
+    #         PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
+    #     ):
+    #         try:
+    #             font = PlaylistFont(
+    #                 path = ...,
+    #                 mode = ReproductionMode.FAVORITE
+    #             )
+
+    #             self.musics = font.load()
 
     def add_favorite(self, data):
         if self.favorite_mode is None:

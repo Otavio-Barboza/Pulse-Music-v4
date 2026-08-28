@@ -110,12 +110,18 @@ class TabsNavigation(ft.Tabs):
         self.albums.update()
 
     def connect(self):
+        from core.favorite.controller.favoritas_controller import FavoriteState
+
         # registrando callbacks
         ResizeManager.register(self._adjust_tabs)
         self.playlist.connect()
         self.artists.connect()
         self.albums.connect()
 
+        FavoriteState.register_callback(
+            event = "actualization_favorites",
+            callback = self.load_favorites
+        )
 
     # CRIAÇÃO DOS ITENS
     def _create_tabs(self):
@@ -156,13 +162,12 @@ class TabsNavigation(ft.Tabs):
 
         self.update()
     
-    def load_favorites(self):
+    def load_favorites(self, *_):
         from core.song.model.song import Song
         from core.favorite.controller.favoritas_controller import FavoriteState
         from core.song.model.reproduction import Reproduction
         from core.song.enum.song_enum import ReproductionMode
         
-
         list_musics: list[Song] = FavoriteState.list_favorited_objects()
             
         self.tabs[3].content = Favorite(

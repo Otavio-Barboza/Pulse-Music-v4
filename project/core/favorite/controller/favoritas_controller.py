@@ -18,6 +18,7 @@ class FavoriteState:
 
     # lista com objetos Song
     favorite_list: list[Song] = []
+    
 
     @classmethod
     def register_callback(cls, event: str, callback : callable):

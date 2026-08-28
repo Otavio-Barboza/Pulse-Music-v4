@@ -7,6 +7,7 @@ from core.song.model.audio import AudioProcess
 from core.song.enum.song_enum import ReproductionMode
 from core.song.repository.song_repository import SongRepository
 from core.lyrics.controller.lyrics_services import LyricsServices
+from core.services.controllers.async_manager import AsyncManager
 
 # import geral
 from pathlib import Path
@@ -65,6 +66,8 @@ class ReproductionManager:
         random.shuffle(cls._random_queue)
 
         cls._current_index = 0
+
+        print(f"(set_fonte) - Fonte atual: {cls.current_font}")
 
     @classmethod
     def update_queues(cls):        
@@ -143,11 +146,24 @@ class ReproductionManager:
 
         cls.state.current_song = song
         cls.state.current_time = 0
-        
-        if ReproductionManager.current_font != ReproductionMode.PLAYLIST:
-            Player.load_song(Path(song.path))
+
+
+        if (
+            ReproductionManager.current_font == ReproductionMode.ARTIST
+            or ReproductionManager.current_font == ReproductionMode.ALBUM
+        ):
+            Player.load_song(
+                Path(song.path)
+            )
+        elif (
+            ReproductionManager.current_font == ReproductionMode.PLAYLIST
+            or ReproductionManager.current_font == ReproductionMode.FAVORITE
+        ):
+            Player.load_song(
+                Path(song.path) / f"{song.name}.mp3"
+            )
         else:
-            Player.load_song(Path(song.path) / f"{song.name}.mp3")
+            return
             
         Player.play()
 
@@ -157,7 +173,7 @@ class ReproductionManager:
         cls.notify('play/pause')
         cls.notify('current_song')
         
-        asyncio.create_task(
+        AsyncManager.create_task(
             LyricsServices.notify_callback_lyrics(
                 event = 'get_lyrics',
                 data = {
@@ -170,7 +186,7 @@ class ReproductionManager:
 
         if LyricsServices.expanded_screen:
             LyricsServices.notify(
-                event = 'actualization_letra',
+                event = 'actualization_lyric',
                 data = None
             )
 

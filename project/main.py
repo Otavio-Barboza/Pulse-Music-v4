@@ -18,6 +18,7 @@ from core.meta.cache.global_cache import cache_metadata
 from core.meta.cache.cache_artists import CacheArtists
 from core.lyrics.cache.cache_lyrics import CacheLyrics
 from core.services.controllers.state_app import StateApp
+from core.services.controllers.async_manager import AsyncManager
 from core.network.connection import Connection
 
 # imports de bibliotecas  gerais
@@ -201,7 +202,7 @@ async def main(page: ft.Page):
 
     tabs.connect()
     player.connect()
-
+    
 
     """  Inicializações gerais  """
 
@@ -212,6 +213,7 @@ async def main(page: ft.Page):
     page.on_resized = ResizeManager.to_execute
    
     AudioProcess.start()
+    AsyncManager.start()
     
 
     """  Notificação e execução de eventos globais  """

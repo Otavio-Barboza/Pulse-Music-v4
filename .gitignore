@@ -7,10 +7,6 @@ __pycache__/
 *.pyc
 .vscode/
 
-Assets/Data/Contas/*
-!Assets/Data/Contas/EXEMPLO/
-!Assets/Data/Contas/EXEMPLO/**
-
 project\storage\*
 # Instaladores
 release\windows\**

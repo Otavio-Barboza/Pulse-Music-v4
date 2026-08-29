@@ -1,0 +1,16 @@
+[project]
+name = "pulse-music"
+version = "0.1.0"
+dependencies = [
+    "flet==0.28.3",
+    # demais dependências do player
+]
+
+[tool.flet]
+org = "com.barbozasoftware"
+product = "Pulse Music"
+company = "Barboza Software"
+copyright = "Copyright (C) 2026"
+
+[tool.flet.app]
+path = "."

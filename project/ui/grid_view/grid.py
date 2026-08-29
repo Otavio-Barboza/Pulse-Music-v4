@@ -8,6 +8,8 @@ from core.meta.cache.global_cache import cache_metadata
 from core.meta.repository.extract_metadata import ExtractMetadata
 from core.services.account_manager import AccountManager
 from core.utils.path import AppPaths
+from core.song.model.song import Song
+
 
 # imports gerais
 from pathlib import Path
@@ -108,24 +110,24 @@ class GridImages(ft.GridView):
             func = self.reload
         )
 
+    def _return_song_list(
+        self, 
+        event, 
+        playlist_mode: ReproductionMode,
+        data: dict
+    ) -> list[Song]:
+        
+        song_list: list[Song] = []
 
-    def click(self, e):
-        from core.song.model.song import Song
-        from core.song.model.reproduction import Reproduction
-        
-        song_list = []
-        
         if self.mode == GridMode.ARTIST:
-            modo_playlist = ReproductionMode.ARTIST
-            dados = cache_metadata.artists.to_dict()
             
-            for key, song in dados.get(e.control.data).items():
+            for key, song in data.get(event.control.data).items():
                 if key == 'songs':
                     for music in song:
 
                         song_list.append(
                             Song(
-                                mode = modo_playlist,
+                                mode = playlist_mode,
                                 name = os.path.basename(str(
                                     music.get("artist_path")
                                 )),
@@ -133,18 +135,10 @@ class GridImages(ft.GridView):
                                 key = music.get('key')
                             )
                         )
-                
-            path = dados.get(e.control.data).get('songs')[0].get('artist_path')
-            img = ExtractMetadata.load_image_big_base64(
-                file_path = path, 
-                type = 'artist'
-            )
-            name = dados.get(e.control.data).get('artist_name')
-        else:
-            modo_playlist = ReproductionMode.ALBUM
-            dados = cache_metadata.albums.to_dict()
+
+        elif self.mode == GridMode.ALBUM:
             
-            for song in dados.get(e.control.data).values():
+            for song in data.get(event.control.data).values():
                 for song_path in song:
                     song_list.append(
                         Song(
@@ -157,7 +151,41 @@ class GridImages(ft.GridView):
                             path = str(song_path.get('destination_song')),
                             key = song_path.get('key_song')
                         ) 
-                    )                
+                    )
+
+        return song_list
+
+    def click(self, e):
+        from core.song.model.reproduction import Reproduction
+        
+        song_list: list[Song]
+        
+        if self.mode == GridMode.ARTIST:
+            playlist_mode = ReproductionMode.ARTIST
+            data = cache_metadata.artists.to_dict()
+
+            song_list = self._return_song_list(
+                event = e,
+                playlist_mode = playlist_mode,
+                data = data
+            )
+
+            path = data.get(e.control.data).get('songs')[0].get('artist_path')
+            img = ExtractMetadata.load_image_big_base64(
+                file_path = path, 
+                type = 'artist'
+            )
+
+            name = data.get(e.control.data).get('artist_name')
+        else:
+            playlist_mode = ReproductionMode.ALBUM
+            data = cache_metadata.albums.to_dict()
+
+            song_list = self._return_song_list(
+                event = e,
+                playlist_mode = playlist_mode,
+                data = data
+            )
 
             for song in song_list:
                 if song.path is not None:
@@ -168,6 +196,7 @@ class GridImages(ft.GridView):
                 file_path = path, 
                 type = 'album'
             )
+
             name = e.control.data
 
         self.page.overlay.clear()
@@ -180,14 +209,18 @@ class GridImages(ft.GridView):
                 ),
                 mode = self.mode,
                 name = name,
-                playlist_mode = modo_playlist,
-                page = self.page
+                playlist_mode = playlist_mode,
+                page = self.page,
+                function_update_musics = self._return_song_list
             )
         )
         self.page.update()
+
+        GridState.set_current_mode(playlist_mode)
+        GridState.set_open_grid_playlist(True)
         
         Reproduction.load_songs_from_mode(
-            mode = modo_playlist,
+            mode = playlist_mode,
             list = song_list
         )
 

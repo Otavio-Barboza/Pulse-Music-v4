@@ -18,7 +18,12 @@ import flet as ft
 
 
 class ListViewMusic(ft.ListView):
-    def __init__(self, page: ft.Page, musics: list[Song], favorite_mode: ReproductionMode | None = None):
+    def __init__(
+        self, 
+        page: ft.Page, 
+        musics: list[Song], 
+        favorite_mode: ReproductionMode | None = None
+    ):
         super().__init__(
             spacing = 10,
             expand = True
@@ -72,6 +77,7 @@ class ListViewMusic(ft.ListView):
                 event = 'update_displayed_musics',
                 function = self.reload
             )
+
     
     def will_unmount(self):        
         ReproductionManager._callbacks["actualization_container"].remove(self._callback)
@@ -135,20 +141,6 @@ class ListViewMusic(ft.ListView):
                 self.update()
             except Exception as e:
                 print(f'CALLBACK RECARREGA PLATLIST ERROR: {e}')
-
-
-    # def reload_favorites(self):
-    #     if (
-    #         isinstance(PlaylistState.playlist_loaded, dict) and
-    #         PlaylistState.playlist_loaded['open_or_close'] == PlaylistLoaded.OPEN
-    #     ):
-    #         try:
-    #             font = PlaylistFont(
-    #                 path = ...,
-    #                 mode = ReproductionMode.FAVORITE
-    #             )
-
-    #             self.musics = font.load()
 
     def add_favorite(self, data):
         if self.favorite_mode is None:

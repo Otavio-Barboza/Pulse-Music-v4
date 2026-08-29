@@ -20,6 +20,7 @@ class OverlayImages(ft.Container):
         image_big : str, 
         music : list, 
         name : str,
+        # function_update_musics: callable
     ):
         super().__init__(
             height = 700,
@@ -33,6 +34,7 @@ class OverlayImages(ft.Container):
         self.playlist_mode = playlist_mode
         self.mode = mode
         self.music = music
+        # self.function_update_musics = function_update_musics
 
         self.content = ft.ResponsiveRow(
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
@@ -94,7 +96,7 @@ class OverlayImages(ft.Container):
                                 content = ListViewMusic(
                                     page = self.page,
                                     musics = self.music,
-                                    favorite_mode = None
+                                    favorite_mode = None,
                                 )
                             )
                         ]
@@ -102,8 +104,3 @@ class OverlayImages(ft.Container):
                 )
             ]
         )
-        
-        # PlaylistState.open_playlist(
-        #     id = card.data["id"],
-        #     status = PlaylistLoaded.OPEN
-        # )

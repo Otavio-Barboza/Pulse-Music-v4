@@ -119,7 +119,7 @@ class Scanner:
                         "added_to_page" : True
                     }
                 )
-            
+
             _changed = False
 
         await asyncio.sleep(1)

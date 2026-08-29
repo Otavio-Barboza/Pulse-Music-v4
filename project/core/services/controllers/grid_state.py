@@ -9,7 +9,11 @@ class GridMode(Enum):
     
     
 class GridState:
+
+    # current_mode: GridMode | None = None
+    # open_grid_playlist: bool = False
     _callbacks = {}
+
     
     @classmethod
     def register_callback(cls, event: str, func: callable):
@@ -32,3 +36,11 @@ class GridState:
                         asyncio.create_task(res)
             except Exception as e:
                 print(e)
+
+    # @classmethod
+    # def set_current_mode(cls, mode: GridMode):
+    #     cls.current_mode = mode
+
+    # @classmethod
+    # def set_open_grid_playlist(cls, value: bool):
+    #     cls.open_grid_playlist = value

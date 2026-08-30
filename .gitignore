@@ -8,6 +8,6 @@ __pycache__/
 .vscode/
 
 project\storage\*
-project\build\*
+project\build\**
 # Instaladores
 release\windows\**

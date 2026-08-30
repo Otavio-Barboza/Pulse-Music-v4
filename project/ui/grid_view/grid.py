@@ -210,14 +210,14 @@ class GridImages(ft.GridView):
                 mode = self.mode,
                 name = name,
                 playlist_mode = playlist_mode,
-                page = self.page,
-                function_update_musics = self._return_song_list
+                page = self.page
+                # function_update_musics = self._return_song_list
             )
         )
         self.page.update()
 
-        GridState.set_current_mode(playlist_mode)
-        GridState.set_open_grid_playlist(True)
+        # GridState.set_current_mode(playlist_mode)
+        # GridState.set_open_grid_playlist(True)
         
         Reproduction.load_songs_from_mode(
             mode = playlist_mode,

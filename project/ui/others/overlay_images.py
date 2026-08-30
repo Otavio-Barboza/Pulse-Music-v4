@@ -96,7 +96,7 @@ class OverlayImages(ft.Container):
                                 content = ListViewMusic(
                                     page = self.page,
                                     musics = self.music,
-                                    favorite_mode = None,
+                                    favorite_mode = None
                                 )
                             )
                         ]

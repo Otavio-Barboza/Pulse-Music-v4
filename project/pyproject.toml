@@ -1,9 +1,19 @@
 [project]
-name = "pulse-music"
+name = "Pulse Music"
 version = "0.1.0"
 dependencies = [
     "flet==0.28.3",
-    # demais dependências do player
+    "requests==2.32.5",
+    "deep-translator==1.11.4",
+    "python-dotenv==1.1.1",
+    "lyricsgenius==3.7.2",
+    "langdetect==1.0.9",
+    "aiohttp==3.12.15",
+    "mutagen==1.47.0",
+    "google-auth-oauthlib==1.2.2",
+    "aiofiles==25.1.0",
+    "pyglet==2.1.15",
+    "pywhatkit==5.4"
 ]
 
 [tool.flet]

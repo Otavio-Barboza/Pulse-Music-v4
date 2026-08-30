@@ -21,8 +21,8 @@ Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; GroupDesc
 Source: "..\project\build\windows\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Pulse Music"; Filename: "{app}\Pulse Music.exe"
-Name: "{autodesktop}\Pulse Music"; Filename: "{app}\Pulse Music.exe"; Tasks: desktopicon
+Name: "{group}\Pulse Music"; Filename: "{app}\pulse_music.exe"
+Name: "{autodesktop}\Pulse Music"; Filename: "{app}\pulse_music.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\Pulse Music.exe"; Description: "Executar Pulse Music"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\pulse_music.exe"; Description: "Executar Pulse Music"; Flags: nowait postinstall skipifsilent

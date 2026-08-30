@@ -7,7 +7,7 @@ __pycache__/
 *.pyc
 .vscode/
 
-project\storage\*
-project\build\**
+project/storage/*
+project/build/**
 # Instaladores
-release\windows\**
+release/windows/**

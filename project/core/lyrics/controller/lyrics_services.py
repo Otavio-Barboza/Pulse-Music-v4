@@ -9,7 +9,7 @@ from core.utils.path import AppPaths
 
 # import geral
 from deep_translator.exceptions import TranslationNotFound
-import requests, time, asyncio
+import requests, asyncio
 
 
 class LyricsServices:

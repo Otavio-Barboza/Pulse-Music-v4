@@ -4,7 +4,6 @@ from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
-import os, json
 
 
 """ _summary_: 

@@ -1,7 +1,3 @@
-# import geral
-import threading
-
-
 class Monitoring:
 
     @classmethod

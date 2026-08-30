@@ -7,7 +7,7 @@ from core.utils.path import AppPaths
 
 # imports gerais
 from pathlib import Path
-import json, aiofiles, os, requests
+import requests
 
 
 class MetadataRepository:

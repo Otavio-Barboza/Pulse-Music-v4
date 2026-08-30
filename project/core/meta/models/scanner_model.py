@@ -6,7 +6,7 @@ from core.meta.scanner.scanner import Scanner
 from ui.utils.utils_ui import UtilsUi
 
 # imports gerais
-import asyncio, os
+import asyncio
 
 
 class ScannerModel:

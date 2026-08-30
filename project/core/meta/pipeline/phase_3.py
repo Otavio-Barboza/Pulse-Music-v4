@@ -12,7 +12,7 @@ from core.meta.pipeline.helpers.analysis import analyze_consensus, choose_artist
 
 # imports gerais
 from pathlib import Path
-import aiohttp, os
+import aiohttp
 
 
 class Phase3:

@@ -5,7 +5,7 @@ from core.network.network import network
 from ui.utils.utils_ui import UtilsUi
 
 # import geral
-import aiohttp, asyncio, flet, time
+import asyncio, flet
 
 
 class Connection:

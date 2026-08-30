@@ -3,6 +3,7 @@ from core.utils.utils import Utils
 from core.utils.path import AppPaths
 from core.services.account_manager import AccountManager
 
+
 class CacheLyrics:
     
     lyric = {}

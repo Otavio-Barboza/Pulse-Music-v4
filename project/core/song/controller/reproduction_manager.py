@@ -130,9 +130,7 @@ class ReproductionManager:
     def play(cls):
         cls.state.current_time = 0
 
-        if not cls._is_monitoring:
-            cls.start_time_monitor()
-            cls._is_monitoring = True
+        cls.start()
 
         if not cls._queue:
             return
@@ -252,32 +250,21 @@ class ReproductionManager:
     @classmethod
     def set_drag_slider(cls, value: bool):
         cls._slider_dragging = value
-        
+
     @classmethod
     def start(cls):
         if cls._is_monitoring:
             return
-        
-        cls._is_monitoring = True
+
+        # Registra o recebimento do evento de término enviado pelo audio_main.exe.
+        AudioProcess.register_event_callback(
+            event = "song_finished",
+            callback = cls._on_song_finished
+        )
+
         cls.start_time_monitor()
+        cls._is_monitoring = True
 
-
-    @classmethod
-    def process_audio_events(cls):
-        """
-            Processa os eventos enviados pelo processo de áudio.
-
-            O processo de áudio apenas informa o que aconteceu.
-            A decisão sobre o que fazer pertence ao ReproductionManager.
-        """
-
-        for event, value in AudioProcess.process_events():
-
-            match event:
-
-                case "end_of_song":
-                    cls.handle_end_of_music()
-                    
     @classmethod
     def start_time_monitor(cls):
 
@@ -291,29 +278,24 @@ class ReproductionManager:
 
             while True:
 
-                # Obtém os estados mais recentes enviados pelo processo de áudio
-                AudioProcess.update_state()
-
-                # Verifica se o processo de áudio enviou algum evento, como o término da música.
-                cls.process_audio_events()
-
                 if (
                     cls.state.is_playing 
                     and not cls._slider_dragging
                 ):
-                    # Obtém a duração atual através do estado recebido do processo de áudio.
-                    current_duration: float = Player.current_duration()
+                    # O AudioProcess mantém o estado recebido do audio_main.exe
+                    current_duration = Player.current_duration()
 
                     if (
                         cls.state.total_time != current_duration
                         or current_duration == 0.0
                     ):
                         cls.update_total_time()
-                        cls.notify('slider')
+                        cls.notify("slider")
 
                     # Obtém a posição atual através do estado recebido do processo de áudio.
-                    temp: float = Player.current_position()
-                    cls.update_time(temp)
+                    cls.update_time(
+                        Player.current_position()
+                    )
                     
                 time.sleep(0.2)
 
@@ -348,20 +330,27 @@ class ReproductionManager:
         Player.go_to(value)
         cls.notify('slider_position')
 
-
-    # VOLUME
     @classmethod
     def set_volume(cls, volume: float):
+        print(f"[REPRODUCTION MANAGER] volume: {volume}")
         cls.state.volume = volume
         Player.set_volume(cls.state.volume)
-        cls.notify('volume')
+        cls.notify("volume")
 
     
     # TRATAMENTO AUTOMÁTICO DA MÚSICA
     @classmethod
-    def handle_end_of_music(cls):
-        print(f"(handle_end_of_music): {cls.configuration.repeat}")
+    def _on_song_finished(cls, data: dict):
+        """
+            Recebe a informação de que o audio_main.exe terminou naturalmente a música.
 
+            A decisão sobre a próxima reprodução continua pertencendo ao ReproductionManager.
+        """
+        print("[REPRODUCTION] Música terminou, avançando...")
+        cls.handle_end_of_music()
+
+    @classmethod
+    def handle_end_of_music(cls):
         if cls.configuration.repeat:
             cls.play()
         else:

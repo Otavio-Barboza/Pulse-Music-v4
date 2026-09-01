@@ -22,9 +22,8 @@ from core.services.controllers.async_manager import AsyncManager
 from core.network.connection import Connection
 
 # imports de bibliotecas  gerais
-from multiprocessing import freeze_support
 from pathlib import Path
-import asyncio, sys, multiprocessing
+import asyncio
 import flet as ft
 
 
@@ -213,9 +212,6 @@ async def main(page: ft.Page):
     
     page.on_resized = ResizeManager.to_execute
 
-    multiprocessing.set_executable(sys.executable)
-    print("sys.executable:", sys.executable)
-
     AudioProcess.start()
     AsyncManager.start()
     
@@ -227,8 +223,6 @@ async def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    freeze_support()
-    
     asyncio.run(
         ft.app_async(
             target = main, 

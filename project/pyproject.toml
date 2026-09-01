@@ -24,3 +24,8 @@ copyright = "Copyright (C) 2026"
 
 [tool.flet.app]
 path = "."
+
+[tool.flet.app.windows]
+data = [
+"assets/app/audio_main.exe"
+]

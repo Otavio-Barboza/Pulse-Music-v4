@@ -1,14 +1,31 @@
+# Itens gerais para não subir ao github.
 .env
-client_secret_google.json
-contas.json
+
 
 # pycache e elementos do VsCode
 __pycache__/
 *.pyc
 .vscode/
 
+
+# Itens não necessários do projeto para subir.
 project/storage/*
 project/build/**
+
+
 # Instaladores
 release/windows/**
+
+
+# teste pessoais realizados. Não necessários subir ao github.
 test/**
+
+
+# Áudio: processo de áudio executável. Player necessita dele para reproduzir as músicas.
+audio/**
+!audio/audio_main.py
+
+
+# Conteúdos de assets que não devem subir ao github
+client_secret_google.json
+audio_main.exe

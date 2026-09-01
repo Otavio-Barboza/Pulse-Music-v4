@@ -50,8 +50,7 @@ class Player:
             Pausa a reprodução e retorna a posição para o início.
         """
 
-        AudioProcess.send_command("pause")
-        AudioProcess.send_command("seek", 0)
+        AudioProcess.send_command("stop")
     
     @classmethod
     def formatted_total_duration(cls) -> str:
@@ -133,3 +132,7 @@ class Player:
             Solicita ao processo de áudio que altere a posição atual da música.
         """
         AudioProcess.send_command("seek", seconds)
+
+    @classmethod
+    def get_audio_state(cls) -> dict:
+        return AudioProcess.get_audio_state()

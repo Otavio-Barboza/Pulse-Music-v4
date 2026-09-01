@@ -11,3 +11,4 @@ project/storage/*
 project/build/**
 # Instaladores
 release/windows/**
+test/**

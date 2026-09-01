@@ -24,7 +24,7 @@ from core.network.connection import Connection
 # imports de bibliotecas  gerais
 from multiprocessing import freeze_support
 from pathlib import Path
-import asyncio
+import asyncio, sys, multiprocessing
 import flet as ft
 
 
@@ -212,8 +212,11 @@ async def main(page: ft.Page):
     tabs.load_favorites()
     
     page.on_resized = ResizeManager.to_execute
-   
-    # AudioProcess.start()
+
+    multiprocessing.set_executable(sys.executable)
+    print("sys.executable:", sys.executable)
+
+    AudioProcess.start()
     AsyncManager.start()
     
 

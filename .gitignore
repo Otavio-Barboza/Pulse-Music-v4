@@ -29,3 +29,8 @@ audio/**
 # Conteúdos de assets que não devem subir ao github
 client_secret_google.json
 audio_main.exe
+information_main.exe
+
+# informations
+information/**
+project/core/information/**

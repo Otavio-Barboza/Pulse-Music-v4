@@ -1,4 +1,4 @@
-# Pulse Music v4
+# Pulse Music
 
 Projeto desenvolvido como Trabalho de Conclusão de Curso; 
 Efetuando ainda no Ensino Médio Técnico Integrado (Informática);

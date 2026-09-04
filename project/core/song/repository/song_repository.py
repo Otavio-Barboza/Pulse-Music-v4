@@ -22,6 +22,7 @@ class SongRepository:
         music_list_path: list[str] = [
             str(path / song)
             for song in os.listdir(path)
+            if (path / song).suffix.lower() == ".mp3"
         ]
         music_list_json: list[str] = [
             key
@@ -36,7 +37,9 @@ class SongRepository:
                     path = path / song,
                     key = Task.return_track_id(path / song),
                     mode = mode
-                ) for song in sorted(os.listdir(path), key = str.casefold)
+                ) for song in sorted(
+                    os.listdir(path), key = str.casefold
+                ) 
             ]
         else:
             return [

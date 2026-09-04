@@ -12,8 +12,6 @@ class AppPaths:
 
     # assets
     ASSETS_IMAGE: Path = BASE_DIR / "assets" / "image"
-    ASSETS_JSON: Path = BASE_DIR / "assets" / "auth" / "client_secret_google.json"
-
 
     # local app data do windows
     LOCAL_APP_DATA: Path = Path(os.getenv("LOCALAPPDATA")) / "Barboza Software" / "Pulse Music"

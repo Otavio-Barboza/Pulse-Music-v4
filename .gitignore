@@ -31,6 +31,8 @@ client_secret_google.json
 audio_main.exe
 information_main.exe
 
+
 # informations
 information/**
-project/core/information/**
+!information/README.md
+# !information/information_main_example.py

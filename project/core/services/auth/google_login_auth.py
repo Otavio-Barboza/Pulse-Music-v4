@@ -5,6 +5,7 @@ from ui.utils.utils_ui import UtilsUi
 from core.services.account_manager import AccountManager
 from core.utils.path import AppPaths
 from core.utils.utils import Utils
+from core.information.service.information_service import InformationService
 
 # imports gerais
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -45,11 +46,10 @@ async def login_google(page):
     # então essa parte continua síncrona mesmo (não tem como mudar),
     # mas o resto (requisição da foto) será async.
 
-    _FLOW = InstalledAppFlow.from_client_secrets_file(
-        AppPaths.ASSETS_JSON,
+    _FLOW = InstalledAppFlow.from_client_config(
+        InformationService.get("GOOGLE"),
         scopes = _SCOPES
     )
-
     _CREDS = _FLOW.run_local_server(port = 0)
 
     # Agora buscamos as informações do usuário via chamada async
@@ -69,6 +69,7 @@ async def login_google(page):
 
     # validando conta, já a selecionada no login já exista é dado o return para encerrar o processo.
     accounts_json = await Utils.async_load_json(AppPaths.ACCOUNT_JSON)
+
     account: dict
     for account in accounts_json.get("accounts"):
         if account.get("id") == _account_id:

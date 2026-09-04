@@ -1,11 +1,10 @@
+# import de back-end
+from core.information.service.information_service import InformationService
+
 # imports gerais
 from email.message import EmailMessage
 from datetime import datetime
-import smtplib, dotenv, os
-
-
-dotenv.load_dotenv(r'Assets\App\Env\.env')
-SENHA_APP = os.getenv('SENHA_APP')
+import smtplib
 
 
 def send_email(
@@ -38,5 +37,7 @@ def send_email(
     )
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(EMAIL_APP, SENHA_APP)
+        smtp.login(
+            EMAIL_APP, InformationService.get("APP")
+        )
         smtp.send_message(msg)

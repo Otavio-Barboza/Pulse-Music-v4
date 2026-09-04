@@ -1,22 +1,22 @@
 # imports de back-end
-from core.lyrics.model.genius import Genius
 from core.lyrics.translate.translator import Translator
 from core.lyrics.cache.cache_lyrics import CacheLyrics
 from core.lyrics.translate.language_detect import language_detect
 from core.services.account_manager import AccountManager
 from core.utils.utils import Utils
 from core.utils.path import AppPaths
+from core.information.service.information_service import InformationService
 
 # import geral
 from deep_translator.exceptions import TranslationNotFound
-import requests, asyncio
+import requests, asyncio, lyricsgenius
 
 
 class LyricsServices:
 
     expanded_screen: bool = False
     
-    GENIUS = Genius()
+    genius = None
     translator = Translator()
 
     AVAILABLE_LANGUAGES: dict[str, str] = {}    
@@ -26,7 +26,6 @@ class LyricsServices:
         ] = uf
 
     callbacks = {}
-
 
     # callbacks, registros e chamadas
     @classmethod
@@ -40,6 +39,23 @@ class LyricsServices:
         for callback in cls.callbacks.get(event, []):
             callback(data)
 
+    @classmethod
+    def initializate_genius(cls) -> str:
+        cls.genius = lyricsgenius.Genius(
+            access_token = InformationService.get("GENIUS"),
+            response_format = "plain",
+            timeout = 15,
+            sleep_time = 0.2,
+            remove_section_headers = True,
+            skip_non_songs = True,
+            excluded_terms = ["(Remix)", "(Live)"],
+            replace_default_terms = False,
+            retries = 0,
+            user_agent = "",
+            proxy = None
+        )
+        print(f"[LYRICS SERVICE]: genius inicializado: {cls.genius}")
+    
     @classmethod
     async def notify_callback_lyrics(cls, data, event: str):
         for callback in cls.callbacks.get(event, []):
@@ -67,7 +83,7 @@ class LyricsServices:
                 return
             
             song = await asyncio.to_thread(
-                cls.GENIUS.search_song,
+                cls.genius.search_song,
                 title = data.get("name"),
                 artist = data.get("artist")
             )
@@ -275,3 +291,9 @@ class LyricsServices:
         
         # retorna a letra traduzida
         return translated_lyric
+
+
+InformationService.register_callback_event(
+    event = "initializate_genius",
+    callback = LyricsServices.initializate_genius
+)

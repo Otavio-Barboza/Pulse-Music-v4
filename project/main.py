@@ -20,6 +20,7 @@ from core.lyrics.cache.cache_lyrics import CacheLyrics
 from core.services.controllers.state_app import StateApp
 from core.services.controllers.async_manager import AsyncManager
 from core.network.connection import Connection
+from core.information.process.information_process import InformationProcess
 
 # imports de bibliotecas  gerais
 from pathlib import Path
@@ -136,6 +137,13 @@ async def main(page: ft.Page):
     async def start_scanner():
         await ScannerModel.async_start_scanner(page)
 
+
+    """  INICIALIZAÇÃO DE SERVIÇOS AUXILIARES  """
+
+    AudioProcess.start()
+    InformationProcess.start()
+    AsyncManager.start()
+
     
     """  Validar login  """
 
@@ -211,9 +219,6 @@ async def main(page: ft.Page):
     tabs.load_favorites()
     
     page.on_resized = ResizeManager.to_execute
-
-    AudioProcess.start()
-    AsyncManager.start()
     
 
     """  Notificação e execução de eventos globais  """

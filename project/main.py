@@ -226,8 +226,6 @@ async def main(page: ft.Page):
     page.run_task(start_scanner)
     page.run_task(start_connection)
 
-    print("fazendo um teste")
-
 
 if __name__ == "__main__":
     asyncio.run(

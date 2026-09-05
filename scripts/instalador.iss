@@ -1,7 +1,7 @@
 [Setup]
 AppId={{7C4E6A91-3F28-4B75-9D62-8A1F5C73E204}
 AppName=Pulse Music
-AppVersion=0.1.0
+AppVersion=0.2.0
 AppPublisher=Barboza Software
 DefaultDirName={autopf}\Pulse Music
 DefaultGroupName=Pulse Music

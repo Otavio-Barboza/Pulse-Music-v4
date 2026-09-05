@@ -29,19 +29,19 @@ class ReproductionManager:
     _slider_dragging: bool = False
 
     _callbacks: dict[str, list] = {
-        'volume' : [],
-        'total_time' : [],
-        'slider_position' : [],
-        'current_song' : [], # callback para marcar musica que estiver tocando no momento.
-        'slider' : [],
-        'actualization_container' : [],
-        'play/pause' : [],
-        'repeat' : [],
-        'shuffle' : []
+        "volume" : [],
+        "total_time" : [],
+        "slider_position" : [],
+        "current_song" : [], # callback para marcar musica que estiver tocando no momento.
+        "slider" : [],
+        "actualization_container" : [],
+        "play/pause" : [],
+        "repeat" : [],
+        "shuffle" : []
     }
 
     LyricsServices.register_callback(
-        event = 'get_lyrics',
+        event = "get_lyrics",
         callback = LyricsServices.get_lyric
     )
 

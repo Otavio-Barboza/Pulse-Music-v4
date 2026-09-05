@@ -7,6 +7,8 @@ class StateApp:
     open_settings = False
     current_configuration_session = None
     overlay_tips = True
+
+    expanded_section_is_open: bool = False
     _callbacks = {}
 
 

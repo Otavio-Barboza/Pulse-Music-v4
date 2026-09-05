@@ -26,10 +26,7 @@ class InformationService:
             "key" : key
         })
 
-        print(f"[INFORMATION SERVICE] Response: {response}")
-        print(f"[INFORMATION SERVICE] Response: {response}")
         print(f"[INFORMATION SERVICE] Success: {response.get('success')}")
-        print(f"[INFORMATION SERVICE] Not success: {not response.get('success')}")
 
         if not isinstance(response, dict):
             raise RuntimeError(

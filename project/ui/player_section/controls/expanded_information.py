@@ -12,7 +12,7 @@ class ExpandedInformation(ft.Container):
             alignment = ft.alignment.center,
             padding = ft.padding.all(10),
         )
-        self.page = page
+        self._app_page = page
 
         self._image = ft.Container(
             col = 12,
@@ -32,7 +32,20 @@ class ExpandedInformation(ft.Container):
             ]
         )
 
-        ReproductionManager.register_callback('current_song', self.actualization_expanded_information)
+        self.callback = self.actualization_expanded_information
+
+
+    def did_mount(self):
+        if self.page is not None:
+            ReproductionManager.register_callback(
+                "current_song", 
+                self.callback
+            )        
+
+    def will_unmount(self):
+        if self.callback in ReproductionManager._callbacks["current_song"]:
+            ReproductionManager._callbacks["current_song"].remove(self.callback)
+
     
     def _create_text(self, value: str = '') -> ft.Text:
         return ft.Text(
@@ -50,7 +63,7 @@ class ExpandedInformation(ft.Container):
         )
     
     def actualization_expanded_information(self, *_):
+        from core.services.controllers.state_app import StateApp
+
         self._image.content.src = ReproductionManager.get_cover()
-        
-        if self.page:
-            self.update()
+        self._image.update()
